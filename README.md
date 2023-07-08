@@ -4,7 +4,7 @@
 
 - [ ] line login
 - [ ] google(firebase) login
-- [ ] products/category db
+- [ ] category db
 - [ ] favorite db?
 - [ ] comment db?
 - [ ] order db(order_item, shipping, payment)
@@ -13,6 +13,7 @@
 
 ## Changlog
 
+- +[faker](https://github.com/faker-js/faker)
 - fixed create table issue(executeQuery only one query each time) drop if exist then create
 - es6 import wo babel 
 - auth route (session-cookie should use?... no, use jwt)
