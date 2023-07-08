@@ -62,7 +62,7 @@ const guessDataType = (key, value) => {
     key.includes('_id') ||
     typeof value === 'number'
   ) {
-    return 'int'
+    return 'int '
   }
 
   if (
@@ -105,7 +105,7 @@ const generateCreateTableSql = (table, obj) => {
   const last = `PRIMARY KEY (${primaryKey}) ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`
 
   const sql = [first, ...sqlColumns, last].join(' ')
-  console.log(sql)
+
   return sql
 }
 
