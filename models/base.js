@@ -62,7 +62,7 @@ const guessDataType = (key, value) => {
     key.includes('_id') ||
     typeof value === 'number'
   ) {
-    return 'int(11) '
+    return 'int'
   }
 
   if (
@@ -78,7 +78,7 @@ const guessDataType = (key, value) => {
 
 // TODO: generate create sql from object
 // FIXME: need to test: has error for products json file(maybe mysql/mariadb version problem)
-const generateCreateSql = (table, obj, dropTableFirst = true) => {
+const generateCreateTableSql = (table, obj) => {
   const sqlColumns = []
   // first item key is primary key
   const primaryKey = Object.keys(obj)[0]
@@ -94,31 +94,37 @@ const generateCreateSql = (table, obj, dropTableFirst = true) => {
 
     // add default value string
     const defaultValue = guessDataType(key, value).includes('datetime')
-      ? 'DEFAULT CURRENT_TIMESTAMP'
-      : 'DEFAULT NULL'
+      ? ' DEFAULT CURRENT_TIMESTAMP'
+      : ' DEFAULT NULL'
 
     sqlColumns.push(`${key} ${guessDataType(key, value)}${defaultValue},`)
   }
 
-  const drop = dropTableFirst ? `DROP TABLE IF EXISTS ${table};` : ''
+  //const drop = dropTableFirst ? `DROP TABLE IF EXISTS ${table};` : ''
   const first = `CREATE TABLE ${table} (`
-  const last = `PRIMARY KEY (${primaryKey})
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`
+  const last = `PRIMARY KEY (${primaryKey}) ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`
 
-  const sql = [drop, first, ...sqlColumns, last].join('\n')
+  const sql = [first, ...sqlColumns, last].join(' ')
+  console.log(sql)
   return sql
 }
 
 // TODO:  create table dynamic form json sample files(simple guess)
 const createTable = async (table, obj, dropTableFirst = true) => {
+  if (dropTableFirst) {
+    await dropTable(table)
+  }
+
+  // generate create table sql and execute
   const { rows } = await executeQuery(
-    generateCreateSql(table, obj, dropTableFirst)
+    generateCreateTableSql(table, obj, dropTableFirst)
   )
+
   return rows[0]
 }
 
 const dropTable = async (table) => {
-  const { rows } = await executeQuery(`DROP TABLE ${table}`)
+  const { rows } = await executeQuery(`DROP TABLE IF EXISTS ${table}`)
   return rows
 }
 
