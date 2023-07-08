@@ -19,7 +19,9 @@ const debug = process.env.NODE_ENV === 'development'
  * @returns {Promise<{rows: array, fields: array}>}
  */
 const executeQuery = async (sql, logRows = false, logFields = false) => {
-  debug && console.log(sql.bgWhite)
+  // limit log string string length
+  const sqlLog = sql.length < 1500 ? sql : sql.slice(0, 1500) + '...'
+  debug && console.log(sqlLog.bgWhite)
 
   try {
     const [rows, fields] = await pool.execute(sql)
