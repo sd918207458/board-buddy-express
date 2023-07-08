@@ -2,15 +2,20 @@
 
 ## TODO
 
-- [] es6 import and babel [ref](https://www.freecodecamp.org/news/how-to-enable-es6-and-beyond-syntax-with-node-and-express-68d3e11fe1ab/)
-- [] products/category db
-- [] favorite db?
-- [] comment db?
-- [] order db(order_item, shipping, payment)
+- [ ] line login
+- [ ] google(firebase) login
+- [ ] products/category db
+- [ ] favorite db?
+- [ ] comment db?
+- [ ] order db(order_item, shipping, payment)
 
+## FIXME
+
+- [ ] create table bug
 
 ## Changlog
 
+- es6 import wo babel 
 - auth route (session-cookie should use?... no, use jwt)
 
 ### 20230604
@@ -23,5 +28,3 @@
 - json2db(create db and insert data) ok
 - db backup tool ok
 - create, drop, TRUNCATE db.... should need another TEST db?
-
-
