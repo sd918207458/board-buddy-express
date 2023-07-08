@@ -25,17 +25,18 @@
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
-    "eslint": "^7.5.0",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^5.0.0-alpha.2",
     "nodemon": "^1.19.4",
-    "prettier": "^2.0.5"
+    "prettier": "^3.0.0"
   },
   "type": "module",
   "engines": {
-    "node": ">=8.10.0"
+    "yarn": ">= 1.6",
+    "node": ">= 16.0"
   },
   "nodemonConfig": {
     "ignore": [
