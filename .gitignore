@@ -28,3 +28,4 @@ test.js
 
 package-lock.json
 yarn.lock
+data/json/faker-users.json
