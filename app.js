@@ -24,10 +24,11 @@ import 'colors'
 // fileStore的選項
 const fileStoreOptions = {}
 
+import authJwtRouter from './routes/auth-jwt.js'
+import authRouter from './routes/auth.js'
+import emailRouter from './routes/email.js'
 import indexRouter from './routes/index.js'
 import usersRouter from './routes/users.js'
-import authRouter from './routes/auth.js'
-import authJwtRouter from './routes/auth-jwt.js'
 
 const app = express()
 
@@ -68,9 +69,10 @@ app.use(
 )
 
 app.use('/api/', indexRouter)
-app.use('/api/users', usersRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/auth-jwt', authJwtRouter)
+app.use('/api/email', emailRouter)
+app.use('/api/users', usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
