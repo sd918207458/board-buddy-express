@@ -1,20 +1,21 @@
 import { totp } from 'otplib'
 import 'dotenv/config.js'
 
-// const secret = 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD'
+const sharedSecret = process.env.OTP_SECRET
 
-//const sharedSecret = reqJSON.contact_email + 'APICHALLENGE'
-const secret = process.env.OTP_SECRET
+// https://github.com/yeojz/otplib#totp-options
+// totp.options = { step: 30 } // 30s step
 
-totp.options = { step: 60 } // 60s step
-
+// generateToken
+// use email+sharedSecret for shared secret for each user
 const generateToken = (email = '') => {
-  return totp.generate(email + secret)
+  return totp.generate(email + sharedSecret)
 }
 
+// verifyToken - only for step 30s token verify
 const verifyToken = (token) => {
   try {
-    return totp.verify({ token, secret })
+    return totp.verify({ token, sharedSecret })
   } catch (err) {
     console.error(err)
     return false
