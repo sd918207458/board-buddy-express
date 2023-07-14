@@ -13,6 +13,7 @@
 
 ## Changlog
 
+- +nodemailer + Google SMTP
 - +[faker](https://github.com/faker-js/faker)
 - fixed create table issue(executeQuery only one query each time) drop if exist then create
 - es6 import wo babel 
