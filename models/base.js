@@ -151,15 +151,17 @@ const testTable = async (table) => {
 
 /**
  * generate where sql string.
- * @param {object} obj  - ex. {id:1, name:'Eddy'}
+ * @param {object|string} objOrString  - ex. {id:1, name:'Eddy'}
  * @param {('AND'|'OR')} [separator="AND"] - join separator
  * @returns {string}
  */
-const whereSql = (obj, separator = 'AND') => {
-  if (isEmpty(obj)) return ''
+const whereSql = (objOrString, separator = 'AND') => {
+  if (typeof objOrString === 'string') return objOrString
+
+  if (isEmpty(objOrString)) return ''
 
   const where = []
-  for (const [key, value] of Object.entries(obj)) {
+  for (const [key, value] of Object.entries(objOrString)) {
     where.push(`${key} = ${sqlString.escape(value)}`)
   }
 
@@ -180,21 +182,18 @@ const orderbySql = (obj) => {
     orderby.push(`${key} ${value}`)
   }
 
-  return `ORDER BY ${orderby.join(', ')} `
+  return `ORDER BY ${orderby.join(', ')}`
 }
 
 /**
  * Returns the count of the rows
  * @param {string} table - table name
- * @param {object} where - ex. {id:1, name:'Eddy'}
- * @param {object} order - ex. {id: 'asc', name: 'desc', username: ''}
+ * @param {object|string} where - ex. {id:1, name:'Eddy'}, string is for custom where clause ex.'WHERE id > 0'
  * @returns {number}
  */
-const count = async (table, where = {}, order = {}) => {
+const count = async (table, where = {}) => {
   const sql = sqlString.format(
-    `SELECT COUNT(*) as count FROM ${table} ${whereSql(where)} ${orderbySql(
-      order
-    )}`
+    `SELECT COUNT(*) as count FROM ${table} ${whereSql(where)}`
   )
 
   const { rows } = await executeQuery(sql)
@@ -204,13 +203,20 @@ const count = async (table, where = {}, order = {}) => {
 /**
  * standard select
  * @param {string} table - table name
- * @param {object} where - ex. {id:1, name:'Eddy'}
+ * @param {object|string} where - ex. {id:1, name:'Eddy'}, string is for custom where clause ex.'WHERE id > 0'
  * @param {object} order - ex. {id: 'asc', name: 'desc', username: ''}
+ * @param {number} limit - limit number ex.10, default is 0 (ignored it)
+ * @param {number|undefined} offset - offset number ex.10, default is undefined (ignored it)
  * @returns {{rows: Array, fields: Array}}
  */
-const find = async (table, where = {}, order = {}) => {
+const find = async (table, where = {}, order = {}, limit = 0, offset) => {
+  const limitClause = limit ? `LIMIT ${limit}` : ''
+  const offsetClause = offset ? `OFFSET ${offset}` : ''
+
   const sql = sqlString.format(
-    `SELECT * FROM ${table} ${whereSql(where)} ${orderbySql(order)}`
+    `SELECT * FROM ${table} ${whereSql(where)} ${orderbySql(
+      order
+    )} ${limitClause} ${offsetClause}`
   )
 
   return await executeQuery(sql)
