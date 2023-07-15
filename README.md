@@ -2,6 +2,7 @@
 
 ## TODO
 
+- [ ] OTP workflow
 - [ ] line login
 - [ ] google(firebase) login
 - [ ] category db
