@@ -225,9 +225,9 @@ const find = async (table, where = {}, order = {}, limit = 0, offset) => {
 /**
  * select return just one row
  * @param {string} table - table name
- * @param {object} where - ex. {id:1, name:'Eddy'}
+ * @param {object|string} where - ex. {id:1, name:'Eddy'}, string is for custom where clause ex.'WHERE id > 0'
  * @param {object} order - ex. {id: 'asc', name: 'desc', username: ''}
- * @returns {{rows: Array, fields: Array}}
+ * @returns {object}
  */
 const findOne = async (table, where = {}, order = {}) => {
   const sql = sqlString.format(
