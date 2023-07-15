@@ -5,9 +5,11 @@ import { readJsonFile } from '../utils/json-tool.js'
 
 import {
   getProducts,
+  getProductsWithQS,
   getProductById,
   createBulkProducts,
   cleanAll,
+  countWithQS,
 } from '../models/products.js'
 
 // 清除資料庫後，以範例json資料直接插入到資料庫
@@ -40,6 +42,31 @@ router.get('/:pid', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
   // 讀入範例資料
   const products = await getProducts()
+  res.json({ products })
+})
+
+// 獲得所有資料，加入分頁與搜尋字串功能，單一資料表處理
+// user?page=1&keyword=xxxx&cat_ids=1,2&orderby=id&prepage=10
+router.get('/', async (req, res, next) => {
+  // 獲取網頁的搜尋字串
+  const { page, keyword, cat_ids, orderby, prepage } = req.query
+
+  // 建立資料庫搜尋條件
+
+  // 讀入範例資料
+  const total = await countWithQS()
+  const products = await getProductsWithQS()
+
+  // {
+  //   total: 100,
+  //   perpage: 10,
+  //   page: 1,
+  //   data:[
+  //     {id:123, name:'',...},
+  //     {id:123, name:'',...}
+  //   ]
+  // }
+
   res.json({ products })
 })
 

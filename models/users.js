@@ -16,7 +16,7 @@ const table = 'users'
 
 // 所需的資料處理函式
 const getUsers = async () => {
-  const { rows, fields } = await find(table)
+  const { rows } = await find(table)
   return rows
 }
 const getUserById = async (id) => await findOneById(table, id)
