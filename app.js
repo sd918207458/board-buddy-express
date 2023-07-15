@@ -28,6 +28,7 @@ import authJwtRouter from './routes/auth-jwt.js'
 import authRouter from './routes/auth.js'
 import emailRouter from './routes/email.js'
 import indexRouter from './routes/index.js'
+import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 
 const app = express()
@@ -72,6 +73,7 @@ app.use('/api/', indexRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/auth-jwt', authJwtRouter)
 app.use('/api/email', emailRouter)
+app.use('/api/reset-password', resetPasswordRouter)
 app.use('/api/users', usersRouter)
 
 // catch 404 and forward to error handler

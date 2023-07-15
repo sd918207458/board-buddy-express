@@ -321,6 +321,10 @@ const remove = async (table, where) => {
   return rows
 }
 
+const removeById = async (table, id) => {
+  return remove(table, { id })
+}
+
 export {
   cleanTable,
   count,
@@ -333,6 +337,7 @@ export {
   insertMany,
   insertOne,
   remove,
+  removeById,
   testQuery,
   testTable,
   update,
