@@ -1,8 +1,12 @@
 # OTP (one time password)
 
+## 展示畫面
+
+![](imgs/otp-demo.gif)
+
 ## 說明事項
 
-使用 TOTP 與預設選項(30s step)，相關技術參考: [otpauth](https://www.npmjs.com/package/otpauth), [TOTP維基百科中文](https://zh.wikipedia.org/zh-tw/%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E4%B8%80%E6%AC%A1%E6%80%A7%E5%AF%86%E7%A0%81%E7%AE%97%E6%B3%95), [RFC6238](https://datatracker.ietf.org/doc/html/rfc6238)
+使用[otpauth](https://www.npmjs.com/package/otpauth)的 TOTP 與預設選項(30s step)。相關技術參考: , [TOTP維基百科中文](https://zh.wikipedia.org/zh-tw/%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E4%B8%80%E6%AC%A1%E6%80%A7%E5%AF%86%E7%A0%81%E7%AE%97%E6%B3%95), [RFC6238](https://datatracker.ietf.org/doc/html/rfc6238)
 
 規則:
 
@@ -13,7 +17,7 @@
 
 補充: 
 
-如果需要分離式的流程要額外設計，例如`第1頁填email 第2頁再填otp 第3頁再填新密碼`的流程，彼此間需要一些機制(如session)來作好安全防範
+如果需要分離式的流程要額外設計，例如`第1頁填email 第2頁再填otp 第3頁再填新密碼`的流程，不同頁面間需要一些機制(如session)來作好安全防範
 
 ## 工作流程(Workflow)
 
@@ -77,9 +81,16 @@ sequenceDiagram
     Node-->>React: 回應 { msg: 'reset password ok' }
 ```
 
-## 展示畫面
+## 套用說明
 
-Next([repo]()): `/user-test/forget-password`
-MySQL schema([repo]()): `data/otp.sql`
+1. 向外寄信(SMTP功能)要先設定好: 參考[(2023年7月) Node + Google SMTP發送電子郵件](https://github.com/mfee-react/express-base-esm/blob/main/docs/smtp.md)
+2. 建立otp資料表: MySQL資料表([repo](https://github.com/mfee-react/express-base-esm/blob/main/data/otp.sql)): `data/otp.sql`
+3. 瀏覽器(客戶)端(React): [repo](https://github.com/mfee-react/next-bs5/blob/main/pages/user-test/forget-password.js))，範例上路由是用 `/user-test/forget-password`
 
-![](imgs/otp-demo.gif)
+其它:
+
+- next(react)頁面有用到一個倒數計數的勾子[useInterval](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-interval.js)，只是簡單展示在畫面上倒數60秒
+- express中的OTP設定檔是[config
+/otp.js](https://github.com/mfee-react/express-base-esm/blob/main/config/otp.js)，資料表各種處理查詢用是在[models/otp.js](https://github.com/mfee-react/express-base-esm/blob/main/models/otp.js)與路由是在[routes
+/reset-password.js](https://github.com/mfee-react/express-base-esm/blob/main/routes/reset-password.js)
+
