@@ -29,7 +29,8 @@ router.post('/otp', async (req, res, next) => {
 
   // 寄送email
   const mailOptions = {
-    from: `"xxxx"<${process.env.SMTP_TO_EMAIL}>`,
+    // 這裡要改寄送人名稱，email在.env檔中代入
+    from: `"support"<${process.env.SMTP_TO_EMAIL}>`,
     to: email,
     subject: '重設密碼要求的電子郵件驗証碼',
     text: mailText(otp.token),
@@ -52,6 +53,7 @@ router.post('/reset', async (req, res, next) => {
 
   if (!token) return res.json({ message: 'fail', code: '400' })
 
+  // updatePassword中會驗証otp的存在與合法性(是否有到期)
   const result = await updatePassword(email, token, password)
 
   if (!result) return res.json({ message: 'fail', code: '400' })
