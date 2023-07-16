@@ -11,8 +11,8 @@ let totp = null
 const generateToken = (email = '') => {
   // Create a new TOTP object.
   totp = new OTPAuth.TOTP({
-    issuer: 'ACME',
-    label: 'AzureDiamond',
+    issuer: 'express-base',
+    label: email,
     algorithm: 'SHA1',
     digits: 6,
     period: 30,
