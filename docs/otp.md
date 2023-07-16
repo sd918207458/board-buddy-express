@@ -38,12 +38,17 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
+    autonumber
     React->>+Node: 要求OTP {email: 'x@xx.com'}
     Node-->>+DB: 產生OTP,記錄到otp資料表
-    Note over Node: 寄送email
+    Node-->>+SMTP: 寄送包含OTP的Email
     Node-->>React: 回應 { msg: 'email sent' }
     Note over React: 驗証碼輸入欄進入倒數
 ```
+
+> 註: 因為會有"失敗/逾時"需重新產生OTP記錄情況，產生OTP前應需判斷是否是這情況
+
+
 
 #### 重設密碼+驗証OTP流程
 
@@ -51,6 +56,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
     React->>+Node: 要求重設密碼 {email: 'x@...',otpToken:'123...', password:'xxx...'}
     Node-->>+DB: 查詢otp資料表記錄
     DB-->>-Node: 回應查詢結果, otp為合法
