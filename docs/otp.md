@@ -2,9 +2,9 @@
 
 ## 展示畫面
 
-> 套用說明見最下面章節
-
 ![](imgs/otp-demo.gif)
+
+> 套用說明見本文[最下面的套用說明](https://github.com/mfee-react/express-base-esm/blob/main/docs/otp.md#%E5%A5%97%E7%94%A8%E8%AA%AA%E6%98%8E)
 
 ## 說明事項
 
