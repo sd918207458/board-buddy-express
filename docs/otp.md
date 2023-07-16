@@ -2,6 +2,8 @@
 
 ## 展示畫面
 
+> 套用說明見最下面章節
+
 ![](imgs/otp-demo.gif)
 
 ## 說明事項
@@ -45,7 +47,7 @@ flowchart TD
 
 ### 時序圖 (Sequence diagram) 
 
-> 註: 以下 React(Next/客戶端/瀏覽器端), Node(伺服器端), DB(資料庫)
+> 註: 以下 React(Next/客戶端/瀏覽器端), Node(伺服器端), DB(資料庫), SMTP(寄email伺服器)
 
 #### 要求OTP流程
 
@@ -70,13 +72,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    React->>+Node: 要求重設密碼 {email: 'x@...',otpToken:'123...', password:'xxx...'}
+    React->>+Node: 要求重設密碼 {email: 'x@mail.com',token:'123456', password:'xxx'}
     Node-->>+DB: 查詢otp資料表記錄
     DB-->>-Node: 回應查詢結果, otp為合法
     Note over Node: 進行重設密碼流程
     Node-->>+DB: 更新users資料表密碼記錄
     DB-->>-Node: 回應查詢結果,更新完成
-    Node-->>React: 回應 { msg: 'reset password ok' }
+    Node-->>React: 回應 { msg: 'success' }
 ```
 
 ## 套用說明
