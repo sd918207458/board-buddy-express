@@ -29,8 +29,8 @@ router.post('/otp', async (req, res, next) => {
 
   // 寄送email
   const mailOptions = {
-    from: `"eddy"<${process.env.SMTP_TO_EMAIL}>`,
-    to: `hello@eddychang.me`,
+    from: `"xxxx"<${process.env.SMTP_TO_EMAIL}>`,
+    to: email,
     subject: '重設密碼要求的電子郵件驗証碼',
     text: mailText(otp.token),
   }
@@ -53,8 +53,6 @@ router.post('/reset', async (req, res, next) => {
   if (!token) return res.json({ message: 'fail', code: '400' })
 
   const result = await updatePassword(email, token, password)
-
-  console.log(result)
 
   if (!result) return res.json({ message: 'fail', code: '400' })
 

@@ -2,7 +2,18 @@
 
 ## 說明事項
 
-- 使用 TOTP 與預設選項(30s step)
+使用 TOTP 與預設選項(30s step)，相關技術參考: [otpauth](https://www.npmjs.com/package/otpauth), [TOTP維基百科中文](https://zh.wikipedia.org/zh-tw/%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E4%B8%80%E6%AC%A1%E6%80%A7%E5%AF%86%E7%A0%81%E7%AE%97%E6%B3%95), [RFC6238](https://datatracker.ietf.org/doc/html/rfc6238)
+
+規則:
+
+- 每60秒才能重傳一組新驗証碼到Email(伺服器會檢查+網頁上會倒數秒數)。
+- 電子郵件驗証碼的過期時間預設為30分鐘(在Node中的createOtp設定)，使用資料庫欄位比對時間。
+- 逾期或失敗重傳，需要至少60s，在Node與資料庫欄位也有檢查。
+- 除上述外，其它安全機制沒實作。
+
+補充: 
+
+如果需要分離式的流程要額外設計，例如`第1頁填email 第2頁再填otp 第3頁再填新密碼`的流程，彼此間需要一些機制(如session)來作好安全防範
 
 ## 工作流程(Workflow)
 
@@ -66,3 +77,9 @@ sequenceDiagram
     Node-->>React: 回應 { msg: 'reset password ok' }
 ```
 
+## 展示畫面
+
+Next([repo]()): `/user-test/forget-password`
+MySQL schema([repo]()): `data/otp.sql`
+
+![](imgs/otp-demo.gif)
