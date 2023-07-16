@@ -90,7 +90,7 @@ sequenceDiagram
 其它:
 
 - next(react)頁面有用到一個倒數計數的勾子[useInterval](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-interval.js)，只是簡單展示在畫面上倒數60秒
-- express中的OTP設定檔是[config
+- express中的OTP設定是[config
 /otp.js](https://github.com/mfee-react/express-base-esm/blob/main/config/otp.js)，資料表各種處理查詢用是在[models/otp.js](https://github.com/mfee-react/express-base-esm/blob/main/models/otp.js)與路由是在[routes
-/reset-password.js](https://github.com/mfee-react/express-base-esm/blob/main/routes/reset-password.js)
+/reset-password.js](https://github.com/mfee-react/express-base-esm/blob/main/routes/reset-password.js)可能會需要依你的資料表欄位、資料表名稱、路由...etc修改
 
