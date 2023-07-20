@@ -1,8 +1,11 @@
 # express-base-es6
 
+## NOTE
+
+- `.env`檔如果不存在，從`.env.template`改為`.env`檔案
+
 ## TODO
 
-- [ ] OTP workflow
 - [ ] line login
 - [ ] google(firebase) login
 - [ ] category db
@@ -14,6 +17,7 @@
 
 ## Changlog
 
+- OTP workflow
 - +nodemailer + Google SMTP
 - +[faker](https://github.com/faker-js/faker)
 - fixed create table issue(executeQuery only one query each time) drop if exist then create
