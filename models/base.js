@@ -78,8 +78,7 @@ const guessDataType = (key, value) => {
   return 'varchar(200) '
 }
 
-// TODO: generate create sql from object
-// FIXME: need to test: has error for products json file(maybe mysql/mariadb version problem)
+// generate create sql from object
 const generateCreateTableSql = (table, obj) => {
   const sqlColumns = []
   // first item key is primary key
@@ -279,9 +278,13 @@ const updateById = async (table, obj, id) => {
  * @param {object} obj
  * @returns {object}
  */
+// FIXME: array value should convert to csv string, but...object value?
 const insertOne = async (table, obj) => {
   const columns = Object.keys(obj)
-  const data = Object.values(obj)
+  // array value convert to csv string
+  const data = Object.values(obj).map((v) =>
+    Array.isArray(v) ? v.join(',') : v
+  )
 
   const { rows } = await executeQuery(
     sqlString.format(`INSERT INTO ${table} (??) VALUES (?)`, [columns, data])
@@ -298,7 +301,10 @@ const insertOne = async (table, obj) => {
  */
 const insertMany = async (table, array) => {
   const columns = Object.keys(array[0])
-  const data = array.map((v) => Object.values(v))
+  // FIXME: array value should convert to csv string, but...object value?
+  const data = array.map((v) =>
+    Object.values(v).map((v) => (Array.isArray(v) ? v.join(',') : v))
+  )
 
   const { rows } = await executeQuery(
     sqlString.format(`INSERT INTO ${table} (??) VALUES ?`, [columns, data])
