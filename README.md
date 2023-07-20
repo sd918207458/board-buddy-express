@@ -1,8 +1,10 @@
 # express-base-es6
 
-## NOTE
+## !!使用前注意
 
-- `.env`檔如果不存在，從`.env.template`改為`.env`檔案
+- `.env`檔已移除，記得clone後，將`.env.template`改為`.env`檔案
+- `.env`中`DB_設定`需改為你的資料庫、帳號、密碼才能開始使用
+- 資料庫schema檔案在`data`中
 
 ## TODO
 
