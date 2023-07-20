@@ -2,6 +2,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+// 導入dotenv 使用 .env 檔案中的設定值 process.env
+import dotenv from 'dotenv'
 
 // 讓console.log可以呈現檔案與行號
 // console.log show line number
@@ -48,4 +50,8 @@ const toKebabCase = (str) =>
     .map((x) => x.toLowerCase())
     .join('-')
 
-export { extendLog, isEmpty, toKebabCase }
+const loadEnv = (fileExt = '') => {
+  dotenv.config({ path: `${fileExt ? '.env' : '.env' + fileExt}` })
+}
+
+export { extendLog, isEmpty, toKebabCase, loadEnv }

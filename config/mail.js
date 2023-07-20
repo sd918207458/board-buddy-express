@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 // 導入dotenv 使用 .env 檔案中的設定值 process.env
 import 'dotenv/config.js'
 
-let transport
+let transport = null
 
 // 定義所有email的寄送伺服器位置
 transport = {
