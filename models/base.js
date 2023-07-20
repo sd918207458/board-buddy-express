@@ -210,7 +210,7 @@ const count = async (table, where = {}) => {
  */
 const find = async (table, where = {}, order = {}, limit = 0, offset) => {
   const limitClause = limit ? `LIMIT ${limit}` : ''
-  const offsetClause = offset ? `OFFSET ${offset}` : ''
+  const offsetClause = offset !== undefined ? `OFFSET ${offset}` : ''
 
   const sql = sqlString.format(
     `SELECT * FROM ${table} ${whereSql(where)} ${orderbySql(

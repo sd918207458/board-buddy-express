@@ -28,6 +28,7 @@ import authJwtRouter from './routes/auth-jwt.js'
 import authRouter from './routes/auth.js'
 import emailRouter from './routes/email.js'
 import indexRouter from './routes/index.js'
+import productsRouter from './routes/products.js'
 import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 
@@ -70,9 +71,10 @@ app.use(
 )
 
 app.use('/api/', indexRouter)
-app.use('/api/auth', authRouter)
 app.use('/api/auth-jwt', authJwtRouter)
+app.use('/api/auth', authRouter)
 app.use('/api/email', emailRouter)
+app.use('/api/products', productsRouter)
 app.use('/api/reset-password', resetPasswordRouter)
 app.use('/api/users', usersRouter)
 
