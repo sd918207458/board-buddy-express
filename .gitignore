@@ -33,3 +33,4 @@ testotp.js
 data/json/fake-product.json
 .env
 
+make-product-sample.js
