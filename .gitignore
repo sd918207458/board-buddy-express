@@ -34,3 +34,4 @@ data/json/fake-product.json
 .env
 
 make-product-sample.js
+data/product-n2m.sql

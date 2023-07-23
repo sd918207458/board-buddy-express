@@ -8,6 +8,7 @@
 
 ## TODO
 
+- [ ] change db & sql style and format to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
 - [ ] line login
 - [ ] google(firebase) login
 - [ ] category db
