@@ -12,6 +12,21 @@ const getProducts = async () => {
 }
 
 // 查詢所有資料，加入分頁與搜尋字串功能
+// SELECT *
+// FROM product 
+// WHERE  name LIKE '%Awesome%'
+//        AND cat_id IN (1,2,3)
+//        AND (
+//               FIND_IN_SET(1, color)
+//               OR FIND_IN_SET(2, color)
+//        )
+//        AND (FIND_IN_SET(3, tag))
+//        AND (
+//               FIND_IN_SET(1, size)
+//               OR FIND_IN_SET(2, size)
+//        )
+// ORDER BY id
+// LIMIT 0 OFFSET 10;
 const getProductsWithQS = async (where = '', order = {}, limit = 0, offset) => {
   const { rows } = await find(table, where, order, limit, offset)
   return rows
