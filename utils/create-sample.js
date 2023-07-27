@@ -17,6 +17,90 @@ extendLog() // 執行全域套用
 // console.log呈現顏色用 全域套用
 import 'colors'
 
+const catOptions = [
+  {
+    id: 1,
+    name: '衣服',
+  },
+  {
+    id: 2,
+    name: '鞋子',
+  },
+  {
+    id: 3,
+    name: '配件',
+  },
+  {
+    id: 4,
+    name: '帽子',
+  },
+  {
+    id: 5,
+    name: '其它',
+  },
+]
+
+const tagOptions = [
+  {
+    id: 1,
+    name: '男性',
+  },
+  {
+    id: 2,
+    name: '女性',
+  },
+  {
+    id: 3,
+    name: '中性',
+  },
+  {
+    id: 4,
+    name: '兒童',
+  },
+]
+
+const colorOptions = [
+  {
+    id: 1,
+    name: '黑',
+  },
+  {
+    id: 2,
+    name: '白',
+  },
+  {
+    id: 3,
+    name: '紅',
+  },
+  {
+    id: 4,
+    name: '綠',
+  },
+  {
+    id: 5,
+    name: '黃',
+  },
+]
+
+const sizeOptions = [
+  {
+    id: 1,
+    name: 'S',
+  },
+  {
+    id: 2,
+    name: 'M',
+  },
+  {
+    id: 3,
+    name: 'L',
+  },
+  {
+    id: 4,
+    name: 'XL',
+  },
+]
+
 function creatFakeUser() {
   return {
     userId: faker.string.uuid(),
@@ -83,40 +167,49 @@ function createFakeProduct() {
   }
 }
 
-const createProducts = async (num) => {
+const createProducts = async (num, reset = true, productStartId = 0) => {
   const products = Array(num)
     .fill(1)
     .map((v, i) => {
-      return { id: i + 1, ...createFakeProduct() }
+      return { id: i + 1 + productStartId, ...createFakeProduct() }
     })
 
   //await writeJsonFile('./data/json/fake-product.json', products)
 
-  await createTable('product', products[0])
-  await insertMany('product', products)
+  // use create table will drop first default
+  if (reset) {
+    await createTable('product', products[0])
+    await createTable('product_color', { id: 1, pid: 1, color_id: 1 })
+    await createTable('product_tag', { id: 1, pid: 1, tag_id: 1 })
+    await createTable('product_size', { id: 1, pid: 1, size_id: 1 })
 
-  await cleanTable('product_color')
-  await cleanTable('product_tag')
-  await cleanTable('product_size')
+    await createTable('category', catOptions[0])
+    await createTable('size', sizeOptions[0])
+    await createTable('color', colorOptions[0])
+    await createTable('tag', tagOptions[0])
+
+    await insertMany('category', catOptions)
+    await insertMany('size', sizeOptions)
+    await insertMany('color', colorOptions)
+    await insertMany('tag', tagOptions)
+  }
+
+  await insertMany('product', products)
 
   const product_color = []
   const product_tag = []
   const product_size = []
 
   for (const product of products) {
-    const color_ids = product.color
-    const tag_ids = product.tag
-    const size_ids = product.size
-
-    for (const color_id of color_ids) {
+    for (const color_id of product.color) {
       product_color.push({ pid: product.id, color_id })
     }
 
-    for (const tag_id of tag_ids) {
+    for (const tag_id of product.tag) {
       product_tag.push({ pid: product.id, tag_id })
     }
 
-    for (const size_id of size_ids) {
+    for (const size_id of product.size) {
       product_size.push({ pid: product.id, size_id })
     }
   }
@@ -126,4 +219,5 @@ const createProducts = async (num) => {
   await insertMany('product_size', product_size)
 }
 
+// 產生1k資料
 createProducts(1000)
