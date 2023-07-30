@@ -72,6 +72,9 @@ router.post('/login', async (req, res) => {
 
   console.log(member)
 
+  // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
+  delete member.password
+
   // generate an access token
   const accessToken = jsonwebtoken.sign({ ...member }, accessTokenSecret, {
     expiresIn: '24h',
