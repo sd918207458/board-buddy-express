@@ -4,7 +4,7 @@ const router = express.Router()
 // 認証用middleware(中介軟體)
 import auth from '../middlewares/auth.js'
 
-import { verifyUser, getUser } from '../models/users.js'
+import { verifyUser, getUser, getUserById } from '../models/users.js'
 
 router.post('/login', async function (req, res, next) {
   // 獲得username, password資料
@@ -71,7 +71,12 @@ router.get('/private', auth, (req, res) => {
 router.get('/check-login', async function (req, res, next) {
   if (req.session.userId) {
     const userId = req.session.userId
-    return res.json({ message: 'authorized', userId })
+    // 這裡可以直接查詢會員資料一並送出
+    const user = await getUserById(userId)
+    // 如果沒必要，user的password資料不應該，也不需要回應給瀏覽器
+    delete user.password
+
+    return res.json({ message: 'authorized', user })
   } else {
     return res.json({ message: 'Unauthorized' })
   }
