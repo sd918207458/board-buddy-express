@@ -39,6 +39,9 @@ router.post('/login', async function (req, res, next) {
 
   console.log(member)
 
+  // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
+  delete member.password
+
   // 啟用session
   req.session.userId = member.id
 
