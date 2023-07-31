@@ -14,19 +14,21 @@ export default function authenticate(req, res, next) {
 
   // if no token
   if (!token) {
-    return res.status(403).json({ message: 'Forbidden' })
+    return res.json({ message: 'Forbidden', code: '403' })
   }
 
   if (token) {
+    // verify的callback會帶有decoded payload(解密後的有效資料)就是user的資料
     jsonwebtoken.verify(token, accessTokenSecret, (err, user) => {
       if (err) {
-        return res.status(403).json({ message: 'Forbidden' })
+        return res.json({ message: 'Forbidden', code: '403' })
       }
 
+      // 將user資料加到req中
       req.user = user
       next()
     })
   } else {
-    return res.status(401).json({ message: 'Unauthorized' })
+    return res.json({ message: 'Unauthorized', code: '401' })
   }
 }
