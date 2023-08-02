@@ -20,9 +20,8 @@ import { extendLog } from './utils/tool.js'
 extendLog() // 執行全域套用
 // console.log呈現顏色用 全域套用
 import 'colors'
-
-// fileStore的選項
-const fileStoreOptions = {}
+// 檔案上傳
+import fileUpload from 'express-fileupload'
 
 import authJwtRouter from './routes/auth-jwt.js'
 import authRouter from './routes/auth.js'
@@ -33,6 +32,10 @@ import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 
 const app = express()
+
+// 檔案上傳
+// 選項參考: https://github.com/richardgirges/express-fileupload
+app.use(fileUpload())
 
 // 可以使用的CORS要求，options必要
 // app.use(cors())
@@ -55,6 +58,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+// fileStore的選項
+const fileStoreOptions = {}
+// session-cookie使用
 app.use(
   session({
     store: new FileStore(fileStoreOptions), // 使用檔案記錄session
@@ -70,6 +76,7 @@ app.use(
   })
 )
 
+// 路由使用
 app.use('/api/', indexRouter)
 app.use('/api/auth-jwt', authJwtRouter)
 app.use('/api/auth', authRouter)

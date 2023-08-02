@@ -7,6 +7,10 @@ import { isEmpty } from '../utils/tool.js'
 // 認証用middleware(中介軟體)
 // import auth from '../middlewares/auth.js'
 
+// 上傳檔案用使用multer(另一方案是使用express-fileupload)
+import multer from 'multer'
+const upload = multer({ dest: 'public/' })
+
 import {
   cleanAll,
   createBulkUsers,
@@ -32,6 +36,42 @@ router.get('/:userId', async function (req, res, next) {
   const user = await getUserById(req.params.userId)
   return res.json({ message: 'success', code: '200', user })
 })
+
+// POST - 上傳檔案用，使用express-fileupload
+router.post('/upload', async function (req, res, next) {
+  // req.files 所有上傳來的檔案
+  // req.body 其它的文字欄位資料…
+  console.log(req.files, req.body)
+
+  if (req.files) {
+    console.log(req.files.avatar) // 上傳來的檔案(欄位名稱為avatar)
+    return res.json({ message: 'success', code: '200' })
+  } else {
+    console.log('沒有上傳檔案')
+    return res.json({ message: 'fail', code: '409' })
+  }
+})
+
+// POST - 上傳檔案用，使用multer
+// 注意: 使用nulter會和express-fileupload衝突，所以要先註解掉express-fileupload的使用再作測試
+// 在app.js中的app.use(fileUpload())
+router.post(
+  '/upload2',
+  upload.single('avatar'), // 上傳來的檔案(這是單個檔案，欄位名稱為avatar)
+  async function (req, res, next) {
+    // req.file 即上傳來的檔案(avatar這個檔案)
+    // req.body 其它的文字欄位資料…
+    console.log(req.file, req.body)
+
+    if (req.file) {
+      console.log(req.file)
+      return res.json({ message: 'success', code: '200' })
+    } else {
+      console.log('沒有上傳檔案')
+      return res.json({ message: 'fail', code: '409' })
+    }
+  }
+)
 
 // POST - 新增會員資料
 router.post('/', async function (req, res, next) {
