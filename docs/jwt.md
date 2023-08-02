@@ -190,7 +190,7 @@ function parseJwt(token) {
 我們一樣可以實作出一個專門用於JWT的useAuth勾子，也是為了要在重新整理或重新連上網頁時，向伺服器進行重新的認証用，實作的內容如下(它除了名稱改了一下之外，與之前在[session-cookie](./session-cookie.md)實作並沒差太多):
 
 
-- 程式碼在: [hooks/use-auth-jwt.js]()
+- 程式碼在: [hooks/use-auth-jwt.js](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-auth-jwt.js)
 
 `AuthProviderJWT`這個Context一樣要加到`_app.js`中，如果怕會和`AuthProvider`衝突可以先註解掉它。
 
@@ -213,5 +213,5 @@ export default function MyApp({ Component, pageProps }) {
 
 其它測試的實作請參考:
 
-- [pages/user-test/jwt.js]()
-- [pages/user-test/login-status-jwt.js]()
+- [pages/user-test/jwt.js](https://github.com/mfee-react/next-bs5/blob/main/pages/user-test/jwt.js)
+- [pages/user-test/login-status-jwt.js](https://github.com/mfee-react/next-bs5/blob/main/pages/user-test/login-status-jwt.js)

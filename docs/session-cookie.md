@@ -240,7 +240,7 @@ router.get('/check-login', async function (req, res, next) {
 
 > 註: 因為在`auth`狀態共享到全站後，登入與登出的行為，只會和`useAuth`勾子的狀態有關，實際上登出和登入函式也可以都寫在`useAuth`中，再加入Context中傳出使用，本教學並沒有這樣作。
 
-- 程式碼在: [hooks/use-auth.js]()
+- 程式碼在: [hooks/use-auth.js](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-auth.js)
 
 
 `AuthProvider`一樣需要加到`_app.js`中，它是全站分享的會員登入狀態Context:
