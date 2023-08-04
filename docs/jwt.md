@@ -1,4 +1,4 @@
-# 會員登入解說-JWT
+# 會員登入解說 - JWT
 
 ## JWT
 
@@ -8,7 +8,6 @@ JWT的內容詳細介紹並非本文的重點，本文主要在實作這個功�
 
 - [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token) 維基百科(英文)
 - [淺談 Session 與 JWT 差異](https://medium.com/@jedy05097952/%E6%B7%BA%E8%AB%87-session-%E8%88%87-jwt-%E5%B7%AE%E7%95%B0-8d00b2396115)
-- 
 
 JWT的token(令牌，通常被稱為access token)是以公開/私有密鑰的加密演算來進行相關驗証，所以藉著這個通行証或令牌，作為一種授權(Authorization)時的運用機制，也就是當客戶端需要要求隱私或保護資料時，需要一開始登入後認証(Authentication)完成後，由伺服器端發給的一個令牌，之後加在對敏感性(或隱私性)資料的要求標頭中一併要求才行，伺服器端會對這令牌，進行驗証才會回應這些敏感性(或隱私性)資料。
 
