@@ -1,4 +1,4 @@
-# Google login整合(透過firebase)
+# Google 登入整合(透過firebase)
 
 ## 測試畫面
 
