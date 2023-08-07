@@ -1,6 +1,8 @@
 # Google login整合(透過firebase)
 
-有其它問題請再line我
+## 測試畫面
+
+![](imgs/test-firebase-google-login.gif)
 
 ## 準備工作
 
