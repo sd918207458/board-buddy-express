@@ -63,6 +63,8 @@ router.post('/login', async (req, res) => {
 
   // 傳送access token回應(react可以儲存在state中使用)
   res.json({
+    message: 'success',
+    code: '200',
     accessToken,
   })
 })
