@@ -16,7 +16,7 @@
 2. 程式碼範例在`next-bs5`專案中的[pages/user-test/google-login-redirect.js](https://github.com/mfee-react/next-bs5/blob/main/pages/user-test/google-login-redirect.js)與[hooks/use-firebase.js](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-firebase.js)目前只有實作session-cookie這種，jwt修改一下就能用了。
 3. 後端(node, express伺服器端)登入機制和之前的[google-login](./google-login.md)一樣
 
-### 解說
+### 程式碼解說
 
 登入時要改用`loginGoogleRedirect`方法，它的程式碼很簡單，也不處理登入後的流程:
 
