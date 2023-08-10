@@ -1,8 +1,8 @@
-# LINE 登入整合(透過firebase)
+# LINE 登入整合
 
 ## 測試畫面
 
-![](imgs/test-firebase-google-login.gif)
+![](imgs/)
 
 ## 重要說明(必要預先理解)
 
@@ -13,6 +13,8 @@
 ## 準備工作
 
 ### 申請LINE channel
+
+
 
 ### 伺服器端-資料庫
 

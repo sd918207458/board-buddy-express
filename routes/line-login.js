@@ -28,6 +28,7 @@ const LineLogin = new line_login({
   bot_prompt: 'normal',
 })
 
+// session-cookie登入機制
 const sessionLogin = (req, res, user) => {
   // 啟用session(這裡是用session cookie機制)
   req.session.userId = user.id
@@ -35,6 +36,7 @@ const sessionLogin = (req, res, user) => {
   return res.json({ message: 'success', code: '200', user })
 }
 
+// jwt登入機制
 const jwtLogin = (req, res, user) => {
   // 產生存取令牌(access token)，其中包含會員資料
   const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
@@ -52,7 +54,34 @@ const jwtLogin = (req, res, user) => {
   })
 }
 
-// 登出用
+// ------------ 以下為路由 ------------
+
+// JWT登出機制
+router.get('/logout-jwt', async function (req, res, next) {
+  if (!req.query) {
+    return res.json({ message: 'fail' })
+  }
+  // get access_token from db
+  // 有存在 -> 執行登入工作
+  const user = await findOne('users', {
+    line_uid: req.query.line_uid,
+  })
+
+  const line_access_token = user.line_access_token
+
+  // https://developers.line.biz/en/docs/line-login/managing-users/#logout
+  // When a user has logged out of your app,
+  // revoke their access token and delete all the user data in your app.
+  LineLogin.revoke_access_token(line_access_token)
+
+  // 清除cookie
+  res.clearCookie('accessToken', { httpOnly: true })
+  res.clearCookie('SESSION_ID', { httpOnly: true }) //cookie name
+
+  return res.json({ message: 'success', code: '200' })
+})
+
+// session-cookie登出機制
 router.get('/logout', async function (req, res, next) {
   if (!req.query) {
     return res.json({ message: 'fail' })
@@ -79,7 +108,7 @@ router.get('/logout', async function (req, res, next) {
 // 此api路由為產生登入網址，之後前端自己導向line網站進行登入
 router.get('/login', LineLogin.authJson())
 
-// 此api路由為登入後，會導回前端(react/next)對應路由頁面，之後作後繼判斷處理
+// 此api路由為line登入後，從前端(react/next)callback的對應路由頁面，即真正登入處理路由
 // `/callback?type=session` : session-cookie登入機制
 // `/callback?type=jwt` : jwt登入機制
 router.get(
@@ -92,7 +121,7 @@ router.get(
       // 以下流程:
       // 1. 先查詢資料庫是否有同line_uid的資料
       // 2-1. 有存在 -> 執行登入工作
-      // 2-2. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有google來的資料 -> 執行登入工作
+      // 2-2. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有line來的資料 -> 執行登入工作
       const isFound = await count('users', {
         line_uid: token_response.id_token.sub,
       })
@@ -112,7 +141,7 @@ router.get(
           sessionLogin(req, res, user)
         }
       } else {
-        // 3. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有google來的資料 -> 執行登入工作
+        // 3. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有line來的資料 -> 執行登入工作
         const newUser = {
           name: token_response.id_token.name,
           email: '',
