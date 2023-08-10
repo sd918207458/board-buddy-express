@@ -13,7 +13,7 @@
 ### 程式範例
 
 1. firebase的機制是先連到google登入頁後，登入完成，再回調(callback)到同一網址回來
-2. 程式碼範例在`next-bs5`專案中的`pages/user-test/google-login-redirect.js`與`hooks/use-firebase.js`目前只有實作session-cookie這種，jwt修改一下就能用了。
+2. 程式碼範例在`next-bs5`專案中的[pages/user-test/google-login-redirect.js](https://github.com/mfee-react/next-bs5/blob/main/pages/user-test/google-login-redirect.js)與[hooks/use-firebase.js](https://github.com/mfee-react/next-bs5/blob/main/hooks/use-firebase.js)目前只有實作session-cookie這種，jwt修改一下就能用了。
 3. 後端(node, express伺服器端)登入機制和之前的[google-login](./google-login.md)一樣
 
 ### 解說
