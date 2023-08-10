@@ -45,7 +45,7 @@ router.post('/jwt', async function (req, res, next) {
 
     // 傳送access token回應(react可以儲存在state中使用)
     // 傳送access token回應(react可以儲存在state中使用)
-    res.json({
+    return res.json({
       message: 'success',
       code: '200',
       accessToken,
@@ -75,8 +75,7 @@ router.post('/jwt', async function (req, res, next) {
     res.cookie('accessToken', accessToken, { httpOnly: true })
 
     // 傳送access token回應(react可以儲存在state中使用)
-    // 傳送access token回應(react可以儲存在state中使用)
-    res.json({
+    return res.json({
       message: 'success',
       code: '200',
       accessToken,
