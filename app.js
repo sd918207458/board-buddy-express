@@ -31,6 +31,7 @@ import productsRouter from './routes/products.js'
 import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 import googleLoginRouter from './routes/google-login.js'
+import lineLoginRouter from './routes/line-login.js'
 
 const app = express()
 
@@ -86,6 +87,7 @@ app.use('/api/products', productsRouter)
 app.use('/api/reset-password', resetPasswordRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/google-login', googleLoginRouter)
+app.use('/api/line-login', lineLoginRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
