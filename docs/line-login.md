@@ -54,7 +54,7 @@ ADD COLUMN line_access_token TEXT COMMENT '';
 
 ### 伺服器端-環境變數
 
-> 註: 可以參考專案中`.env.local`的範例(以下範例你需要改為自己申請的channel id和secret。注意: 不作其它設定時，預設只有這個申請的LINE開發者帳號能登入)
+> 註: 可以參考專案中`.env.template`的範例(以下範例你需要改為自己申請的channel id和secret。注意: 不作其它設定時，預設只有這個申請的LINE開發者帳號能登入)
 
 > 檔案: `.env`
 
