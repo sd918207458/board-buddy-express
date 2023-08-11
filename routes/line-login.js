@@ -22,66 +22,16 @@ const LineLogin = new line_login({
   // react line page callback url
   // 注意: LINE_LOGIN_CALLBACK_URL 是前端(react/next)路由
   // 必需要與 LINE developer 的 "Callback URL" 設定一致
+  // 目前與LINE登入頁設定為一致(登入頁路由=回調頁路由)
   callback_url,
   scope: 'openid profile',
   prompt: 'consent',
   bot_prompt: 'normal',
 })
 
-// session-cookie登入機制
-const sessionLogin = (req, res, user) => {
-  // 啟用session(這裡是用session cookie機制)
-  req.session.userId = user.id
-
-  return res.json({ message: 'success', code: '200', user })
-}
-
-// jwt登入機制
-const jwtLogin = (req, res, user) => {
-  // 產生存取令牌(access token)，其中包含會員資料
-  const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
-    expiresIn: '24h',
-  })
-
-  // 使用httpOnly cookie來讓瀏覽器端儲存access token
-  res.cookie('accessToken', accessToken, { httpOnly: true })
-
-  // 傳送access token回應(react可以儲存在state中使用)
-  return res.json({
-    message: 'success',
-    code: '200',
-    accessToken,
-  })
-}
-
 // ------------ 以下為路由 ------------
 
 // JWT登出機制
-router.get('/logout-jwt', async function (req, res, next) {
-  if (!req.query) {
-    return res.json({ message: 'fail' })
-  }
-  // get access_token from db
-  // 有存在 -> 執行登入工作
-  const user = await findOne('users', {
-    line_uid: req.query.line_uid,
-  })
-
-  const line_access_token = user.line_access_token
-
-  // https://developers.line.biz/en/docs/line-login/managing-users/#logout
-  // When a user has logged out of your app,
-  // revoke their access token and delete all the user data in your app.
-  LineLogin.revoke_access_token(line_access_token)
-
-  // 清除cookie
-  res.clearCookie('accessToken', { httpOnly: true })
-  res.clearCookie('SESSION_ID', { httpOnly: true }) //cookie name
-
-  return res.json({ message: 'success', code: '200' })
-})
-
-// session-cookie登出機制
 router.get('/logout', async function (req, res, next) {
   if (!req.query) {
     return res.json({ message: 'fail' })
@@ -95,12 +45,13 @@ router.get('/logout', async function (req, res, next) {
   const line_access_token = user.line_access_token
 
   // https://developers.line.biz/en/docs/line-login/managing-users/#logout
-  // When a user has logged out of your app,
-  // revoke their access token and delete all the user data in your app.
+  // 登出時進行撤銷(revoke) access token
   LineLogin.revoke_access_token(line_access_token)
 
-  res.clearCookie('SESSION_ID') //cookie name
-  req.session.destroy()
+  // 清除cookie
+  res.clearCookie('accessToken', { httpOnly: true })
+  // 因登入過程中也用到session，也會產生 SESSION_ID，所以也要清除
+  res.clearCookie('SESSION_ID', { httpOnly: true })
 
   return res.json({ message: 'success', code: '200' })
 })
@@ -109,8 +60,7 @@ router.get('/logout', async function (req, res, next) {
 router.get('/login', LineLogin.authJson())
 
 // 此api路由為line登入後，從前端(react/next)callback的對應路由頁面，即真正登入處理路由
-// `/callback?type=session` : session-cookie登入機制
-// `/callback?type=jwt` : jwt登入機制
+// 目前只實作jwt
 router.get(
   '/callback',
   LineLogin.callback(
@@ -135,11 +85,20 @@ router.get(
         // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
         delete user.password
 
-        if (req.query && req.query.type === 'jwt') {
-          jwtLogin(req, res, user)
-        } else {
-          sessionLogin(req, res, user)
-        }
+        // 產生存取令牌(access token)，其中包含會員資料
+        const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
+          expiresIn: '24h',
+        })
+
+        // 使用httpOnly cookie來讓瀏覽器端儲存access token
+        res.cookie('accessToken', accessToken, { httpOnly: true })
+
+        // 傳送access token回應(react可以儲存在state中使用)
+        return res.json({
+          message: 'success',
+          code: '200',
+          accessToken,
+        })
       } else {
         // 3. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有line來的資料 -> 執行登入工作
         const newUser = {
@@ -159,11 +118,20 @@ router.get(
         // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
         delete user.password
 
-        if (req.query && req.query.type === 'jwt') {
-          jwtLogin(req, res, user)
-        } else {
-          sessionLogin(req, res, user)
-        }
+        // 產生存取令牌(access token)，其中包含會員資料
+        const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
+          expiresIn: '24h',
+        })
+
+        // 使用httpOnly cookie來讓瀏覽器端儲存access token
+        res.cookie('accessToken', accessToken, { httpOnly: true })
+
+        // 傳送access token回應(react可以儲存在state中使用)
+        return res.json({
+          message: 'success',
+          code: '200',
+          accessToken,
+        })
       }
     },
     // 登入失敗的回調函式 Failure callback
