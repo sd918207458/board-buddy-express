@@ -20,7 +20,7 @@ sequenceDiagram
     Node-->>+React: 回傳以channel id與secret產生LINE登入網址
     React->>+LINE: 用伺服器生成的登入網址，連至LINE登入頁
     Note over LINE: 會員進行登入
-    LINE->>+React: 登入成功，重定向在網址上加入code與state
+    LINE->>+React: 登入成功，重定向並在網址上加入code與state
     React->>+Node: 將code與state傳送至伺服器callback路由要求登入
     Node-->>React: 登入成功，回應會員資料
   
@@ -32,6 +32,7 @@ sequenceDiagram
 
 1. 申請網址: [https://developers.line.biz/en/](https://developers.line.biz/en/)
 2. 請用 "LINE 帳號" 登入申請，不要用商用帳號的email另外申請。(不然你無法用手機測試登入，就算加入到測試帳號，如果不是line的帳號似乎無法測試)。因為是測試中的channel id，也只有這個申請的LINE帳號能登入而已。
+3. callback(回調頁網址)填入值，即你的登入網頁的網址。(目前設計為同一頁)
 
 申請步驟影片: 
 
@@ -58,15 +59,14 @@ ADD COLUMN line_access_token TEXT COMMENT '';
 > 檔案: `.env`
 
 ```text
-# line login 
 # 注意: LINE_LOGIN_CALLBACK_URL 是前端(react/next)路由
-# 必需要與 LINE developer 的 "Callback URL" 設定一致
+# 必需要與 LINE developer 的 "Callback URL" 設定一致(和登入頁網址一樣)
 LINE_CHANNEL_ID=2000376888
 LINE_CHANNEL_SECRET=ea6f6a568cf9851292c184e0c9f4abca
 LINE_LOGIN_CALLBACK_URL=http://localhost:3000/user-test/line-login-jwt
 ```
 
-### 伺服器端-套件
+### 伺服器端-套件(1、2步驟都需要)
 
 1。安裝所需套件:
 
@@ -80,7 +80,7 @@ npm i bluebird secure-compare request debug
 
 ### 伺服器 - session
 
-在這實作中會使用session作為安全機制，所以要確定你的伺服器中有設定好session。
+在這範例中的實作會使用session作為安全防範機制，所以要確定你的伺服器中有設定好session。下面的範例是使用檔案的儲存session機制。
 
 > app.js
 
