@@ -58,13 +58,15 @@ npm i firebase
 > 註: 可以先用postman測通後端api路由，post下面這個json資料範例
 
 ```json
-"providerData": {
-    "providerId": "google.com",
-    "uid": "100000685961710971999",
-    "displayName": "xxx",
-    "email": "xxx@gmail.com",
-    "phoneNumber": null,
-    "photoURL": "https://lh3.googleusercontent.com/a/xxxxxx"
+{
+    "providerData": {
+        "providerId": "google.com",
+        "uid": "100000685961710971999",
+        "displayName": "xxx",
+        "email": "xxx@gmail.com",
+        "phoneNumber": null,
+        "photoURL": "https://lh3.googleusercontent.com/a/xxxxxx"
+    }
 }
 ```
 
