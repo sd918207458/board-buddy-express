@@ -43,7 +43,7 @@ app.use(fileUpload())
 // app.use(cors())
 app.use(
   cors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'https://localhost:9000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
