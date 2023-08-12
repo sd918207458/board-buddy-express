@@ -32,6 +32,7 @@ import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 import googleLoginRouter from './routes/google-login.js'
 import lineLoginRouter from './routes/line-login.js'
+import facebookLoginRouter from './routes/facebook-login.js'
 
 const app = express()
 
@@ -88,6 +89,7 @@ app.use('/api/reset-password', resetPasswordRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/google-login', googleLoginRouter)
 app.use('/api/line-login', lineLoginRouter)
+app.use('/api/facebook-login', facebookLoginRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

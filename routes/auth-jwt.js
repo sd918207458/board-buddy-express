@@ -76,4 +76,15 @@ router.post('/logout', authenticate, (req, res) => {
   res.json({ message: 'success', code: '200' })
 })
 
+router.post('/logout-ssl-proxy', authenticate, (req, res) => {
+  // 清除cookie
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  })
+
+  res.json({ message: 'success', code: '200' })
+})
+
 export default router
