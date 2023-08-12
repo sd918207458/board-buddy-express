@@ -2,6 +2,8 @@
 
 ## 測試畫面
 
+![](imgs/fb-login-demo.gif)
+
 ## 說明
 
 ## 預備知識 (!!重要必先了解!!)
@@ -23,11 +25,11 @@
 
 #### 第1步 - 申請開發者帳號
 
-先使用一個Facebook帳號，到[Meta for Developers](https://developers.facebook.com/)申請帳號
+先使用現成的或註冊一個新的Facebook帳號，到[Meta for Developers](https://developers.facebook.com/)申請開發人員帳號
 
 #### 第2步 - 找到這個帳號的facebook id
 
-登入到Facebook後，到大頭照頁面，看瀏覽器上面的網址:
+登入到Facebook後，到大頭照頁面，找到瀏覽器上面的網址:
 
 ```text
 https://www.facebook.com/photo/?fbid=10220961010989999&set=a.1488339482392
@@ -37,8 +39,9 @@ fbid後面就是你的facebook id，例如上面的網址中的fbid是`102209610
 
 #### 第3步 - 加入測試人員帳號中
 
-用Line連絡我(Eddy)，把`facebook id`給我，我會加到測試人員帳號中，加入後到[Meta for Developers](https://developers.facebook.com/)中按下同意。
+用Line連絡我(Eddy)，把`facebook id`傳給我，我會加到測試人員帳號中。加入後，連到[Meta for Developers](https://developers.facebook.com/)中的訊息裡要按下同意，這樣才算是正式加入。
 
+之後測試看看，只有有加入的帳號才能進行這種登入。
 
 ### 開發環境 - ssl憑証 + next用
 
