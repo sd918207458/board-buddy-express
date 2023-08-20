@@ -1,0 +1,3 @@
+// get products
+GET http://localhost:3005/api/favorite/products HTTP/1.1
+content-type: application/json
