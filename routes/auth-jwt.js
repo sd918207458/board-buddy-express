@@ -20,7 +20,7 @@ router.get('/private', authenticate, (req, res) => {
 })
 
 // 檢查登入狀態用
-router.get('/check-login', authenticate, (req, res) => {
+router.get('/check-login', authenticate, async (req, res) => {
   const user = req.user
   return res.json({ message: 'authorized', user })
 })

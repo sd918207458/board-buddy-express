@@ -5,7 +5,30 @@ import { executeQuery } from '../models/base.js'
 
 import authenticate from '../middlewares/jwt.js'
 
-/* GET home page. */
+// 獲得某會員id的有加入到我的最愛清單中的商品id們
+router.get('/my-favorite', authenticate, async (req, res, next) => {
+  const sql = `SELECT f.pid
+        FROM favorites AS f
+        WHERE f.uid = ${req.user.id}
+        ORDER BY f.pid ASC;`
+
+  const { rows } = await executeQuery(sql)
+  // 將結果中的pid取出變為一個純資料的陣列
+  const favorites = rows.map((v) => v.pid)
+
+  res.json({ favorites })
+})
+
+router.get('/all-products-no-login', async (req, res, next) => {
+  const sql = `SELECT p.*
+    FROM products AS p
+    ORDER BY p.id ASC`
+
+  const { rows } = await executeQuery(sql)
+
+  res.json({ products: rows })
+})
+
 router.get('/all-products', authenticate, async (req, res, next) => {
   const user = req.user
   const uid = user.id
@@ -59,6 +82,7 @@ router.put('/:pid', authenticate, async (req, res, next) => {
   const { rows } = await executeQuery(sql)
 
   console.log(rows.affectedRows)
+
   if (rows.affectedRows) {
     return res.json({ message: 'success', code: '200' })
   } else {

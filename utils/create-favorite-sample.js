@@ -1,10 +1,10 @@
-import { readJsonFile, writeJsonFile } from './utils/json-tool.js'
+import { readJsonFile, writeJsonFile } from './json-tool.js'
 import {
   createTable,
   insertMany,
   insertOne,
   cleanTable,
-} from './models/base.js'
+} from '../models/base.js'
 // eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
 
@@ -12,7 +12,7 @@ import { fakerZH_TW as faker } from '@faker-js/faker'
 import sqlString from 'sqlstring'
 
 // 讓console.log可以呈現檔案與行號
-import { extendLog, toKebabCase } from './utils/tool.js'
+import { extendLog, toKebabCase } from './tool.js'
 extendLog() // 執行全域套用
 // console.log呈現顏色用 全域套用
 import 'colors'
