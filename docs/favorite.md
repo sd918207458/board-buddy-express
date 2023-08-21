@@ -245,8 +245,8 @@ VALUES (@uid, @pid)
 SET @uid = 1;
 SET @pid = 5;
 -- 
-INSERT INTO favorites (uid, pid)
-VALUES (@uid, @pid)
+DELETE FROM favorites
+WHERE pid=@pid AND uid=@uid;
 ```
 
 ### REST API設計
