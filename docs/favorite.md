@@ -203,7 +203,7 @@ const products = rows.map((v) => ({
       "is_favorite": false
     }
   ]
-]
+}
 ```
 
 相當理想的回應JSON檔，有了`is_favorite`這個布林值，在網頁上直接可以判斷看要呈現實心還空心圖示，這部份到後面的實作程式碼就會見到。
