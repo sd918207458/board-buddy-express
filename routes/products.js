@@ -13,7 +13,7 @@ import {
 import sqlString from 'sqlstring'
 
 // 獲得所有資料，加入分頁與搜尋字串功能，單一資料表處理
-// products/qs??page=1&keyword=xxxx&cat_ids=1,2&sizes=1,2&tags=3,4&colors=1,2,3&orderby=id,asc&perpage=10&price_range=1500,10000
+// products/qs?page=1&keyword=xxxx&cat_ids=1,2&sizes=1,2&tags=3,4&colors=1,2,3&orderby=id,asc&perpage=10&price_range=1500,10000
 router.get('/qs', async (req, res, next) => {
   // 獲取網頁的搜尋字串
   const {
