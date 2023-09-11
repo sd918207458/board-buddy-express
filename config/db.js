@@ -9,6 +9,7 @@ import 'dotenv/config.js'
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,
+  port: process.env.DB_PORT,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   dateStrings: true, // 轉換日期字串格式用
