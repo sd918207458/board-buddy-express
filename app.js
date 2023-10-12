@@ -36,6 +36,8 @@ import facebookLoginRouter from './routes/facebook-login.js'
 
 import favoriteRouter from './routes/favorite.js'
 
+import shipmentRouter from './routes/shipment.js'
+
 const app = express()
 
 // 檔案上傳
@@ -93,6 +95,8 @@ app.use('/api/google-login', googleLoginRouter)
 app.use('/api/line-login', lineLoginRouter)
 app.use('/api/facebook-login', facebookLoginRouter)
 app.use('/api/favorite', favoriteRouter)
+
+app.use('/api/shipment', shipmentRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
