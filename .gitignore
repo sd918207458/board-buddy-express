@@ -36,3 +36,4 @@ data/json/fake-product.json
 make-product-sample.js
 data/product-n2m.sql
 data/test_sql
+testdb.js
