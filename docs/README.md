@@ -1,5 +1,6 @@
 # 教學文件
 
+- [7-11 運送商店選擇](./store-711.md)
 - [(2023年7月) Node + Google SMTP發送電子郵件](./smtp.md)
 - [會員登入解說 - session-cookie](./session-cookie.md)
 - [會員登入解說 - JWT](./jwt.md)
