@@ -6,22 +6,16 @@ import 'dotenv/config.js'
 
 const callback_url = process.env.SHIP_711_STORE_CALLBACK_URL
 
-// POST home page.
+// POST
 router.post('/711', function (req, res, next) {
-  console.log(req.body)
+  //console.log(req.body)
   let searchParams = new URLSearchParams(req.body)
-  console.log(searchParams.toString())
-
   res.redirect(callback_url + '?' + searchParams.toString())
-
-
-  //   res.render('index', { title: 'OK' })
 })
 
-
-// test only
+// only for  test
 router.get('/', function (req, res, next) {
-  res.render('index', { title: 'shipment OK' })
+  res.render('index', { title: 'shipment route is OK' })
 })
 
 export default router
