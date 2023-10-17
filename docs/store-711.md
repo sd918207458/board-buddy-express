@@ -60,7 +60,7 @@ sequenceDiagram
 ```js
 const { store711, openWindow, closeWindow } = useShip711StoreOpener(
     'http://localhost:3005/api/shipment/711',
-    { enableLocalStorage :true } 
+    { enableLocalStorage :false } 
   )
 ```
 
