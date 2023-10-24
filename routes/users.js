@@ -12,28 +12,28 @@ import multer from 'multer'
 const upload = multer({ dest: 'public/' })
 
 import {
-  cleanAll,
-  createBulkUsers,
-  createUser,
-  deleteUserById,
-  getCount,
-  getUser,
-  getUserById,
-  getUsers,
-  updateUser,
-  updateUserById,
-  verifyUser,
-} from '../models/users.js'
+  find,
+  // findOne,
+  findOneById,
+  insertOne,
+  count,
+  updateById,
+  removeById,
+} from '../models/base.js'
+
+// 使用者資料表名稱
+const dbTable = 'users'
 
 // GET - 得到所有會員資料
 router.get('/', async function (req, res, next) {
-  const users = await getUsers()
+  const { rows } = await find(dbTable)
+  const users = rows
   return res.json({ message: 'success', code: '200', users })
 })
 
 // GET - 得到單筆資料(注意，有動態參數時要寫在GET區段最後面)
 router.get('/:userId', async function (req, res, next) {
-  const user = await getUserById(req.params.userId)
+  const user = await findOneById(dbTable, req.params.userId)
   return res.json({ message: 'success', code: '200', user })
 })
 
@@ -93,21 +93,21 @@ router.post('/', async function (req, res, next) {
   }
 
   // 這裡可以再檢查從react來的資料，哪些資料為必要(name, username...)
-  console.log(user)
+  //console.log(user)
 
   // 先查詢資料庫是否有同username與email的資料
-  const count = await getCount({
+  const userCount = await count(dbTable, {
     username: user.username,
     email: user.email,
   })
 
-  // 檢查使用者是否存在
-  if (count) {
+  // 檢查使用者是否存在，不存在count會回傳0
+  if (userCount) {
     return res.json({ message: 'fail', code: '400' })
   }
 
   // 新增至資料庫
-  const result = await createUser(user)
+  const result = await insertOne(dbTable, user)
 
   // 不存在insertId -> 新增失敗
   if (!result.insertId) {
@@ -135,18 +135,32 @@ router.put('/:userId', async function (req, res, next) {
   }
 
   // 這裡可以再檢查從react來的資料，哪些資料為必要(name, username...)
-  console.log(user)
+  // console.log(user)
 
   // 對資料庫執行update
-  const result = await updateUserById(user, userId)
+  const result = await updateById(dbTable, user, userId)
+
   console.log(result)
 
-  // 沒有更新到任何資料
+  // 沒有更新到任何資料 -> 失敗
   if (!result.affectedRows) {
     return res.json({ message: 'fail', code: '400' })
   }
 
-  // 最後成功更新
+  // 成功
+  return res.json({ message: 'success', code: '200' })
+})
+
+// PUT - 刪除會員資料
+router.delete('/:userId', async function (req, res, next) {
+  const result = await removeById(dbTable, req.params.userId)
+
+  // 沒有更新到任何資料 -> 失敗
+  if (!result.affectedRows) {
+    return res.json({ message: 'fail', code: '400' })
+  }
+
+  // 成功
   return res.json({ message: 'success', code: '200' })
 })
 
