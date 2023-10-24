@@ -1,6 +1,6 @@
 {
-  "name": "node-express-es6",
-  "version": "0.0.0",
+  "name": "express-base-esm",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www"
@@ -38,7 +38,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0-alpha.2",
-    "nodemon": "^1.19.4",
+    "nodemon": "^3.0.1",
     "prettier": "^3.0.0"
   },
   "type": "module",

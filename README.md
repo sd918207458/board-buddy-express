@@ -6,19 +6,20 @@
 - `.env`中`DB_設定`需改為你的資料庫、帳號、密碼才能開始使用
 - 資料庫schema檔案在`data`中
 
-## TODO
-
-- [ ] change db & sql style and format to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
-- [ ] line login
-- [ ] google(firebase) login
-- [ ] category db
-- [ ] favorite db?
-- [ ] comment db?
-- [ ] order db(order_item, shipping, payment)
-
 ## FIXME
 
+- [ ] db naming should change to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
+- [ ] remove single models for each route, change to use base models
+
 ## Changlog
+
+### 20231024
+
+- (d) models/users change router/user db funcs
+- (d) docs
+- (d) auth, facebook-login
+
+### 20231023-
 
 - OTP workflow
 - +nodemailer + Google SMTP

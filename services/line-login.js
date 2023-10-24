@@ -1,11 +1,5 @@
 'use strict'
 
-// const debug = require('debug')('line-login:module')
-// const request = require('request')
-// const jwt = require('jsonwebtoken')
-//const secure_compare = require('secure-compare')
-// const crypto = require('crypto')
-// let Promise = require('bluebird')
 import createDebugMessages from 'debug'
 const debug = createDebugMessages('line-login:module')
 import request from 'request'

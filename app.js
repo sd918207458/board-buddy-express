@@ -24,7 +24,6 @@ import 'colors'
 import fileUpload from 'express-fileupload'
 
 import authJwtRouter from './routes/auth-jwt.js'
-import authRouter from './routes/auth.js'
 import emailRouter from './routes/email.js'
 import indexRouter from './routes/index.js'
 import productsRouter from './routes/products.js'
@@ -32,10 +31,7 @@ import resetPasswordRouter from './routes/reset-password.js'
 import usersRouter from './routes/users.js'
 import googleLoginRouter from './routes/google-login.js'
 import lineLoginRouter from './routes/line-login.js'
-import facebookLoginRouter from './routes/facebook-login.js'
-
 import favoriteRouter from './routes/favorite.js'
-
 import shipmentRouter from './routes/shipment.js'
 import linepayRouter from './routes/linepay.js'
 
@@ -87,16 +83,13 @@ app.use(
 // 路由使用
 app.use('/api/', indexRouter)
 app.use('/api/auth-jwt', authJwtRouter)
-app.use('/api/auth', authRouter)
 app.use('/api/email', emailRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/reset-password', resetPasswordRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/google-login', googleLoginRouter)
 app.use('/api/line-login', lineLoginRouter)
-app.use('/api/facebook-login', facebookLoginRouter)
 app.use('/api/favorite', favoriteRouter)
-
 app.use('/api/shipment', shipmentRouter)
 app.use('/api/linepay', linepayRouter)
 
