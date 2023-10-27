@@ -5,13 +5,25 @@ import jsonwebtoken from 'jsonwebtoken'
 
 import authenticate from '../middlewares/jwt.js'
 
-import { verifyUser, getUser } from '../models/users.js'
+// import { verifyUser, getUser } from '../models/users.js'
 
 // 存取`.env`設定檔案使用
 import 'dotenv/config.js'
 
+import { findOne, count } from '../models/base.js'
+
+// 使用者資料表名稱
+const dbTable = 'users'
+
 // 定義安全的私鑰字串
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
+const getUser = async ({ username, password }) =>
+  await findOne(dbTable, { username, password })
+
+// 登入使用
+const verifyUser = async ({ username, password }) =>
+  Boolean(await count(dbTable, { username, password }))
 
 router.get('/private', authenticate, (req, res) => {
   const user = req.user

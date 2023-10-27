@@ -35,6 +35,9 @@ import favoriteRouter from './routes/favorite.js'
 import shipmentRouter from './routes/shipment.js'
 import linepayRouter from './routes/linepay.js'
 
+//test for sq
+import usersSQRouter from './routes/users-sq.js'
+
 const app = express()
 
 // 檔案上傳
@@ -92,6 +95,9 @@ app.use('/api/line-login', lineLoginRouter)
 app.use('/api/favorite', favoriteRouter)
 app.use('/api/shipment', shipmentRouter)
 app.use('/api/linepay', linepayRouter)
+
+// test for sq
+app.use('/api/users-sq', usersSQRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

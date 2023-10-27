@@ -23,10 +23,10 @@ const transporter = nodemailer.createTransport(transport)
 transporter.verify((error, success) => {
   if (error) {
     // 發生錯誤
-    console.error(error)
+    console.error('ERROR - SMTP server connect failed.'.bgRed)
   } else {
     // 代表成功
-    console.log('SMTP Server Connected. Ready to send mail!'.bgGreen)
+    console.log('INFO - SMTP server connected. Ready to send mail!'.bgGreen)
   }
 })
 
