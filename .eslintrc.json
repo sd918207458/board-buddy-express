@@ -7,7 +7,7 @@
   "extends": ["prettier", "eslint:recommended", "plugin:node/recommended"],
   "plugins": ["prettier"],
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2022
   },
   "rules": {
     "prettier/prettier": "error",
