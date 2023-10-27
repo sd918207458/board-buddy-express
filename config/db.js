@@ -19,11 +19,11 @@ const pool = mysql.createPool({
 pool
   .getConnection()
   .then((connection) => {
-    console.log('Database connected successfully!'.bgGreen)
+    console.log('INFO - Database connected successfully!'.bgGreen)
     connection.release()
   })
   .catch((error) => {
-    console.log('Database connect failed'.bgRed)
+    console.log('ERROR - Database connect failed'.bgRed)
     console.log(error)
   })
 
