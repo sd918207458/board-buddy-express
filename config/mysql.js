@@ -1,10 +1,10 @@
-import Sequelize from 'sequelize'
+import { Sequelize, Model, DataTypes } from 'sequelize'
 
 // 讀取.env檔用
 import 'dotenv/config.js'
 
 // 資料庫連結資訊
-const connection = new Sequelize(
+const sequelize = new Sequelize(
   process.env.DB_DATABASE,
   process.env.DB_USERNAME,
   process.env.DB_PASSWORD,
@@ -20,48 +20,44 @@ const connection = new Sequelize(
   }
 )
 
-// Test connection
-console.log('SETUP - Connecting database...'.bgGreen)
-
-connection
+// 啟動時測試連線
+sequelize
   .authenticate()
   .then(() => {
     console.log('INFO - Database connected.'.bgGreen)
   })
-  .catch((err) => {
+  .catch((error) => {
     console.log('ERROR - Unable to connect to the database.'.bgRed)
+    //console.error(err)
   })
 
-const User = connection.define(
+// model test
+const User = sequelize.define(
   'user',
-  { username: Sequelize.STRING },
+  {
+    name: DataTypes.TEXT,
+    favoriteColor: {
+      type: DataTypes.TEXT,
+      defaultValue: 'green',
+    },
+    age: DataTypes.INTEGER,
+    cash: DataTypes.INTEGER,
+  },
   {
     underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 )
 
-export default connection
-// 資料庫連結資訊
-// const pool = mysql.createPool({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USERNAME,
-//   port: process.env.DB_PORT,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE,
-//   dateStrings: true, // 轉換日期字串格式用
-// })
+// create table
+await sequelize.sync({ force: true })
 
-// // 啟動時測試連線
-// pool
-//   .getConnection()
-//   .then((connection) => {
-//     console.log('Database Connected Successfully'.bgGreen)
-//     connection.release()
-//   })
-//   .catch((error) => {
-//     console.log('Database Connection Failed'.bgRed)
-//     console.log(error)
-//   })
+// new a instance
+const jane = await User.create({ name: 'Jane' })
 
-// // 輸出模組
-// export default pool
+console.log(jane instanceof User) // true
+console.log(jane.name) // "Jane"
+
+// 輸出模組
+export default sequelize
