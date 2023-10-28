@@ -20,6 +20,12 @@
     "node/prefer-global/url": ["error", "always"],
     "node/prefer-promises/dns": "error",
     "node/prefer-promises/fs": "error",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "node/no-unsupported-features/es-syntax": [
+      "warn",
+      {
+        "ignores": ["dynamicImport","modules"]
+      }
+    ]
   }
 }

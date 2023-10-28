@@ -4,39 +4,27 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import cors from 'cors'
+import * as fs from 'fs'
 import session from 'express-session'
+
 // 使用檔案的session store，存在sessions資料夾
 import sessionFileStore from 'session-file-store'
 const FileStore = sessionFileStore(session)
 
-// 修正 __dirname for esm
-import { fileURLToPath } from 'url'
+// 修正 __dirname for esm, windows dynamic import bug
+import { fileURLToPath, pathToFileURL } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-// end 修正 __dirname
 
 // 讓console.log可以呈現檔案與行號
 import { extendLog } from './utils/tool.js'
 extendLog() // 執行全域套用
+
 // console.log呈現顏色用 全域套用
 import 'colors'
+
 // 檔案上傳
 import fileUpload from 'express-fileupload'
-
-import authJwtRouter from './routes/auth-jwt.js'
-import emailRouter from './routes/email.js'
-import indexRouter from './routes/index.js'
-import productsRouter from './routes/products.js'
-import resetPasswordRouter from './routes/reset-password.js'
-import usersRouter from './routes/users.js'
-import googleLoginRouter from './routes/google-login.js'
-import lineLoginRouter from './routes/line-login.js'
-import favoriteRouter from './routes/favorite.js'
-import shipmentRouter from './routes/shipment.js'
-import linepayRouter from './routes/linepay.js'
-
-//test for sq
-import usersSQRouter from './routes/users-sq.js'
 
 const app = express()
 
@@ -83,28 +71,23 @@ app.use(
   })
 )
 
-// 路由使用
-app.use('/api/', indexRouter)
-app.use('/api/auth-jwt', authJwtRouter)
-app.use('/api/email', emailRouter)
-app.use('/api/products', productsRouter)
-app.use('/api/reset-password', resetPasswordRouter)
-app.use('/api/users', usersRouter)
-app.use('/api/google-login', googleLoginRouter)
-app.use('/api/line-login', lineLoginRouter)
-app.use('/api/favorite', favoriteRouter)
-app.use('/api/shipment', shipmentRouter)
-app.use('/api/linepay', linepayRouter)
+// 載入routes中的各路由檔案使用
+const apiPath = '/api'
+const routePath = path.join(__dirname, 'routes')
+const filenames = await fs.promises.readdir(routePath)
 
-// test for sq
-app.use('/api/users-sq', usersSQRouter)
+for (const filename of filenames) {
+  const item = await import(pathToFileURL(path.join(routePath, filename)))
+  const slug = filename.split('.')[0]
+  app.use(`${apiPath}/${slug === 'index' ? '' : slug}`, item.default)
+}
 
-// catch 404 and forward to error handler
+// 錯誤處理 catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))
 })
 
-// error handler
+// 錯誤處理 error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message
