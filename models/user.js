@@ -4,24 +4,29 @@ export default async function (sequelize) {
   const User = sequelize.define(
     'User',
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       name: {
-        type: DataTypes.STRING(60),
+        type: DataTypes.STRING,
         allowNull: false,
       },
       username: {
-        type: DataTypes.STRING(60),
+        type: DataTypes.STRING,
         allowNull: true,
       },
       password: {
-        type: DataTypes.STRING(60),
+        type: DataTypes.STRING,
         allowNull: true,
       },
-      favoriteColor: {
-        type: DataTypes.TEXT,
-        defaultValue: 'green',
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
+
       age: DataTypes.INTEGER,
-      cash: DataTypes.INTEGER,
     },
     {
       classMethods: {
@@ -35,7 +40,7 @@ export default async function (sequelize) {
         },
       },
 
-      //   timestamps: false,
+      timestamps: true,
 
       // don't delete database entries but set the newly added attribute deletedAt
       // to the current date (when deletion was done). paranoid will only work if

@@ -3,6 +3,13 @@ import { Sequelize, Model, DataTypes } from 'sequelize'
 // 讀取.env檔用
 import 'dotenv/config.js'
 
+import * as fs from 'fs'
+import path from 'path'
+// 修正 __dirname for esm, windows dynamic import bug
+import { fileURLToPath, pathToFileURL } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 // 資料庫連結資訊
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
@@ -32,14 +39,26 @@ sequelize
     console.error(error)
   })
 
-const modelDefiners = [await import('../models/user.js')]
+// 載入models中的各檔案使用
+const modelsPath = path.join(__dirname, '../models')
+const filenames = await fs.promises.readdir(modelsPath)
 
-// We define all models according to their files.
-for (const modelDefiner of modelDefiners) {
-  modelDefiner.default(sequelize)
+for (const filename of filenames) {
+  const item = await import(pathToFileURL(path.join(modelsPath, filename)))
+  item.default(sequelize)
 }
 
-await sequelize.sync({ force: true })
+// const modelDefiners = [await import('../models/user.js')]
+
+// // We define all models according to their files.
+// for (const modelDefiner of modelDefiners) {
+//   modelDefiner.default(sequelize)
+// }
+
+// This checks what is the current state of the table in the database
+// (which columns it has, what are their data types, etc),
+// and then performs the necessary changes in the table to make it match the model.
+await sequelize.sync({ alter: true })
 console.log('All models were synchronized successfully.')
 // We execute any extra setup after the models are defined, such as adding associations.
 // applyExtraSetup(sequelize)
