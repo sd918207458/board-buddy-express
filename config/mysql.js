@@ -28,7 +28,7 @@ sequelize
   })
   .catch((error) => {
     console.log('ERROR - Unable to connect to the database.'.bgRed)
-    //console.error(err)
+    console.error(error)
   })
 
 // model test

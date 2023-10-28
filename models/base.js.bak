@@ -1,7 +1,5 @@
 // mysql promise pool
-// import pool from '../config/db.js'
-import sequelize from '../config/mysql.js'
-import { QueryTypes } from 'sequelize'
+import pool from '../config/db.js'
 
 // 專用處理sql字串的工具，主要format與escape，防止sql injection
 import sqlString from 'sqlstring'
@@ -22,18 +20,21 @@ const debug = process.env.NODE_ENV === 'development'
  */
 const executeQuery = async (sql, logRows = false, logFields = false) => {
   // limit log string string length
-  const sqlLog = sql.length < 500 ? sql : sql.slice(0, 500) + '...'
+  const sqlLog = sql.length < 1500 ? sql : sql.slice(0, 1500) + '...'
   debug && console.log(sqlLog.bgWhite)
 
   try {
     // Get new connection from pool.
-    // const connection = await pool.acquire()
+    // This method can throw TimeoutError if connection was not created in
+    // specified `factory.acquireTimeoutMillis` time.
+    const connection = await pool.acquire()
+
+    const [rows, fields] = await connection.query(sql)
     // const [rows, fields] = await pool.execute(sql)
-    // pool.release(connection)
 
-    const [rows, fields] = await sequelize.query(sql)
+    // return connection back to pool so it can be reused
+    pool.release(connection)
 
-    // 控制呈現呈現結果
     debug && logRows && console.log(rows)
     debug && logFields && console.log(fields)
     return { rows, fields }
@@ -44,17 +45,23 @@ const executeQuery = async (sql, logRows = false, logFields = false) => {
 
 // TODO: use transaction to test a query
 // !!create, alert and drop can't rolback
-const testQuery = async (sql) => {
-  const transaction = await sequelize.transaction()
+const testQuery = async (query) => {
+  const connection = await pool.getConnection()
+
   try {
-    const result = await sequelize.query(sql, { transaction })
+    await connection.beginTransaction()
+    const result = await connection.query(query)
     debug && console.log(result)
-    await transaction.commit()
+    //await connection.commit()
+    await connection.rollback()
+    connection.release()
+    debug && console.log(result)
+
     return result
   } catch (error) {
     debug && console.log(error)
-    await transaction.rollback()
-    throw new Error(error)
+    await connection.rollback()
+    connection.release()
   }
 }
 

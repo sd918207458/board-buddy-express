@@ -13,6 +13,10 @@
 
 ## Changlog
 
+### 20231028
+
+- (a)pg, pg-hstore, mariadb npm mods for test
+
 ### 20231024
 
 - (d) models/users change router/user db funcs
