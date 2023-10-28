@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router()
-import { createOtp, updatePassword } from '../models/otp.js'
+import { createOtp, updatePassword } from '../db-utils/otp.js'
 import transporter from '../config/mail.js'
 import 'dotenv/config.js'
 

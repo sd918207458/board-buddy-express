@@ -15,7 +15,9 @@
 
 ### 20231028
 
-- (a)pg, pg-hstore, mariadb npm mods for test
+- (u) sequelize raw query for model/base.js
+- (u) dynamic import routes
+- (a) pg, pg-hstore, mariadb npm mods for test
 
 ### 20231024
 

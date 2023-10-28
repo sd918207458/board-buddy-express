@@ -8,7 +8,7 @@ import {
   getProductsWithQS,
   getProductById,
   countWithQS,
-} from '../models/products.js'
+} from '../db-utils/products.js'
 // 專用處理sql字串的工具，主要format與escape，防止sql injection
 import sqlString from 'sqlstring'
 

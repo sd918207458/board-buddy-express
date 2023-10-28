@@ -144,7 +144,8 @@ const cleanTable = async (table) => {
  */
 const testTable = async (table) => {
   try {
-    await pool.execute(`SELECT 1 FROM ${table} LIMIT 1;`)
+    //await pool.execute(`SELECT 1 FROM ${table} LIMIT 1;`)
+    await sequelize.query(`SELECT 1 FROM ${table} LIMIT 1;`)
     return true
   } catch (err) {
     return false

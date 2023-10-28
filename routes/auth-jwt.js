@@ -5,12 +5,12 @@ import jsonwebtoken from 'jsonwebtoken'
 
 import authenticate from '../middlewares/jwt.js'
 
-// import { verifyUser, getUser } from '../models/users.js'
+// import { verifyUser, getUser } from '../db-utils/users.js'
 
 // 存取`.env`設定檔案使用
 import 'dotenv/config.js'
 
-import { findOne, count } from '../models/base.js'
+import { findOne, count } from '../db-utils/base.js'
 
 // 使用者資料表名稱
 const dbTable = 'users'

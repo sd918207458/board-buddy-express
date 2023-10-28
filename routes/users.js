@@ -19,7 +19,7 @@ import {
   count,
   updateById,
   removeById,
-} from '../models/base.js'
+} from '../db-utils/base.js'
 
 // 使用者資料表名稱
 const dbTable = 'users'

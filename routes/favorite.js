@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { executeQuery } from '../models/base.js'
+import { executeQuery } from '../db-utils/base.js'
 
 import authenticate from '../middlewares/jwt.js'
 

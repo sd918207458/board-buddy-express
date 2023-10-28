@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { findOne, insertOne, count } from '../models/base.js'
+import { findOne, insertOne, count } from '../db-utils/base.js'
 
 import jsonwebtoken from 'jsonwebtoken'
 // 存取`.env`設定檔案使用

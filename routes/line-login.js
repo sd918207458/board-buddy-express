@@ -2,7 +2,7 @@ import express from 'express'
 const router = express.Router()
 import jsonwebtoken from 'jsonwebtoken'
 
-import { findOne, insertOne, count } from '../models/base.js'
+import { findOne, insertOne, count } from '../db-utils/base.js'
 // line-login模組
 import line_login from '../services/line-login.js'
 
