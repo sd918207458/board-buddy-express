@@ -3,7 +3,9 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "debug": "DEBUG=express:* node ./bin/www",
+    "debug-win": "set DEBUG=express:* & node ./bin/www"
   },
   "dependencies": {
     "bluebird": "^3.7.2",
