@@ -15,6 +15,8 @@
 
 ## FIXME
 
+- [x] remove express-fileupload and only use multer
+
 ## Design Rules
 
 ### REST API
