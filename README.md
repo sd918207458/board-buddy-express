@@ -15,6 +15,43 @@
 
 ## FIXME
 
+## Design Rules
+
+### REST API
+
+#### standards
+
+- [JSend](https://github.com/omniti-labs/jsend)
+- [Microsoft Azure REST API Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md)
+- [Google JSON guide](https://google.github.io/styleguide/jsoncstyleguide.xml)
+
+#### status code
+
+```text
+GET: 200 OK
+POST: 201 Created
+PUT: 200 OK
+PATCH: 200 OK
+DELETE: 204 No Content
+```
+
+```text
+200 OK - the request was successful and the response contains the requested data
+201 Created - the request was successful and a new resource was created
+400 Bad Request - the request was invalid or missing required parameters
+401 Unauthorized - the client needs to authenticate to access the resource
+404 Not Found - the requested resource was not found
+500 Internal Server Error - an unexpected error occurred on the server
+```
+
+#### pagnation
+
+```
+GET /posts?limit=10&offset=0 - retrieves the first 10 posts
+GET /posts?limit=10&offset=10 - retrieves the second 10 posts
+GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
+```
+
 
 ## Changlog
 
