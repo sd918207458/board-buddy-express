@@ -3,12 +3,8 @@ import { Sequelize, Model, DataTypes } from 'sequelize'
 // 讀取.env檔用
 import 'dotenv/config.js'
 
-import * as fs from 'fs'
-import path from 'path'
-// 修正 __dirname for esm, windows dynamic import bug
-import { fileURLToPath, pathToFileURL } from 'url'
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import applyModels from './models-setup.js'
+import applySeeds from './seeds-setup.js'
 
 // 資料庫連結資訊
 const sequelize = new Sequelize(
@@ -42,25 +38,20 @@ sequelize
   })
 
 // 載入models中的各檔案
-const modelsPath = path.join(__dirname, 'models')
-const filenames = await fs.promises.readdir(modelsPath)
-
-for (const filename of filenames) {
-  const item = await import(pathToFileURL(path.join(modelsPath, filename)))
-  item.default(sequelize)
-}
+await applyModels(sequelize)
 
 // This checks what is the current state of the table in the database
 // (which columns it has, what are their data types, etc),
 // and then performs the necessary changes in the table to make it match the model.
-await sequelize.sync({ alter: true })
+// await sequelize.sync({ alter: true })
+await sequelize.sync({ force: true })
+
 console.log(
   'INFO - 所有模型已完成同步化 All models were synchronized successfully.'
     .bgGreen
 )
 
-// We execute any extra setup after the models are defined, such as adding associations.
-// applyExtraSetup(sequelize)
+await applySeeds(sequelize)
 
 // 輸出模組
 export default sequelize

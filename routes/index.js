@@ -1,18 +1,19 @@
 import express from 'express'
 const router = express.Router()
 
-import sequelize from '#root/sequelize/index.js'
+import sequelize from '#root/config/db/index.js'
+const { User } = sequelize.models
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
-  const users = await sequelize.models.User.findAll()
+  const users = await User.findAll()
   res.json({ users })
 })
 
 router.get('/create', async function (req, res, next) {
-  const jane = await sequelize.models.User.create({ name: 'Jane' })
+  const jane = await User.create({ name: 'Jane' })
 
-  console.log(jane instanceof sequelize.models.User) // true
+  console.log(jane instanceof User) // true
   console.log(jane.name) // "Jane"
   res.json({ msg: 'success' })
 })

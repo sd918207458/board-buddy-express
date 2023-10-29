@@ -1,7 +1,7 @@
 // mysql promise pool
 // import pool from '../config/db.js'
 // import sequelize from '../config/mysql.js'
-import sequelize from '#root/sequelize/index.js'
+import sequelize from '#root/config/db/index.js'
 
 import { QueryTypes } from 'sequelize'
 
