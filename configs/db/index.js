@@ -6,6 +6,10 @@ import 'dotenv/config.js'
 import applyModels from './models-setup.js'
 import applySeeds from './seeds-setup.js'
 
+// { alter: true }
+// { force: true }
+const syncOption = {}
+
 // 資料庫連結資訊
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
@@ -15,7 +19,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'mysql',
-    logging: false,
+    logging: (msg) => console.log(msg.bgWhite),
     define: {
       // prevent sequelize from pluralizing table names
       freezeTableName: true,
@@ -40,18 +44,18 @@ sequelize
 // 載入models中的各檔案
 await applyModels(sequelize)
 
-// This checks what is the current state of the table in the database
-// (which columns it has, what are their data types, etc),
-// and then performs the necessary changes in the table to make it match the model.
-// await sequelize.sync({ alter: true })
-await sequelize.sync({ force: true })
+// 同步化模型與資料庫結構+資料
+await sequelize.sync(syncOption)
+
+// 如果有強制(force)更新或變動(alter)更新，才會用模型範例資料更新
+if (syncOption.force || syncOption.alter) {
+  await applySeeds(sequelize)
+}
 
 console.log(
   'INFO - 所有模型已完成同步化 All models were synchronized successfully.'
     .bgGreen
 )
-
-await applySeeds(sequelize)
 
 // 輸出模組
 export default sequelize
