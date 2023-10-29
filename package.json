@@ -58,6 +58,9 @@
   "nodemonConfig": {
     "ignore": [
       "sessions/*",
+      "data/*",
+      "seeds/*",
+      "public/*",
       "node_modules/*"
     ]
   },
