@@ -5,10 +5,37 @@ const __dirname = path.dirname(__filename)
 // 導入dotenv 使用 .env 檔案中的設定值 process.env
 import dotenv from 'dotenv'
 
+import { readFile, writeFile } from 'fs/promises'
+
+/**
+ * Fetching data from the JSON file and parse to JS data
+ * @param {string} pathname
+ * @returns {Promise<object>} A promise that contains json parse object
+ */
+export const readJsonFile = async (pathname) => {
+  const data = await readFile(path.join(process.cwd(), pathname))
+  return JSON.parse(data)
+}
+
+export const writeJsonFile = async (pathname, jsonOrObject) => {
+  try {
+    // we need string
+    const data =
+      typeof jsonOrObject === 'object'
+        ? JSON.stringify(jsonOrObject)
+        : jsonOrObject
+
+    await writeFile(path.join(process.cwd(), pathname), data)
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 // 讓console.log可以呈現檔案與行號
-// console.log show line number
 //https://stackoverflow.com/questions/45395369/how-to-get-console-log-line-numbers-shown-in-nodejs
-function extendLog() {
+export const extendLog = () => {
   /* eslint-disable */
   ;['log', 'warn', 'error'].forEach((methodName) => {
     const originalMethod = console[methodName]
@@ -34,7 +61,7 @@ function extendLog() {
 }
 
 // 檢查空物件
-function isEmpty(obj) {
+export const isEmpty = (obj) => {
   /* eslint-disable */
   for (var prop in obj) {
     if (obj.hasOwnProperty(prop)) return false
@@ -43,15 +70,13 @@ function isEmpty(obj) {
   /* eslint-enable  */
 }
 
-const toKebabCase = (str) =>
+export const toKebabCase = (str) =>
   str &&
   str
     .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
     .map((x) => x.toLowerCase())
     .join('-')
 
-const loadEnv = (fileExt = '') => {
+export const loadEnv = (fileExt = '') => {
   dotenv.config({ path: `${fileExt ? '.env' : '.env' + fileExt}` })
 }
-
-export { extendLog, isEmpty, toKebabCase, loadEnv }

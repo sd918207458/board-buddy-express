@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 import { createOtp, updatePassword } from '../db-utils/otp.js'
-import transporter from '../config/mail.js'
+import transporter from '#configs/mail.js'
 import 'dotenv/config.js'
 
 // 電子郵件文字訊息樣版

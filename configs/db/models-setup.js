@@ -4,10 +4,12 @@ import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+import appRootPath from 'app-root-path'
+console.log(appRootPath.path)
 
 export default async function applyModels(sequelize) {
   // 載入models中的各檔案
-  const modelsPath = path.join(__dirname, '../../models')
+  const modelsPath = path.join(appRootPath.path, '/models')
   const filenames = await fs.promises.readdir(modelsPath)
 
   for (const filename of filenames) {

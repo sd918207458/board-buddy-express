@@ -4,6 +4,11 @@
     "module": "commonjs",
     "paths": {
       "#root/*": ["./*"],
+      "#configs/*": ["./configs/*"],
+      "#data/*": ["./data/*"],
+      "#middlewares/*": ["./middlewares/*"],
+      "#services/*": ["./services/*"],
+      "#utils/*": ["./utils/*"]
     },
   },
   "exclude": ["node_modules"]

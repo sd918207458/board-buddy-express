@@ -1,5 +1,5 @@
 import express from 'express'
-import transporter from '../config/mail.js'
+import transporter from '#configs/mail.js'
 import 'dotenv/config.js'
 
 const router = express.Router()

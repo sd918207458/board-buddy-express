@@ -1,6 +1,6 @@
 // 資料庫查詢處理函式
 import { insertOne, findOne, updateById, removeById } from './base.js'
-import { generateToken } from '../config/otp.js'
+import { generateToken } from '#configs/otp.js'
 
 const otpTable = 'otp'
 const userTable = 'users'

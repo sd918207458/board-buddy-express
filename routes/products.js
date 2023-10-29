@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { readJsonFile } from '../utils/json-tool.js'
+import { readJsonFile } from '#utils/tool.js'
 
 import {
   getProducts,

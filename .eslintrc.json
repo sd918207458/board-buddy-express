@@ -16,10 +16,15 @@
     "ecmaVersion": 2022
   },
   "settings": {
-    "import/resolver" : {
+    "import/resolver": {
       "alias": {
         "map": [
-          ["#root", "./"]
+          ["#root", "./"],
+          ["#configs", "./configs/"],
+          ["#data", "./data/"],
+          ["#middlewares", "./middlewares/"],
+          ["#services", "./services/"],
+          ["#utils", "./utils/"]
         ],
         "extensions": [".js", ".json", ".node"]
       }

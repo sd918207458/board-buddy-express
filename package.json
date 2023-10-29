@@ -9,6 +9,7 @@
     "debug-win": "set DEBUG=express:* & node ./bin/www"
   },
   "dependencies": {
+    "app-root-path": "^3.1.0",
     "bluebird": "^3.7.2",
     "colors": "^1.4.0",
     "cookie-parser": "~1.4.4",
@@ -62,6 +63,11 @@
     ]
   },
   "imports": {
-    "#root/*": "./*"
+    "#root/*": "./*",
+    "#configs/*": "./configs/*",
+    "#data/*": "./data/*",
+    "#middlewares/*": "./middlewares/*",
+    "#services/*": "./services/*",
+    "#utils/*": "./utils/*"
   }
 }
