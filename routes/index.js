@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import sequelize from '../config/mysql.js'
+import sequelize from '#root/sequelize/index.js'
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {

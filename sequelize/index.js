@@ -32,15 +32,17 @@ const sequelize = new Sequelize(
 sequelize
   .authenticate()
   .then(() => {
-    console.log('INFO - Database connected.'.bgGreen)
+    console.log('INFO - 資料庫已連線 Database connected.'.bgGreen)
   })
   .catch((error) => {
-    console.log('ERROR - Unable to connect to the database.'.bgRed)
+    console.log(
+      'ERROR - 無法連線至資料庫 Unable to connect to the database.'.bgRed
+    )
     console.error(error)
   })
 
-// 載入models中的各檔案使用
-const modelsPath = path.join(__dirname, '../models')
+// 載入models中的各檔案
+const modelsPath = path.join(__dirname, 'models')
 const filenames = await fs.promises.readdir(modelsPath)
 
 for (const filename of filenames) {
@@ -48,48 +50,17 @@ for (const filename of filenames) {
   item.default(sequelize)
 }
 
-// const modelDefiners = [await import('../models/user.js')]
-
-// // We define all models according to their files.
-// for (const modelDefiner of modelDefiners) {
-//   modelDefiner.default(sequelize)
-// }
-
 // This checks what is the current state of the table in the database
 // (which columns it has, what are their data types, etc),
 // and then performs the necessary changes in the table to make it match the model.
 await sequelize.sync({ alter: true })
-console.log('All models were synchronized successfully.')
+console.log(
+  'INFO - 所有模型已完成同步化 All models were synchronized successfully.'
+    .bgGreen
+)
+
 // We execute any extra setup after the models are defined, such as adding associations.
 // applyExtraSetup(sequelize)
-
-// // model test
-// const User = sequelize.define(
-//   'user',
-//   {
-//     name: DataTypes.TEXT,
-//     favoriteColor: {
-//       type: DataTypes.TEXT,
-//       defaultValue: 'green',
-//     },
-//     age: DataTypes.INTEGER,
-//     cash: DataTypes.INTEGER,
-//   },
-//   {
-//     underscored: true,
-//     createdAt: 'created_at',
-//     updatedAt: 'updated_at',
-//   }
-// )
-
-// // create table
-// await sequelize.sync({ force: true })
-
-// // new a instance
-// const jane = await User.create({ name: 'Jane' })
-
-// console.log(jane instanceof User) // true
-// console.log(jane.name) // "Jane"
 
 // 輸出模組
 export default sequelize

@@ -1,6 +1,8 @@
 // mysql promise pool
 // import pool from '../config/db.js'
-import sequelize from '../config/mysql.js'
+// import sequelize from '../config/mysql.js'
+import sequelize from '#root/sequelize/index.js'
+
 import { QueryTypes } from 'sequelize'
 
 // 專用處理sql字串的工具，主要format與escape，防止sql injection

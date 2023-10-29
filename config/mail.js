@@ -23,10 +23,12 @@ const transporter = nodemailer.createTransport(transport)
 transporter.verify((error, success) => {
   if (error) {
     // 發生錯誤
-    console.error('ERROR - SMTP server connect failed.'.bgRed)
+    console.error(
+      'ERROR - 無法連線至SMTP伺服器 Unable to connect to the SMTP server.'.bgRed
+    )
   } else {
     // 代表成功
-    console.log('INFO - SMTP server connected. Ready to send mail!'.bgGreen)
+    console.log('INFO - SMTP伺服器已連線 SMTP server connected.'.bgGreen)
   }
 })
 

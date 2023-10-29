@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
-  const User = sequelize.define(
+  return sequelize.define(
     'User',
     {
       id: {
@@ -25,7 +25,6 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
       },
-
       age: DataTypes.INTEGER,
     },
     {
@@ -39,6 +38,7 @@ export default async function (sequelize) {
           // User.hasMany(models.Response, { foreignKey: { allowNull: false } });
         },
       },
+      tableName: 'user',
 
       timestamps: true,
 
@@ -54,6 +54,4 @@ export default async function (sequelize) {
       updatedAt: 'updated_at',
     }
   )
-
-  return User
 }
