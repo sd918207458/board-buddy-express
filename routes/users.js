@@ -1,11 +1,8 @@
 import express from 'express'
 const router = express.Router()
 
-// 檢查空物件
-import { isEmpty } from '../utils/tool.js'
-
-// 認証用middleware(中介軟體)
-// import auth from '../middlewares/auth.js'
+// 檢查空物件, 轉換req.params為數字
+import { isEmpty, getIdParam } from '#utils/tool.js'
 
 // 上傳檔案用使用multer(另一方案是使用express-fileupload)
 import multer from 'multer'
@@ -21,20 +18,27 @@ import {
   removeById,
 } from '../db-utils/base.js'
 
+import sequelize from '#configs/db/index.js'
+const { User } = sequelize.models
+
 // 使用者資料表名稱
 const dbTable = 'users'
 
 // GET - 得到所有會員資料
-router.get('/', async function (req, res, next) {
-  const { rows } = await find(dbTable)
-  const users = rows
-  return res.json({ message: 'success', code: '200', users })
+router.get('/', async function (req, res) {
+  const users = await User.findAll()
+  // 處理如果沒找到資料
+
+  // 標準回傳JSON
+  return res.json({ status: 'success', data: { users } })
 })
 
 // GET - 得到單筆資料(注意，有動態參數時要寫在GET區段最後面)
-router.get('/:userId', async function (req, res, next) {
-  const user = await findOneById(dbTable, req.params.userId)
-  return res.json({ message: 'success', code: '200', user })
+router.get('/:id', async function (req, res) {
+  // 轉為數字
+  const id = getIdParam(req)
+  const user = await User.findByPk(id)
+  return res.json({ status: 'success', data: { user } })
 })
 
 // POST - 上傳檔案用，使用express-fileupload
@@ -123,7 +127,7 @@ router.post('/', async function (req, res, next) {
 })
 
 // PUT - 更新會員資料
-router.put('/:userId', async function (req, res, next) {
+router.put('/:id', async function (req, res, next) {
   const userId = req.params.userId
   const user = req.body
   console.log(userId, user)
@@ -131,7 +135,7 @@ router.put('/:userId', async function (req, res, next) {
   // 檢查是否有從網址上得到userId
   // 檢查從瀏覽器來的資料，如果為空物件則失敗
   if (!userId || isEmpty(user)) {
-    return res.json({ message: 'error', code: '400' })
+    return res.json({ status: 'error', code: '400' })
   }
 
   // 這裡可以再檢查從react來的資料，哪些資料為必要(name, username...)
@@ -152,16 +156,25 @@ router.put('/:userId', async function (req, res, next) {
 })
 
 // PUT - 刪除會員資料
-router.delete('/:userId', async function (req, res, next) {
-  const result = await removeById(dbTable, req.params.userId)
+router.delete('/:id', async function (req, res, next) {
+  const id = getIdParam(req)
+
+  const affectedRows = await User.destroy({
+    where: {
+      id,
+    },
+  })
 
   // 沒有更新到任何資料 -> 失敗
-  if (!result.affectedRows) {
-    return res.json({ message: 'fail', code: '400' })
+  if (!affectedRows) {
+    return res.json({
+      status: 'fail',
+      message: 'Unable to detele.',
+    })
   }
 
   // 成功
-  return res.json({ message: 'success', code: '200' })
+  return res.json({ status: 'success', data: null })
 })
 
 export default router
