@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
   return sequelize.define(
-    'Shop_Customer',
+    'Brand',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -39,7 +39,6 @@ export default async function (sequelize) {
         },
       },
       // tableName: 'user',
-
       timestamps: true,
 
       // don't delete database entries but set the newly added attribute deletedAt
