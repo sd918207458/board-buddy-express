@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Nike",
+    "slug": "nike",
+    "keywords": "nike",
+    "logo": "",
+    "description": "This is the description of the brand"
+  },
+  {
+    "id": 2,
+    "name": "adidas",
+    "slug": "adidas",
+    "keywords": "adidas",
+    "logo": "",
+    "description": "This is the description of the brand"
+  },
+  {
+    "id": 3,
+    "name": "PUMA",
+    "slug": "puma",
+    "keywords": "puma",
+    "logo": "",
+    "description": "This is the description of the brand"
+  },
+  {
+    "id": 4,
+    "name": "New Balance",
+    "slug": "new-balance",
+    "keywords": "New Balance, newbanlance",
+    "logo": "",
+    "description": "This is the description of the brand"
+  }
+]
