@@ -29,7 +29,7 @@ const upload = multer({ storage: storage })
 
 // GET - 得到所有會員資料
 router.get('/', async function (req, res) {
-  const users = await User.findAll()
+  const users = await User.findAll({ logging: console.log })
   // 處理如果沒找到資料
 
   // 標準回傳JSON

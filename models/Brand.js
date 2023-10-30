@@ -13,44 +13,26 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      username: {
+      slug: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      password: {
+      logo: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      email: {
-        type: DataTypes.STRING,
+      description: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
-      age: DataTypes.INTEGER,
     },
     {
-      classMethods: {
-        associate: function (models) {
-          // User.belongsTo(models.Department, { foreignKey: { allowNull: false } });
-          // User.belongsTo(models.Position, { foreignKey: { allowNull: false } });
-          // User.belongsTo(models.Profile, { foreignKey: { allowNull: false } });
-          // User.hasMany(models.Report, { foreignKey: { allowNull: false } });
-          // User.hasMany(models.Notification, { foreignKey: { allowNull: false } });
-          // User.hasMany(models.Response, { foreignKey: { allowNull: false } });
-        },
-      },
-      // tableName: 'user',
-      timestamps: true,
-
-      // don't delete database entries but set the newly added attribute deletedAt
-      // to the current date (when deletion was done). paranoid will only work if
-      // timestamps are enabled
-      paranoid: false,
-
-      // don't use camelcase for automatically added attributes but underscore style
-      // so updatedAt will be updated_at
-      underscored: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
+      tableName: 'brand', //直接提供資料表名稱
+      timestamps: true, // 使用時間戳
+      paranoid: false, // 軟性刪除
+      underscored: true, // 所有自動建立欄位，使用snake_case命名
+      createdAt: 'created_at', // 建立的時間戳
+      updatedAt: 'updated_at', // 更新的時間戳
     }
   )
 }
