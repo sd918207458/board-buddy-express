@@ -13,7 +13,7 @@ const getProducts = async () => {
 
 // 查詢所有資料，加入分頁與搜尋字串功能
 // SELECT *
-// FROM product 
+// FROM product
 // WHERE  name LIKE '%Awesome%'
 //        AND cat_id IN (1,2,3)
 //        AND (
