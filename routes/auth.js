@@ -3,7 +3,7 @@ const router = express.Router()
 
 import jsonwebtoken from 'jsonwebtoken'
 // 中介軟體，存取隱私會員資料用
-import authenticate from '#middlewares/jwt.js'
+import authenticate from '#middlewares/authenticate.js'
 
 // 存取`.env`設定檔案使用
 import 'dotenv/config.js'
