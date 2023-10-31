@@ -1,14 +1,12 @@
-// !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫，指令為`npm run db-init`
+// !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫資料，指令為`npm run db-init`
 
 import sequelize from '#configs/db/index.js'
 import applySeeds from './seeds-setup.js'
 // import applyAssociations from './associations-setup.js'
 
-// 讓console.log可以呈現檔案與行號
+// 讓console.log可以呈現檔案與行號，呈現顏色用
 import { extendLog } from '#utils/tool.js'
-// 執行全域套用
 extendLog()
-// console.log呈現顏色用 全域套用
 import 'colors'
 
 // 注意，這只會更改資料庫中的表，而不會更改JS端的模型

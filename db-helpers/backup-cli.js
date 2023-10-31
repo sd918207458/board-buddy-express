@@ -1,20 +1,20 @@
-// !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫，指令為`npm run db-backup`
+// !! 注意: 此檔案不是express執行時用，只用於備份資料庫，指令為`npm run db-backup`，備份至`db-backups`目錄中
 
 import fs from 'fs'
 import path from 'path'
 import { spawn } from 'child_process'
 
-// 讓console.log可以呈現檔案與行號
+// 讓console.log可以呈現檔案與行號，呈現顏色用
 import { extendLog } from '#utils/tool.js'
-// 執行全域套用
 extendLog()
-// console.log呈現顏色用 全域套用
 import 'colors'
 
 // 讀取.env檔用
 import 'dotenv/config.js'
 
+// 備份資料夾
 const folder = './db-backups'
+// 相關資料庫設定
 const config = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -23,6 +23,7 @@ const config = {
   database: process.env.DB_DATABASE,
 }
 
+// 備份出的檔案名稱
 const date = new Date()
 const dumpFileName = `${date.getFullYear()}${
   date.getMonth() + 1
@@ -30,8 +31,8 @@ const dumpFileName = `${date.getFullYear()}${
 
 const filePath = path.join(process.cwd(), `${folder}/` + dumpFileName)
 
+// 執行備份指令
 const writeStream = fs.createWriteStream(filePath)
-
 const dump = spawn('mysqldump', [
   '-h',
   config.host,
@@ -43,11 +44,12 @@ const dump = spawn('mysqldump', [
   config.database,
 ])
 
+// 輸出訊息
 dump.stdout
   .pipe(writeStream)
   .on('finish', function () {
     console.log(
-      `INFO - 資料庫${config.database}已備份完成 database backup completed.`
+      `INFO - 資料庫"${config.database}"已備份完成，檔名為"${dumpFileName}". database backup completed.`
         .bgGreen
     )
   })
