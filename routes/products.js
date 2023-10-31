@@ -1,16 +1,16 @@
 import express from 'express'
 const router = express.Router()
 
-import { readJsonFile } from '#utils/tool.js'
+// import { readJsonFile } from '#utils/tool.js'
 
-import {
-  getProducts,
-  getProductsWithQS,
-  getProductById,
-  countWithQS,
-} from '../db-utils/products.js'
+// import {
+//   getProducts,
+//   getProductsWithQS,
+//   getProductById,
+//   countWithQS,
+// } from '../db-utils/products.js'
 // 專用處理sql字串的工具，主要format與escape，防止sql injection
-import sqlString from 'sqlstring'
+// import sqlString from 'sqlstring'
 
 // 獲得所有資料，加入分頁與搜尋字串功能，單一資料表處理
 // products/qs?page=1&keyword=xxxx&cat_ids=1,2&sizes=1,2&tags=3,4&colors=1,2,3&orderby=id,asc&perpage=10&price_range=1500,10000
@@ -34,9 +34,7 @@ router.get('/qs', async (req, res, next) => {
   const conditions = []
 
   // 關鍵字 keyword 使用 `name LIKE '%keyword%'`
-  conditions[0] = keyword
-    ? `name LIKE ${sqlString.escape('%' + keyword + '%')}`
-    : ''
+  conditions[0] = keyword ? `name LIKE %${keyword}%` : ''
 
   // 分類，cat_id 使用 `cat_id IN (1, 2, 3, 4, 5)`
   conditions[1] = cat_ids ? `cat_id IN (${cat_ids})` : ''

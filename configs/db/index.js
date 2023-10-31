@@ -1,22 +1,9 @@
-import { Sequelize, Model, DataTypes } from 'sequelize'
+import { Sequelize } from 'sequelize'
 
 // 讀取.env檔用
 import 'dotenv/config.js'
 
-import applyModels from './models-setup.js'
-import applySeeds from './seeds-setup.js'
-
-// sync 的值有以下三種
-// { alter: true } 檢查資料庫中資料表的當前狀態(它有哪些列,它們的資料類型等),然後在表中進行必要的更改，使其與模型匹配.
-// { force: true } 將建立資料表,如果表已經存在,則將其首先刪除
-// {} 如果表不存在,則建立該表(如果已經存在,則不執行任何操作)
-
-// logging: (msg) => console.log(msg.bgWhite),
-// logging: false
-const options = {
-  logging: false,
-  sync: {},
-}
+import applyModels from '#root/db-helpers/sequelize/models-setup.js'
 
 // 資料庫連結資訊
 const sequelize = new Sequelize(
@@ -27,7 +14,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'mysql',
-    logging: options.logging,
+    logging: false,
     define: {
       freezeTableName: true,
       charset: 'utf8',
@@ -54,13 +41,12 @@ await applyModels(sequelize)
 
 // 同步化模型與資料庫結構
 // 注意，這只會更改資料庫中的表，而不會更改JS端的模型
-await sequelize.sync(options.sync)
-
-// 如果有強制(force)更新或變動(alter)更新，才會用模型範例資料更新
-// 同步化模型與資料庫資料
-if (options.sync.force || options.sync.alter) {
-  await applySeeds(sequelize)
-}
+// 需要更動資料表的範例資料(seeds)，請使用`npm run db-init`
+// sync 的值有以下三種
+// { alter: true } 檢查資料庫中資料表的當前狀態(它有哪些列,它們的資料類型等),然後在表中進行必要的更改，使其與模型匹配.
+// { force: true } 將建立資料表,如果表已經存在,則將其首先刪除
+// {} 如果表不存在,則建立該表(如果已經存在,則不執行任何操作)
+await sequelize.sync({})
 
 console.log(
   'INFO - 所有模型已完成同步化 All models were synchronized successfully.'
