@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize'
 // 讀取.env檔用
 import 'dotenv/config.js'
 
-import applyModels from '#root/db-helpers/sequelize/models-setup.js'
+import applyModels from '#db-helpers/sequelize/models-setup.js'
 
 // 資料庫連結資訊
 const sequelize = new Sequelize(

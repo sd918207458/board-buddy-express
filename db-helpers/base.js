@@ -1,7 +1,7 @@
 // mysql promise pool
 // import pool from '../config/db.js'
 // import sequelize from '../config/mysql.js'
-import sequelize from '#configs/db/index.js'
+import sequelize from '#configs/db.js'
 
 import { QueryTypes } from 'sequelize'
 
@@ -9,7 +9,7 @@ import { QueryTypes } from 'sequelize'
 import sqlString from 'sqlstring'
 
 // 檢查空物件
-import { isEmpty } from '../utils/tool.js'
+import { isEmpty } from '#utils/tool.js'
 
 // 控制是否要呈現除錯訊息
 import 'dotenv/config.js'

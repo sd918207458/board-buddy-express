@@ -2,9 +2,9 @@ import express from 'express'
 const router = express.Router()
 import jsonwebtoken from 'jsonwebtoken'
 
-import { findOne, insertOne, count } from '../db-utils/base.js'
+import { findOne, insertOne, count } from '#db-helpers/base.js'
 // line-login模組
-import line_login from '../services/line-login.js'
+import line_login from '#services/line-login.js'
 
 // 存取`.env`設定檔案使用
 import 'dotenv/config.js'

@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import sequelize from '#configs/db/index.js'
+import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
 /* GET home page. */

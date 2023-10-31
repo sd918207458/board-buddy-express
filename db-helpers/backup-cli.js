@@ -1,13 +1,12 @@
 // !! 注意: 此檔案不是express執行時用，只用於備份資料庫，指令為`npm run db-backup`，備份至`db-backups`目錄中
-
 import fs from 'fs'
 import path from 'path'
 import { spawn } from 'child_process'
 
-// 讓console.log可以呈現檔案與行號，呈現顏色用
+// 讓console.log呈現檔案與行號，與字串訊息呈現顏色用
 import { extendLog } from '#utils/tool.js'
-extendLog()
 import 'colors'
+extendLog()
 
 // 讀取.env檔用
 import 'dotenv/config.js'

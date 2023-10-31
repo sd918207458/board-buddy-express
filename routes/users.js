@@ -3,10 +3,10 @@ const router = express.Router()
 
 // 檢查空物件, 轉換req.params為數字
 import { isEmpty } from '#utils/tool.js'
-import { getIdParam } from '#utils/db-tool.js'
+import { getIdParam } from '#db-helpers/db-tool.js'
 
 // 資料庫使用
-import sequelize from '#configs/db/index.js'
+import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
 // 上傳檔案用使用multer(另一方案是使用express-fileupload)

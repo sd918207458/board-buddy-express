@@ -3,12 +3,7 @@ const router = express.Router()
 
 // const orderModel = require('../db-utils/order.js')
 
-// require('dotenv').config()
-// const { v4: uuidv4 } = require('uuid')
-//const cache = require('memory-cache')
-//const createLinePayClient = require('line-pay-merchant').createLinePayClient
-
-import { findOne, insertOne, update } from '../db-utils/base.js'
+import { findOne, insertOne, update } from '#db-helpers/base.js'
 import { createLinePayClient } from 'line-pay-merchant'
 import { v4 as uuidv4 } from 'uuid'
 

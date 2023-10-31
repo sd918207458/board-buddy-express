@@ -67,9 +67,10 @@
     ]
   },
   "imports": {
-    "#root/*": "./*",
+    "##/*": "./*",
     "#configs/*": "./configs/*",
     "#data/*": "./data/*",
+    "#db-helpers/*": "./db-helpers/*",
     "#middlewares/*": "./middlewares/*",
     "#services/*": "./services/*",
     "#utils/*": "./utils/*"

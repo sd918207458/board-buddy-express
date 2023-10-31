@@ -1,9 +1,9 @@
 import express from 'express'
 const router = express.Router()
 
-import { executeQuery } from '../db-utils/base.js'
+import { executeQuery } from '#db-helpers/base.js'
 
-import authenticate from '../middlewares/jwt.js'
+import authenticate from '#middlewares/jwt.js'
 
 // 獲得某會員id的有加入到我的最愛清單中的商品id們
 router.get('/my-favorite', authenticate, async (req, res, next) => {
