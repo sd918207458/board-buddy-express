@@ -21,6 +21,7 @@ export default async function applySeeds(sequelize) {
 
     await sequelize.models[prop].bulkCreate(seeds, {
       ignoreDuplicates: true,
+      individualHooks: true, // trigger the beforeCreate hook
     })
   }
 }

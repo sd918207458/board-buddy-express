@@ -1,0 +1,106 @@
+import express from 'express'
+const router = express.Router()
+
+import jsonwebtoken from 'jsonwebtoken'
+// 中介軟體，存取隱私會員資料用
+import authenticate from '#middlewares/jwt.js'
+
+// 存取`.env`設定檔案使用
+import 'dotenv/config.js'
+
+// 資料庫使用
+import { QueryTypes } from 'sequelize'
+import sequelize from '#configs/db.js'
+const { User } = sequelize.models
+
+// 驗証加密密碼字串用
+import { compareHash } from '#db-helpers/password-hash.js'
+
+// 定義安全的私鑰字串
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
+// 測試中介軟體用
+router.get('/private', authenticate, (req, res) => {
+  const user = req.user
+  // 這裡可以加上所需的資料庫查詢
+
+  return res.json({ status: 'success', data: { user } })
+})
+
+// 檢查登入狀態用
+router.get('/check', authenticate, async (req, res) => {
+  const user = req.user
+  return res.json({ status: 'success', data: { user } })
+})
+
+router.post('/login', async (req, res) => {
+  // 從前端來的資料 req.body = { username:'xxxx', password :'xxxx'}
+  const loginUser = req.body
+
+  // 檢查從前端來的資料哪些為必要
+  if (!loginUser.username || !loginUser.password) {
+    return res.json({ status: 'fail', data: null })
+  }
+
+  // 查詢資料庫，是否有這帳號與密碼的使用者資料
+  // 方式一: 使用直接查詢
+  const user = await sequelize.query(
+    'SELECT * FROM user WHERE username=? LIMIT 1',
+    {
+      replacements: [loginUser.username], //代入問號值
+      type: QueryTypes.SELECT, //執行為SELECT
+      plain: true, // 只回傳第一筆資料
+      raw: true, // 只需要資料表中資料
+      logging: console.log, // SQL執行呈現在console.log
+    }
+  )
+
+  // 方式二: 使用模型查詢
+  // const user = await User.findOne({
+  //   where: {
+  //     username: newUser.username,
+  //   },
+  //   raw: true, // 只需要資料表中資料
+  // })
+
+  // console.log(user)
+
+  // user=null代表不存在
+  if (!user) {
+    return res.json({ status: 'error', message: '使用者不存在' })
+  }
+
+  // 比較密碼hash與登入用的密碼字串正確性
+  // isValid=true 代表正確
+  const isValid = await compareHash(loginUser.password, user.password)
+
+  // isValid=false 代表密碼錯誤
+  if (!isValid) {
+    return res.json({ status: 'error', message: '密碼錯誤' })
+  }
+
+  // user的password資料不應該也不需要回應給瀏覽器
+  delete user.password
+
+  // 產生存取令牌(access token)，其中包含會員資料
+  const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
+    expiresIn: '24h',
+  })
+
+  // 使用httpOnly cookie來讓瀏覽器端儲存access token
+  res.cookie('accessToken', accessToken, { httpOnly: true })
+
+  // 傳送access token回應(例如react可以儲存在state中使用)
+  res.json({
+    status: 'success',
+    data: { accessToken },
+  })
+})
+
+router.post('/logout', authenticate, (req, res) => {
+  // 清除cookie
+  res.clearCookie('accessToken', { httpOnly: true })
+  res.json({ status: 'success', data: null })
+})
+
+export default router

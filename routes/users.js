@@ -9,11 +9,11 @@ import { getIdParam } from '#db-helpers/db-tool.js'
 import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
-// 上傳檔案用使用multer(另一方案是使用express-fileupload)
+// 上傳檔案用使用multer
 import path from 'path'
 import multer from 'multer'
 
-// multer的設定值
+// multer的設定值 - START
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     // 存放目錄
@@ -24,8 +24,8 @@ const storage = multer.diskStorage({
     callback(null, req.body.newFilename + path.extname(file.originalname))
   },
 })
-
 const upload = multer({ storage: storage })
+// multer的設定值 - END
 
 // GET - 得到所有會員資料
 router.get('/', async function (req, res) {
@@ -56,11 +56,6 @@ router.post('/', async function (req, res) {
 
   // 要新增的會員資料
   const newUser = req.body
-
-  // 檢查從瀏覽器來的資料，如果為空物件則失敗
-  if (isEmpty(newUser)) {
-    return res.json({ status: 'fail', data: null })
-  }
 
   // 檢查從前端來的資料哪些為必要(name, username...)
   if (
