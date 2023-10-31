@@ -1,5 +1,5 @@
 // !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫資料，指令為`npm run db-init`
-import sequelize from '#configs/db/index.js'
+import sequelize from '#configs/db.js'
 import applySeeds from './seeds-setup.js'
 // import applyAssociations from './associations-setup.js'
 
@@ -26,3 +26,7 @@ console.log(
 
 // 同步化資料庫關聯
 // applyAssociations(sequelize)
+
+// Ends the process
+// eslint-disable-next-line
+process.exit()
