@@ -1,6 +1,8 @@
 import express from 'express'
 const router = express.Router()
+
 import { createOtp, updatePassword } from '#db-helpers/otp.js'
+
 import transporter from '#configs/mail.js'
 import 'dotenv/config.js'
 
@@ -39,10 +41,11 @@ router.post('/otp', async (req, res, next) => {
     text: mailText(otp.token),
   }
 
+  // 寄送email
   transporter.sendMail(mailOptions, (err, response) => {
     if (err) {
       // 失敗處理
-      //console.log(err)
+      // console.log(err)
       return res.json({ status: 'error', message: '發送otp電子郵件失敗' })
     } else {
       // 成功回覆的json
@@ -52,17 +55,22 @@ router.post('/otp', async (req, res, next) => {
 })
 
 // 重設密碼用
-router.post('/reset', async (req, res, next) => {
+router.post('/reset', async (req, res) => {
   const { email, token, password } = req.body
 
-  if (!token) return res.json({ message: 'fail', code: '400' })
+  if (!token || !email || !password) {
+    return res.json({ status: 'error', message: '缺少必要資料' })
+  }
 
-  // updatePassword中會驗証otp的存在與合法性(是否有到期)
+  // updatePassword中驗証otp的存在與合法性(是否有到期)
   const result = await updatePassword(email, token, password)
 
-  if (!result) return res.json({ message: 'fail', code: '400' })
+  if (!result) {
+    return res.json({ status: 'error', message: '修改密碼失敗' })
+  }
 
-  return res.json({ message: 'success', code: '200' })
+  // 成功
+  return res.json({ status: 'success', data: null })
 })
 
 export default router
