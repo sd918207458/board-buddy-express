@@ -8,10 +8,10 @@
 
 ## TODO
 
-- [x] node import alias for root(#root)
+- [x] db password hashing with bcrypt
+- [x] node import alias for root(##)
 - [ ] db naming should change to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
 - [ ] remove single models for each route, change to use base models
-
 
 ## FIXME
 
@@ -53,7 +53,6 @@ GET /posts?limit=10&offset=0 - retrieves the first 10 posts
 GET /posts?limit=10&offset=10 - retrieves the second 10 posts
 GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ```
-
 
 ## Changlog
 
