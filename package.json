@@ -5,6 +5,8 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "dev": "nodemon ./bin/www",
+    "db-init": "node ./db-helpers/sequelize/init-cli.js",
+    "db-backup": "node ./db-helpers/backup-cli.js",
     "debug": "DEBUG=express:* node ./bin/www",
     "debug-win": "set DEBUG=express:* & node ./bin/www"
   },
