@@ -44,24 +44,24 @@ router.post('/login', async (req, res) => {
 
   // 查詢資料庫，是否有這帳號與密碼的使用者資料
   // 方式一: 使用直接查詢
-  const user = await sequelize.query(
-    'SELECT * FROM user WHERE username=? LIMIT 1',
-    {
-      replacements: [loginUser.username], //代入問號值
-      type: QueryTypes.SELECT, //執行為SELECT
-      plain: true, // 只回傳第一筆資料
-      raw: true, // 只需要資料表中資料
-      logging: console.log, // SQL執行呈現在console.log
-    }
-  )
+  // const user = await sequelize.query(
+  //   'SELECT * FROM user WHERE username=? LIMIT 1',
+  //   {
+  //     replacements: [loginUser.username], //代入問號值
+  //     type: QueryTypes.SELECT, //執行為SELECT
+  //     plain: true, // 只回傳第一筆資料
+  //     raw: true, // 只需要資料表中資料
+  //     logging: console.log, // SQL執行呈現在console.log
+  //   }
+  // )
 
   // 方式二: 使用模型查詢
-  // const user = await User.findOne({
-  //   where: {
-  //     username: newUser.username,
-  //   },
-  //   raw: true, // 只需要資料表中資料
-  // })
+  const user = await User.findOne({
+    where: {
+      username: loginUser.username,
+    },
+    raw: true, // 只需要資料表中資料
+  })
 
   // console.log(user)
 

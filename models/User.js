@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize'
-//
-import { generateHash, compareHash } from '#db-helpers/password-hash.js'
+// 加密密碼字串用
+import { generateHash } from '#db-helpers/password-hash.js'
 
 export default async function (sequelize) {
   return sequelize.define(

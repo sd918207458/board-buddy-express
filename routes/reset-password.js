@@ -20,12 +20,15 @@ XXX台灣網站`
 router.post('/otp', async (req, res, next) => {
   const { email } = req.body
 
-  if (!email) return res.json({ message: 'fail', code: '400' })
+  if (!email) return res.json({ status: 'error', message: 'email為必要' })
 
   // 建立otp資料表記錄，成功回傳otp記錄物件，失敗為空物件{}
   const otp = await createOtp(email)
 
-  if (!otp.token) return res.json({ message: 'fail', code: '400' })
+  console.log(otp)
+
+  if (!otp.token)
+    return res.json({ status: 'error', message: '建立otp token失敗' })
 
   // 寄送email
   const mailOptions = {
@@ -39,10 +42,11 @@ router.post('/otp', async (req, res, next) => {
   transporter.sendMail(mailOptions, (err, response) => {
     if (err) {
       // 失敗處理
-      return res.status(400).json({ message: 'fail', detail: err })
+      //console.log(err)
+      return res.json({ status: 'error', message: '發送otp電子郵件失敗' })
     } else {
       // 成功回覆的json
-      return res.json({ message: 'email sent', code: '200' })
+      return res.json({ status: 'success', data: null })
     }
   })
 })
