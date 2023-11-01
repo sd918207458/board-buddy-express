@@ -70,13 +70,20 @@ export const isEmpty = (obj) => {
   /* eslint-enable  */
 }
 
-export const toKebabCase = (str) =>
-  str &&
-  str
-    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    .map((x) => x.toLowerCase())
-    .join('-')
+// 轉換字串為kebab-case
+export const toKebabCase = (str) => {
+  return (
+    str &&
+    str
+      .match(
+        /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g
+      )
+      .map((x) => x.toLowerCase())
+      .join('-')
+  )
+}
 
+// 載入.env檔用
 export const loadEnv = (fileExt = '') => {
   dotenv.config({ path: `${fileExt ? '.env' : '.env' + fileExt}` })
 }
