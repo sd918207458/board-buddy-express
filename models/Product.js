@@ -1,6 +1,4 @@
 import { DataTypes } from 'sequelize'
-// 加密密碼字串用
-import { generateHash } from '#db-helpers/password-hash.js'
 
 export default async function (sequelize) {
   return sequelize.define(
@@ -14,6 +12,10 @@ export default async function (sequelize) {
       sn: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       brand_id: {
         type: DataTypes.INTEGER,
@@ -37,10 +39,6 @@ export default async function (sequelize) {
       },
       info: {
         type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      name: {
-        type: DataTypes.STRING,
         allowNull: true,
       },
     },

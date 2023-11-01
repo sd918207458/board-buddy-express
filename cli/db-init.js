@@ -1,6 +1,6 @@
 // !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫資料，指令為`npm run db-init`
 import sequelize from '#configs/db.js'
-import applySeeds from './seeds-setup.js'
+import applySeeds from '#db-helpers/sequelize/seeds-setup.js'
 // import applyAssociations from './associations-setup.js'
 
 // 讓console.log呈現檔案與行號，與字串訊息呈現顏色用
