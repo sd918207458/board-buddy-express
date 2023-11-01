@@ -49,7 +49,7 @@ await applyModels(sequelize)
 await sequelize.sync({})
 
 console.log(
-  'INFO - 所有模型已完成同步化 All models were synchronized successfully.'
+  'INFO - 所有模型已完成同步化(如果表不存在建立該表) All models were synchronized successfully.'
     .bgGreen
 )
 

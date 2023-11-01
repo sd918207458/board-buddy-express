@@ -20,7 +20,7 @@ await sequelize.sync({ force: true })
 await applySeeds(sequelize)
 
 console.log(
-  'INFO - 所有種子資料已完成同步化 All seeds were synchronized successfully.'
+  'INFO - 所有模型與種子資料已完成同步化(建立資料表,如果表已經存在首先刪除) All seeds were synchronized successfully.'
     .bgGreen
 )
 
