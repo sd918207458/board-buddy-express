@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
   return sequelize.define(
-    'ShopCustomer',
+    'Tag',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -13,21 +13,9 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      username: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
     },
     {
-      tableName: 'shop_customer', //直接提供資料表名稱
+      tableName: 'tag', //直接提供資料表名稱
       timestamps: true, // 使用時間戳
       paranoid: false, // 軟性刪除
       underscored: true, // 所有自動建立欄位，使用snake_case命名

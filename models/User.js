@@ -27,6 +27,26 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      birth_date: {
+        type: DataTypes.DATEONLY, //只需要日期
+        allowNull: true,
+      },
+      sex: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      postcode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       hooks: {

@@ -19,6 +19,39 @@
 
 ## Design Rules
 
+- [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
+- [Modern SQL Style Guide](https://gist.github.com/mattmc3/38a85e6a4ca1093816c08d4815fbebfb)
+
+### DB
+
+### Table Names
+
+Lower Case Table Name
+Table name in Singular
+Prefixed Table name
+
+### Field Names
+
+Use all above cases which include lowercase, no space, no numbers, and avoid prefix.
+
+Choose short names no-longer than two words.
+
+Field names should be easy and understandable.
+
+Primary key can be id or table name_id or it can be a self-explanatory name.
+
+Avoid using reserve words as field name. i.e. — Pre-defined words or Keywords. You can add prefix to these names to make it understandable like user_name, signup_date.
+
+Avoid using column with same name as table name. This can cause confusion while writing query.
+
+Avoid abbreviated, concatenated, or acronym-based names.
+
+Do define a foreign key on database schema.
+
+Foreign key column must have a table name with their primary key.
+
+e.g. blog_id represents foreign key id from table blog.
+
 ### REST API
 
 #### standards
