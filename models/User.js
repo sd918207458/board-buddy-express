@@ -47,6 +47,22 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      google_uid: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      line_uid: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      photo_url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      line_access_token: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       hooks: {
