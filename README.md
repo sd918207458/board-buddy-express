@@ -6,6 +6,38 @@
 - `.env`中`DB_XXX`相關設定，需改為你的資料庫、帳號、密碼才能開始使用
 - 資料庫schema檔案
 
+## 指令
+
+express執行:
+
+```sh
+npm run dev
+```
+
+資料庫種子資料載入:
+
+```sh
+npm run seed
+```
+
+資料庫備份(mysqldump):
+
+```sh
+npm run backup
+```
+
+express執行&除錯(macOS, linux):
+
+```sh
+npm run debug
+```
+
+express執行&除錯(win):
+
+```sh
+npm run debug-win
+```
+
 ## TODO
 
 - [x] db password hashing with bcrypt

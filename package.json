@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www",
-    "db-init": "node ./cli/db-init.js",
-    "db-backup": "node ./cli/db-backup.js",
+    "seed": "node ./cli/db-init.js",
+    "backup": "node ./cli/db-backup.js",
     "debug": "DEBUG=express:* node ./bin/www",
     "debug-win": "set DEBUG=express:* & node ./bin/www"
   },
