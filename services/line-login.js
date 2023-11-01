@@ -2,7 +2,7 @@
 
 import createDebugMessages from 'debug'
 const debug = createDebugMessages('line-login:module')
-import request from 'c'
+import request from 'request'
 import jwt from 'jsonwebtoken'
 import secure_compare from 'secure-compare'
 import crypto from 'crypto'
