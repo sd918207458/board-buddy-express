@@ -22,9 +22,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/backup
 /.temp
-/test
 
 package-lock.json
 yarn.lock
