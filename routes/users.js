@@ -40,6 +40,7 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
   // 轉為數字
   const id = getIdParam(req)
+
   const user = await User.findByPk(id)
   return res.json({ status: 'success', data: { user } })
 })
@@ -78,16 +79,15 @@ router.post('/', async function (req, res) {
     },
   })
 
-  // 新增失敗 created=false代表沒新增
+  // 新增失敗 created=false 代表沒新增
   if (!created) {
     return res.json({ status: 'error', message: '建立會員失敗' })
   }
 
-  console.log(user.id)
-
-  // 成功建立會員的回應(不需要回傳資料)
-  // 201標準回應
-  res.location(`/users/${user.id}`)
+  // 成功建立會員的回應
+  // 狀態`201`是建立資料的標準回應，
+  // 如有必要可以加上`Location`會員建立的uri在回應標頭中，或是回應剛建立的資料
+  // res.location(`/users/${user.id}`)
   return res.status(201).json({
     status: 'success',
     data: null,
