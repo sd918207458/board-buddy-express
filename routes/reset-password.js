@@ -16,21 +16,21 @@ ${otpToken}
     
 敬上
 
-XXX台灣網站`
+台灣 NextJS Inc. 網站`
 
 // create otp
 router.post('/otp', async (req, res, next) => {
   const { email } = req.body
 
-  if (!email) return res.json({ status: 'error', message: 'email為必要' })
+  if (!email) return res.json({ status: 'error', message: '缺少必要資料' })
 
   // 建立otp資料表記錄，成功回傳otp記錄物件，失敗為空物件{}
   const otp = await createOtp(email)
 
-  console.log(otp)
+  // console.log(otp)
 
   if (!otp.token)
-    return res.json({ status: 'error', message: '建立otp token失敗' })
+    return res.json({ status: 'error', message: 'Email錯誤或期間內重覆要求' })
 
   // 寄送email
   const mailOptions = {
@@ -46,7 +46,7 @@ router.post('/otp', async (req, res, next) => {
     if (err) {
       // 失敗處理
       // console.log(err)
-      return res.json({ status: 'error', message: '發送otp電子郵件失敗' })
+      return res.json({ status: 'error', message: '發送電子郵件失敗' })
     } else {
       // 成功回覆的json
       return res.json({ status: 'success', data: null })

@@ -88,7 +88,7 @@ const createOtp = async (email, exp = 30, limit = 60) => {
 
   // 建立新記錄
   const otp = await Otp.create(newOtp)
-  console.log(otp.dataValues)
+  // console.log(otp.dataValues)
 
   return otp.dataValues
 }
