@@ -111,6 +111,14 @@ DELETE: 204 No Content
 500 Internal Server Error - an unexpected error occurred on the server
 ```
 
+POST
+
+```text
+Once you are creating a resource on the server, you should return the 201 status code along with a Location header, allowing the client to locate the newly created resource.
+
+The response payload is optional and it typically describes and links to the resource created.
+```
+
 #### pagnation
 
 ```

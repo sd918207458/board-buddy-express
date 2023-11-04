@@ -64,7 +64,7 @@ router.post('/', async function (req, res) {
     !newUser.name ||
     !newUser.password
   ) {
-    return res.json({ status: 'fail', data: null })
+    return res.json({ status: 'error', message: '缺少必要資料' })
   }
 
   // 執行後user是建立的會員資料，created為布林值
@@ -80,13 +80,17 @@ router.post('/', async function (req, res) {
 
   // 新增失敗 created=false代表沒新增
   if (!created) {
-    return res.json({ status: 'fail', data: null })
+    return res.json({ status: 'error', message: '建立會員失敗' })
   }
 
-  // 成功建立會員的回應
-  return res.json({
+  console.log(user.id)
+
+  // 成功建立會員的回應(不需要回傳資料)
+  // 201標準回應
+  res.location(`/users/${user.id}`)
+  return res.status(201).json({
     status: 'success',
-    data: { user },
+    data: null,
   })
 })
 
