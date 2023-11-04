@@ -8,6 +8,8 @@ import { getIdParam } from '#db-helpers/db-tool.js'
 // 資料庫使用
 import sequelize from '#configs/db.js'
 const { User } = sequelize.models
+// 驗証加密密碼字串用
+import { compareHash } from '#db-helpers/password-hash.js'
 
 // 上傳檔案用使用multer
 import path from 'path'
@@ -114,43 +116,80 @@ router.post(
 // PUT - 更新會員資料
 router.put('/:id', async function (req, res) {
   const id = getIdParam(req)
-  const newUser = req.body
+  const loginUser = req.body
 
   // 檢查是否有從網址上得到id
   // 檢查從瀏覽器來的資料，如果為空物件則失敗
-  if (!id || isEmpty(newUser)) {
-    return res.json({ status: 'fail', data: null })
+  if (!id || isEmpty(loginUser)) {
+    return res.json({ status: 'error', message: '缺少必要資料' })
   }
 
-  //檢查從前端來的資料哪些為必要(name, username...)
-  if (
-    !newUser.username ||
-    !newUser.email ||
-    !newUser.name ||
-    !newUser.password
-  ) {
-    return res.json({ status: 'fail', data: null })
+  //檢查從前端來的資料哪些為必要(name, ...)
+  if (!loginUser.email || !loginUser.name || !loginUser.password) {
+    return res.json({ status: 'error', message: '缺少必要資料' })
   }
+
+  // 查詢
+  // const dbUser = await User.findOne({
+  //   where: {
+  //     id,
+  //   },
+  //   raw: true, // 只需要資料表中資料
+  // })
+  const dbUser = await User.findByPk(id, {
+    raw: true, // 只需要資料表中資料
+  })
+
+  // user=null代表不存在
+  if (!dbUser) {
+    return res.json({ status: 'error', message: '使用者不存在' })
+  }
+
+  console.log(loginUser.password)
+  console.log(dbUser)
+
+  // 比較密碼hash與登入用的密碼字串正確性
+  // isValid=true 代表正確
+  const isValid = await compareHash(loginUser.password, dbUser.password)
+
+  // isValid=false 代表密碼錯誤
+  if (!isValid) {
+    return res.json({ status: 'error', message: '密碼錯誤' })
+  }
+
+  // 更新時，略過password
+  const newUser = { ...loginUser }
+  delete newUser.password
+
+  console.log(newUser)
 
   // 對資料庫執行update
   const [affectedRows] = await User.update(newUser, {
     where: {
       id,
     },
+    //individualHooks: true, // 加密密碼字串用trigger the beforeUpdate hook
   })
 
   console.log(affectedRows)
 
   // 沒有更新到任何資料 -> 失敗
   if (!affectedRows) {
-    return res.json({ status: 'fail', data: null })
+    return res.json({ status: 'error', message: '更新失敗' })
   }
 
   // 成功
   // 查出更新的資料
-  const user = await User.findByPk(id)
+  const updatedUser = await User.findByPk(id, {
+    raw: true, // 只需要資料表中資料
+  })
+
+  delete updatedUser.password
+  console.log(updatedUser)
+  // user的password資料不應該也不需要回應給瀏覽器
+
   // 回傳
-  return res.json({ status: 'success', data: { user } })
+  return res.json({ status: 'success', data: { user: updatedUser } })
 })
 
 // DELETE - 刪除會員資料
