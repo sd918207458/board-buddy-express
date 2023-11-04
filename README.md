@@ -40,8 +40,7 @@ npm run debug-win
 
 ## TODO
 
-- [x] db password hashing with bcrypt
-- [x] node import alias for root(##)
+- [ ] user change password feature
 - [ ] db naming should change to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
 - [ ] remove single models for each route, change to use base models
 
@@ -128,6 +127,13 @@ GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ```
 
 ## Changlog
+
+### 20231104
+
+- (a) user register/update(profile) feature
+- (u) refactor test all reset-password(otp) feature
+- (a) db password hashing with bcrypt
+- (a) node import alias for root(##)
 
 ### 20231028
 
