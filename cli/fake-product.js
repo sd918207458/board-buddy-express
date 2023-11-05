@@ -1,14 +1,5 @@
-// import {
-//   createTable,
-//   insertMany,
-//   insertOne,
-//   cleanTable,
-// } from '../db-utils/base.js'
 // eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
-
-// 專用處理sql字串的工具，主要format與escape，防止sql injection
-// import sqlString from 'sqlstring'
 
 // 讓console.log可以呈現檔案與行號, 呈現顏色用
 import { extendLog, toKebabCase } from '#utils/tool.js'
@@ -17,208 +8,151 @@ extendLog()
 
 import { readJsonFile, writeJsonFile } from '#utils/tool.js'
 
-const catOptions = [
-  {
-    id: 1,
-    name: '衣服',
-  },
-  {
-    id: 2,
-    name: '鞋子',
-  },
-  {
-    id: 3,
-    name: '配件',
-  },
-  {
-    id: 4,
-    name: '帽子',
-  },
-  {
-    id: 5,
-    name: '其它',
-  },
-]
+// 預設產生檔案目錄(相對於根目錄)
+const folder = './seeds-tmp/'
 
-const tagOptions = [
-  {
-    id: 1,
-    name: '男性',
-  },
-  {
-    id: 2,
-    name: '女性',
-  },
-  {
-    id: 3,
-    name: '中性',
-  },
-  {
-    id: 4,
-    name: '兒童',
-  },
-]
+// 品牌名稱，為了要取名稱設為全域
+const brands = ['Nike', 'adidas', 'PUMA', 'New Balance']
 
-const colorOptions = [
-  {
-    id: 1,
-    name: '黑',
-  },
-  {
-    id: 2,
-    name: '白',
-  },
-  {
-    id: 3,
-    name: '紅',
-  },
-  {
-    id: 4,
-    name: '綠',
-  },
-  {
-    id: 5,
-    name: '黃',
-  },
-]
+const createBrands = async (filename = 'Brand.json') => {
+  const allBrands = brands.map((v, i) => {
+    return {
+      id: i + 1,
+      name: v,
+      img: '',
+      info: 'This is the description of the brand',
+    }
+  })
 
-const sizeOptions = [
-  {
-    id: 1,
-    name: 'S',
-  },
-  {
-    id: 2,
-    name: 'M',
-  },
-  {
-    id: 3,
-    name: 'L',
-  },
-  {
-    id: 4,
-    name: 'XL',
-  },
-]
-
-function creatFakeUser() {
-  return {
-    userId: faker.string.uuid(),
-    name: faker.person.firstName() + faker.person.lastName(),
-    username: faker.internet.userName(),
-    sex: faker.person.sex(),
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-    birth_date: faker.date.birthdate(),
-    city: faker.location.city(),
-    address: faker.location.streetAddress(true),
-    // avatar: faker.image.avatar(),
-    // city: faker.location.city(),
-    // address: faker.location.streetAddress(true),
-    // register_date: faker.date.past(),
-    // bio: faker.person.bio(),
-  }
+  await writeJsonFile(filename, allBrands, folder)
+  console.log(`INFO - "${filename}" 檔案已建立完成`.bgCyan)
 }
 
-function createFakeProduct() {
-  const productTypes = [
-    '運動鞋',
-    '跑步鞋',
-    '籃球鞋',
-    '瑜珈鞋',
-    '瑜珈墊',
-    '瑜珈衣',
-    '排汗衣',
-    '短袖上衣',
-    '短褲',
-    '長褲',
-    '長袖上衣',
-    '背心',
-  ]
-  const name =
-    faker.commerce.productName() + faker.string.fromCharacters(productTypes)
-  const slug = toKebabCase(name)
-  const price = faker.number.int({ min: 15, max: 100 }) * 100
-  const imgs = Array(3)
+// 以下建立分類用 模型Category
+const mainCats = ['服飾', '鞋類', '配件']
+const subCats = [
+  ['短袖上衣', '短褲', '長袖上衣', '長褲', '外套'],
+  ['慢跑鞋', '籃球鞋'],
+  ['包款', '帽類'],
+]
+// 所有分類，為了要取名稱設為全域
+let allCats = []
+
+const createCats = async (filename = 'Category.json') => {
+  const mCats = mainCats.map((v, i) => {
+    return { id: i + 1, name: v, parent_id: null }
+  })
+
+  allCats = [...mCats]
+  let idIndex = mCats.length + 1
+
+  for (let i = 0; i < subCats.length; i++) {
+    for (let j = 0; j < subCats[i].length; j++) {
+      const item = { id: idIndex, name: subCats[i][j], parent_id: i + 1 }
+      allCats.push(item)
+      idIndex++
+    }
+  }
+
+  await writeJsonFile(filename, allCats, folder)
+  console.log(`INFO - "${filename}" 檔案已建立完成`.bgCyan)
+}
+
+// 以下建立產品用 模型Product
+const genProduct = () => {
+  const photos = Array(3)
     .fill(1)
     .map((v, i) => faker.image.url())
-  const teaser = imgs[0]
+    .join(',')
 
-  const stock = faker.number.int({ min: 1, max: 10 }) * 10
+  const brand_id = faker.number.int({ min: 1, max: 4 })
+  const cat_id = faker.number.int({ min: 4, max: 12 })
+  const name = `${faker.commerce.productName()} - ${brands[brand_id - 1]} ${
+    allCats[cat_id - 1].name
+  }`
 
   return {
     sn: faker.string.uuid(),
     name,
-    slug,
-    teaser,
-    imgs,
-    stock,
-    price,
+    photos,
+    stock: faker.number.int({ min: 1, max: 10 }) * 10,
+    price: faker.number.int({ min: 15, max: 150 }) * 100,
     info: faker.commerce.productDescription(),
-    cat_id: faker.number.int({ min: 1, max: 5 }),
-    color: faker.helpers.arrayElements([1, 2, 3, 4, 5], { min: 1, max: 5 }),
-    tag: faker.helpers.arrayElements([1, 2, 3, 4], {
-      min: 1,
-      max: 3,
-    }),
-    size: faker.helpers.arrayElements([1, 2, 3, 4], {
-      min: 1,
-      max: 4,
-    }),
+    brand_id,
+    cat_id: faker.number.int({ min: 4, max: 12 }),
+    color: faker.helpers
+      .arrayElements([1, 2, 3, 4], { min: 1, max: 4 })
+      .join(','),
+    tag: faker.helpers
+      .arrayElements([1, 2, 3, 4], {
+        min: 1,
+        max: 3,
+      })
+      .join(','),
+    size: faker.helpers
+      .arrayElements([1, 2, 3, 4], {
+        min: 1,
+        max: 4,
+      })
+      .join(','),
   }
 }
 
-const createProducts = async (num, reset = true, productStartId = 0) => {
+const productSize = []
+const productColor = []
+const productTag = []
+
+const createProducts = async (num = 1, filename = 'Product.json') => {
   const products = Array(num)
     .fill(1)
     .map((v, i) => {
-      return { id: i + 1 + productStartId, ...createFakeProduct() }
+      // 建立各關聯資料表
+      const id = i + 1
+      const product = genProduct()
+
+      const sizeList = product.size.split(',').map((v2, i2) => {
+        return { pid: id, sid: v2 }
+      })
+
+      const colorList = product.color.split(',').map((v2, i2) => {
+        return { pid: id, cid: v2 }
+      })
+
+      const tagList = product.tag.split(',').map((v2, i2) => {
+        return { pid: id, tid: v2 }
+      })
+
+      productSize.push(...sizeList)
+      productColor.push(...colorList)
+      productTag.push(...tagList)
+
+      return { id, ...product }
     })
 
-  //await writeJsonFile('./data/json/fake-product.json', products)
+  await writeJsonFile(filename, products, folder)
+  console.log(`INFO - "${num}" 筆範例, "${filename}" 檔案已建立完成`.bgCyan)
 
-  // use create table will drop first default
-  if (reset) {
-    await createTable('product', products[0])
-    await createTable('product_color', { id: 1, pid: 1, color_id: 1 })
-    await createTable('product_tag', { id: 1, pid: 1, tag_id: 1 })
-    await createTable('product_size', { id: 1, pid: 1, size_id: 1 })
-
-    await createTable('category', catOptions[0])
-    await createTable('size', sizeOptions[0])
-    await createTable('color', colorOptions[0])
-    await createTable('tag', tagOptions[0])
-
-    await insertMany('category', catOptions)
-    await insertMany('size', sizeOptions)
-    await insertMany('color', colorOptions)
-    await insertMany('tag', tagOptions)
-  }
-
-  await insertMany('product', products)
-
-  const product_color = []
-  const product_tag = []
-  const product_size = []
-
-  for (const product of products) {
-    for (const color_id of product.color) {
-      product_color.push({ pid: product.id, color_id })
-    }
-
-    for (const tag_id of product.tag) {
-      product_tag.push({ pid: product.id, tag_id })
-    }
-
-    for (const size_id of product.size) {
-      product_size.push({ pid: product.id, size_id })
-    }
-  }
-
-  await insertMany('product_color', product_color)
-  await insertMany('product_tag', product_tag)
-  await insertMany('product_size', product_size)
+  await writeJsonFile('Product_Size.json', productSize, folder)
+  await writeJsonFile('Product_Color.json', productColor, folder)
+  await writeJsonFile('Product_Tag.json', productTag, folder)
+  console.log(
+    `INFO - "Product_Size.json" "Product_Color.json" "Product_Tag.json"檔案已建立完成`
+      .bgCyan
+  )
 }
 
-// 產生1k資料
-createProducts(1000)
+// 使用指令 `node ./cli/fake-user.js 100`
+const args = process.argv
+// 預設為10筆
+const num = Number(args[2]) || 100
+
+await createBrands()
+// 需先產生分類，商品名稱上才會有分類名稱
+// 共產生Category.json與Product.json兩檔案
+await createCats()
+await createProducts(num)
+
+// 訊息
+console.log('範例檔案已建立完成'.bgBlue)
+// eslint-disable-next-line
+process.exit()

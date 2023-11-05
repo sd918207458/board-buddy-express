@@ -10,6 +10,7 @@
 
 ### 231105
 
+- (a) user model add avatar and upload-avatar route
 - (u) jwt access token change include user id, google_uid, line_uid, username. and expiresIn change to '3d'
 
 ### 231104

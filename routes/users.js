@@ -5,12 +5,12 @@ const router = express.Router()
 import authenticate from '#middlewares/authenticate.js'
 
 // 檢查空物件, 轉換req.params為數字
-import { isEmpty } from '#utils/tool.js'
 import { getIdParam } from '#db-helpers/db-tool.js'
 
 // 資料庫使用
 import sequelize from '#configs/db.js'
 const { User } = sequelize.models
+
 // 驗証加密密碼字串用
 import { compareHash } from '#db-helpers/password-hash.js'
 
@@ -121,6 +121,7 @@ router.post(
     // req.file 即上傳來的檔案(avatar這個檔案)
     // req.body 其它的文字欄位資料…
     // console.log(req.file, req.body)
+
     if (req.file) {
       const id = req.user.id
       const data = { avatar: req.file.filename }
@@ -132,7 +133,7 @@ router.post(
         },
       })
 
-      // 沒有更新到任何資料 -> 失敗
+      // 沒有更新到任何資料 -> 失敗或沒有資料被更新
       if (!affectedRows) {
         return res.json({
           status: 'error',
@@ -249,7 +250,7 @@ router.put('/:id/profile', authenticate, async function (req, res) {
     },
   })
 
-  // 沒有更新到任何資料 -> 失敗
+  // 沒有更新到任何資料 -> 失敗或沒有資料被更新
   if (!affectedRows) {
     return res.json({ status: 'error', message: '更新失敗或沒有資料被更新' })
   }
@@ -276,7 +277,7 @@ router.delete('/:id', async function (req, res) {
     },
   })
 
-  // 沒有更新到任何資料 -> 失敗
+  // 沒有刪除到任何資料 -> 失敗或沒有資料被刪除
   if (!affectedRows) {
     return res.json({
       status: 'fail',

@@ -17,7 +17,7 @@ export const readJsonFile = async (pathname) => {
   return JSON.parse(data)
 }
 
-export const writeJsonFile = async (pathname, jsonOrObject) => {
+export const writeJsonFile = async (pathname, jsonOrObject, folder = './') => {
   try {
     // we need string
     const data =
@@ -25,7 +25,7 @@ export const writeJsonFile = async (pathname, jsonOrObject) => {
         ? JSON.stringify(jsonOrObject)
         : jsonOrObject
 
-    await writeFile(path.join(process.cwd(), pathname), data)
+    await writeFile(path.join(process.cwd(), folder + pathname), data)
     return true
   } catch (e) {
     console.log(e)

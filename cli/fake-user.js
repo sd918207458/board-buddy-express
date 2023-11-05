@@ -10,6 +10,9 @@ extendLog()
 // 台灣縣市鄉鎮郵遞區號
 import { countries, townships, postcodes } from '#data/tw-township.js'
 
+// 預設產生檔案目錄(相對於根目錄)
+const folder = './seeds-tmp/'
+
 // 產生單個物件用
 const genUser = () => {
   // 隨機地址用
@@ -49,7 +52,7 @@ const createUsers = async (num = 1, filename = 'User.json') => {
       return genUser()
     })
 
-  await writeJsonFile(filename, users)
+  await writeJsonFile(filename, users, folder)
   console.log(`INFO - "${num}" 筆範例, "${filename}" 檔案已建立完成`.bgCyan)
 }
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
 
 // 專用處理sql字串的工具，主要format與escape，防止sql injection
@@ -56,20 +57,24 @@ const createUsers = async (num = 1, filename = 'User.json') => {
   await writeJsonFile(filename, users)
 }
 
+// 品牌名稱，為了要取名稱設為全域
+const brands = ['Nike', 'adidas', 'PUMA', 'New Balance']
 // 以下建立分類用 模型Category
-const createCats = async (filename = 'Category.json') => {
-  const mainCats = ['服飾', '鞋類', '配件']
-  const subCats = [
-    ['短袖上衣', '短褲', '長袖上衣', '長褲', '外套'],
-    ['慢跑鞋', '籃球鞋'],
-    ['包款', '帽類'],
-  ]
+const mainCats = ['服飾', '鞋類', '配件']
+const subCats = [
+  ['短袖上衣', '短褲', '長袖上衣', '長褲', '外套'],
+  ['慢跑鞋', '籃球鞋'],
+  ['包款', '帽類'],
+]
+// 所有分類，為了要取名稱設為全域
+let allCats = []
 
+const createCats = async (filename = 'Category.json') => {
   const mCats = mainCats.map((v, i) => {
     return { id: i + 1, name: v, parent_id: null }
   })
 
-  const allCats = [...mCats]
+  allCats = [...mCats]
   let idIndex = mCats.length + 1
 
   for (let i = 0; i < subCats.length; i++) {
@@ -90,14 +95,20 @@ const genProduct = () => {
     .map((v, i) => faker.image.url())
     .join(',')
 
+  const brand_id = faker.number.int({ min: 1, max: 4 })
+  const cat_id = faker.number.int({ min: 4, max: 12 })
+  const name = `${faker.commerce.productName()} - ${brands[brand_id - 1]} ${
+    allCats[cat_id - 1].name
+  }`
+
   return {
     sn: faker.string.uuid(),
-    name: faker.commerce.productName(),
+    name,
     photos,
     stock: faker.number.int({ min: 1, max: 10 }) * 10,
     price: faker.number.int({ min: 15, max: 150 }) * 100,
     info: faker.commerce.productDescription(),
-    brand_id: faker.number.int({ min: 1, max: 4 }),
+    brand_id,
     cat_id: faker.number.int({ min: 4, max: 12 }),
     color: faker.helpers.arrayElements([1, 2, 3, 4], { min: 1, max: 4 }),
     tag: faker.helpers.arrayElements([1, 2, 3, 4], {
@@ -122,6 +133,7 @@ const createProducts = async (num = 1, filename = 'Product.json') => {
 }
 
 //await createUsers(17)
+await createCats()
 await createProducts(500)
 
 // console.log(faker.lorem.lines({ min: 1, max: 3 }))
