@@ -3,39 +3,36 @@
 ## TODO
 
 - [ ] user change password feature
-- [ ] db naming should change to [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
-- [ ] remove single models for each route, change to use base models
 
 ## FIXME
 
-- [x] remove express-fileupload and only use multer
-
 ## LOG
 
-### 20231105
+### 231105
 
 - (u) jwt access token change include user id, google_uid, line_uid, username. and expiresIn change to '3d'
 
-### 20231104
+### 231104
 
 - (a) user register/update(profile) feature
 - (u) refactor test all reset-password(otp) feature
 - (a) db password hashing with bcrypt
 - (a) node import alias for root(##)
 
-### 20231028
+### 231028
 
 - (u) sequelize raw query for model/base.js
 - (u) dynamic import routes
 - (a) pg, pg-hstore, mariadb npm mods for test
+- remove express-fileupload and only use multer
 
-### 20231024
+### 231024
 
 - (d) models/users change router/user db funcs
 - (d) docs
 - (d) auth, facebook-login
 
-### 20231023-
+### 231023-
 
 - OTP workflow
 - +nodemailer + Google SMTP
@@ -44,12 +41,12 @@
 - es6 import wo babel 
 - auth route (session-cookie should use?... no, use jwt)
 
-### 20230604
+### 230604
 
 - get: all, byId is ok
 - post: insertOne is ok
 
-### 20230606
+### 230606
 
 - json2db(create db and insert data) ok
 - db backup tool ok

@@ -2,9 +2,8 @@
 
 ## !!使用前注意
 
-- `.env`檔已移除，記得clone後，將`.env.template`改為`.env`檔案
+- `.env`檔已移除，記得git clone後，將`.env.template`改為`.env`檔案，之後進行相關設定
 - `.env`中`DB_XXX`相關設定，需改為你的資料庫、帳號、密碼才能開始使用
-- 資料庫schema檔案
 
 ## 指令
 
@@ -14,7 +13,7 @@ express執行:
 npm run dev
 ```
 
-資料庫種子資料載入:
+資料庫種子(範例)資料載入:
 
 ```sh
 npm run seed
@@ -38,13 +37,12 @@ express執行&除錯(win):
 npm run debug-win
 ```
 
-
-## Design Rules
+## 設計準則 Design Rules
 
 - [SQL Style Guide](https://www.sqlstyle.guide/zh-tw/)
 - [Modern SQL Style Guide](https://gist.github.com/mattmc3/38a85e6a4ca1093816c08d4815fbebfb)
 
-### DB
+### 資料庫 DB
 
 ### Table Names
 
@@ -74,7 +72,7 @@ Foreign key column must have a table name with their primary key.
 
 e.g. blog_id represents foreign key id from table blog.
 
-### REST API
+### API路由 REST API
 
 #### standards
 
@@ -111,10 +109,8 @@ The response payload is optional and it typically describes and links to the res
 
 #### pagnation
 
-```
+```text
 GET /posts?limit=10&offset=0 - retrieves the first 10 posts
 GET /posts?limit=10&offset=10 - retrieves the second 10 posts
 GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ```
-
-
