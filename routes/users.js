@@ -22,11 +22,13 @@ import multer from 'multer'
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     // 存放目錄
-    callback(null, 'public/')
+    callback(null, 'public/avatar/')
   },
   filename: function (req, file, callback) {
+    // 經授權後，req.user帶有會員的id
+    const newFilename = req.user.id
     // 新檔名由表單傳來的req.body.newFilename決定
-    callback(null, req.body.newFilename + path.extname(file.originalname))
+    callback(null, newFilename + path.extname(file.originalname))
   },
 })
 const upload = multer({ storage: storage })
@@ -112,15 +114,36 @@ router.post('/', async function (req, res) {
 
 // POST - 可同時上傳與更新會員檔案用，使用multer(設定值在此檔案最上面)
 router.post(
-  '/upload',
+  '/upload-avatar',
+  authenticate,
   upload.single('avatar'), // 上傳來的檔案(這是單個檔案，表單欄位名稱為avatar)
   async function (req, res) {
     // req.file 即上傳來的檔案(avatar這個檔案)
     // req.body 其它的文字欄位資料…
-    console.log(req.file, req.body)
-
+    // console.log(req.file, req.body)
     if (req.file) {
-      return res.json({ status: 'success', data: null })
+      const id = req.user.id
+      const data = { avatar: req.file.filename }
+
+      // 對資料庫執行update
+      const [affectedRows] = await User.update(data, {
+        where: {
+          id,
+        },
+      })
+
+      // 沒有更新到任何資料 -> 失敗
+      if (!affectedRows) {
+        return res.json({
+          status: 'error',
+          message: '更新失敗或沒有資料被更新',
+        })
+      }
+
+      return res.json({
+        status: 'success',
+        data: { avatar: req.file.filename },
+      })
     } else {
       return res.json({ status: 'fail', data: null })
     }
@@ -214,17 +237,21 @@ router.put('/:id/profile', authenticate, async function (req, res) {
     return res.json({ status: 'error', message: '使用者不存在' })
   }
 
+  // 有些特殊欄位的值沒有時要略過更新，不然會造成資料庫錯誤
+  if (!user.birth_date) {
+    delete user.birth_date
+  }
+
   // 對資料庫執行update
   const [affectedRows] = await User.update(user, {
     where: {
       id,
     },
   })
-  //console.log(affectedRows)
 
   // 沒有更新到任何資料 -> 失敗
   if (!affectedRows) {
-    return res.json({ status: 'error', message: '更新失敗' })
+    return res.json({ status: 'error', message: '更新失敗或沒有資料被更新' })
   }
 
   // 更新成功後，找出更新的資料，updatedUser為更新後的會員資料

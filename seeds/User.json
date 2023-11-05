@@ -1,10 +1,11 @@
 [
   {
-    "id":1,
+    "id": 1,
     "name": "哈利",
     "username": "herry",
     "password": "11111",
     "email": "herry@test.com",
+    "avatar": "1.webp",
     "sex": "男",
     "birth_date": "1980-07-13",
     "phone": "0906102808",
@@ -17,6 +18,7 @@
     "username": "ginny",
     "password": "22222",
     "email": "ginny@test.com",
+    "avatar": "",
     "sex": "女",
     "birth_date": "1981-08-11",
     "phone": "0946840920",
@@ -29,6 +31,7 @@
     "username": "mione",
     "password": "33333",
     "email": "mione@test.com",
+    "avatar": "",
     "sex": "女",
     "birth_date": "1979-09-19",
     "phone": "0912541534",

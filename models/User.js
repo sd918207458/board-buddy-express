@@ -27,6 +27,10 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      avatar: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       birth_date: {
         type: DataTypes.DATEONLY, //只需要日期
         allowNull: true,

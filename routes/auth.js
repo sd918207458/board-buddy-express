@@ -19,18 +19,6 @@ import { compareHash } from '#db-helpers/password-hash.js'
 // 定義安全的私鑰字串
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 
-// 測試中介軟體用
-router.get('/private', authenticate, async (req, res) => {
-  const user = await User.findByPk(req.user.id, {
-    raw: true, // 只需要資料表中資料
-  })
-  // 這裡可以加上其它的資料庫查詢
-
-  // 不回傳密碼值
-  delete user.password
-  return res.json({ status: 'success', data: { user } })
-})
-
 // 檢查登入狀態用
 router.get('/check', authenticate, async (req, res) => {
   // 查詢資料庫目前的資料
