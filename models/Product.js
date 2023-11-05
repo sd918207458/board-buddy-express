@@ -41,6 +41,18 @@ export default async function (sequelize) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      color: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      size: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tag: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       tableName: 'product', //直接提供資料表名稱

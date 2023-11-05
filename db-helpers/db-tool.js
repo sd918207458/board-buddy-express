@@ -1,3 +1,23 @@
+export const getWhere = (conditions, joinWith = 'AND') => {
+  // 去除空字串
+  const conditionsValues = conditions.filter((v) => v)
+
+  // 各條件需要先包含在`()`中，因各自內查詢是OR, 與其它的是AND
+  return conditionsValues.length > 0
+    ? `WHERE ` + conditionsValues.map((v) => `( ${v} )`).join(` ${joinWith} `)
+    : ''
+}
+
+// 排序用，orderby=id,asc
+export const getOrder = (orderby = 'id,asc') => {
+  const column = orderby.split(',')[0]
+  const keyword = orderby.split(',')[1]
+
+  if (!column || !keyword) return ''
+
+  return `ORDER BY ${column} ${keyword}`
+}
+
 // only for mysql
 export const getBetween = (value, dbColumn, min, max) => {
   if (!value) return ''
@@ -11,7 +31,7 @@ export const getBetween = (value, dbColumn, min, max) => {
   // 價格要介於min~max間
   if (minValue < min || maxValue > max) return ''
 
-  return `${dbColumn} BETWEEN ${min} AND ${max}`
+  return `${dbColumn} BETWEEN ${minValue} AND ${maxValue}`
 }
 
 // only for mysql

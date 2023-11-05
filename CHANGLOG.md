@@ -10,6 +10,9 @@
 
 ### 231105
 
+- (test) ? 10k products data maybe squelize seed function max limit
+- (u) products route add brand_ids query string for brand query(as cat_ids)
+- (u) products route refactor
 - (a) user model add avatar and upload-avatar route
 - (u) jwt access token change include user id, google_uid, line_uid, username. and expiresIn change to '3d'
 

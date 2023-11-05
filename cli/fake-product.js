@@ -79,7 +79,7 @@ const genProduct = () => {
     price: faker.number.int({ min: 15, max: 150 }) * 100,
     info: faker.commerce.productDescription(),
     brand_id,
-    cat_id: faker.number.int({ min: 4, max: 12 }),
+    cat_id,
     color: faker.helpers
       .arrayElements([1, 2, 3, 4], { min: 1, max: 4 })
       .join(','),
