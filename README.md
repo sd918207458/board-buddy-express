@@ -114,3 +114,7 @@ GET /posts?limit=10&offset=0 - retrieves the first 10 posts
 GET /posts?limit=10&offset=10 - retrieves the second 10 posts
 GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ```
+
+### JWT
+
+- add only unchangeable fields like username, role to JWT

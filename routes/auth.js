@@ -20,9 +20,14 @@ import { compareHash } from '#db-helpers/password-hash.js'
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 
 // 測試中介軟體用
-router.get('/private', authenticate, (req, res) => {
-  const user = req.user
-  // 這裡可以加上所需的資料庫查詢
+router.get('/private', authenticate, async (req, res) => {
+  const user = await User.findByPk(req.user.id, {
+    raw: true, // 只需要資料表中資料
+  })
+  // 這裡可以加上其它的資料庫查詢
+
+  // 不回傳密碼值
+  delete user.password
   return res.json({ status: 'success', data: { user } })
 })
 
@@ -33,6 +38,8 @@ router.get('/check', authenticate, async (req, res) => {
     raw: true, // 只需要資料表中資料
   })
 
+  // 不回傳密碼值
+  delete user.password
   return res.json({ status: 'success', data: { user } })
 })
 
@@ -73,7 +80,7 @@ router.post('/login', async (req, res) => {
     return res.json({ status: 'error', message: '使用者不存在' })
   }
 
-  // 比較密碼hash與登入用的密碼字串正確性
+  // compareHash(登入時的密碼純字串, 資料庫中的密碼hash) 比較密碼正確性
   // isValid=true 代表正確
   const isValid = await compareHash(loginUser.password, user.password)
 
