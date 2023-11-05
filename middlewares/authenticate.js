@@ -16,7 +16,7 @@ export default function authenticate(req, res, next) {
   if (!token) {
     return res.json({
       status: 'error',
-      message: 'no access token',
+      message: '授權失敗，沒有存取令牌',
     })
   }
 
@@ -25,12 +25,11 @@ export default function authenticate(req, res, next) {
     if (err) {
       return res.json({
         status: 'error',
-        message: 'invalid access token',
+        message: '不合法的存取令牌',
       })
     }
 
     // 將user資料加到req中
-    // FIXME: ?移除iat與exp屬性?
     req.user = user
     next()
   })

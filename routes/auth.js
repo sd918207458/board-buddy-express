@@ -23,13 +23,16 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 router.get('/private', authenticate, (req, res) => {
   const user = req.user
   // 這裡可以加上所需的資料庫查詢
-
   return res.json({ status: 'success', data: { user } })
 })
 
 // 檢查登入狀態用
 router.get('/check', authenticate, async (req, res) => {
-  const user = req.user
+  // 查詢資料庫目前的資料
+  const user = await User.findByPk(req.user.id, {
+    raw: true, // 只需要資料表中資料
+  })
+
   return res.json({ status: 'success', data: { user } })
 })
 
@@ -79,12 +82,17 @@ router.post('/login', async (req, res) => {
     return res.json({ status: 'error', message: '密碼錯誤' })
   }
 
-  // user的password資料不應該也不需要回應給瀏覽器
-  delete user.password
+  // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
+  const returnUser = {
+    id: user.id,
+    username: user.username,
+    google_uid: user.google_uid,
+    line_uid: user.line_uid,
+  }
 
   // 產生存取令牌(access token)，其中包含會員資料
-  const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
-    expiresIn: '24h',
+  const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+    expiresIn: '3d',
   })
 
   // 使用httpOnly cookie來讓瀏覽器端儲存access token

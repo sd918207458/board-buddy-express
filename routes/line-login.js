@@ -83,11 +83,18 @@ router.get(
         })
 
         // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
-        delete user.password
+        // delete user.password
+        // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
+        const returnUser = {
+          id: user.id,
+          username: user.username,
+          google_uid: user.google_uid,
+          line_uid: user.line_uid,
+        }
 
         // 產生存取令牌(access token)，其中包含會員資料
-        const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
-          expiresIn: '24h',
+        const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+          expiresIn: '3d',
         })
 
         // 使用httpOnly cookie來讓瀏覽器端儲存access token
@@ -116,11 +123,18 @@ router.get(
         })
 
         // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
-        delete user.password
+        //delete user.password
+        // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
+        const returnUser = {
+          id: user.id,
+          username: user.username,
+          google_uid: user.google_uid,
+          line_uid: user.line_uid,
+        }
 
         // 產生存取令牌(access token)，其中包含會員資料
-        const accessToken = jsonwebtoken.sign({ ...user }, accessTokenSecret, {
-          expiresIn: '24h',
+        const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+          expiresIn: '3d',
         })
 
         // 使用httpOnly cookie來讓瀏覽器端儲存access token
