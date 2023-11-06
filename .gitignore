@@ -23,6 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /.temp
+/seeds-tmp
 
 package-lock.json
 yarn.lock
