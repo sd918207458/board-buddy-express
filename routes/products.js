@@ -1,15 +1,8 @@
 import express from 'express'
 const router = express.Router()
-import _ from 'lodash'
 
 // 檢查空物件, 轉換req.params為數字
-import {
-  getIdParam,
-  getFindInSet,
-  getBetween,
-  getOrder,
-  getWhere,
-} from '#db-helpers/db-tool.js'
+import { getIdParam } from '#db-helpers/db-tool.js'
 
 // 資料庫使用
 import sequelize from '#configs/db.js'
@@ -38,8 +31,7 @@ router.get('/', async (req, res) => {
   //   price_lte = 100000 // number, 對應 price 欄位, `price <= 10000`
   // } = req.query
 
-  // !!注意: 這裡要檢查各query參數值的正確性或給定預設值，要不然可能會產生資料庫查詢錯誤
-
+  // !!注意: 以下都要檢查各query參數值的正確性，或給定預設值，要不然可能會產生資料庫查詢錯誤
   // 建立例如: `CONCAT(",", color, ",") REGEXP ",(1|2),"`
   const genConcatRegexp = (param, column) => {
     return sequelize.where(
@@ -96,7 +88,7 @@ router.get('/', async (req, res) => {
     conditions.push(genClause(key, value))
   }
 
-  console.log(conditions)
+  // console.log(conditions)
 
   // 分頁用
   const page = Number(req.query.page) || 1
