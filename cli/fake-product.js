@@ -60,9 +60,8 @@ const createCats = async (filename = 'Category.json') => {
 
 // 以下建立產品用 模型Product
 const genProduct = () => {
-  const photos = Array(3)
-    .fill(1)
-    .map((v, i) => faker.image.url())
+  const photos = faker.helpers
+    .arrayElements(['t1.jpg', 't2.jpg', 't3.jpg', 't4.jpg', 't5.jpg'], 3)
     .join(',')
 
   const brand_id = faker.number.int({ min: 1, max: 4 })
@@ -111,15 +110,15 @@ const createProducts = async (num = 1, filename = 'Product.json') => {
       const product = genProduct()
 
       const sizeList = product.size.split(',').map((v2, i2) => {
-        return { pid: id, sid: v2 }
+        return { pid: id, sid: Number(v2) }
       })
 
       const colorList = product.color.split(',').map((v2, i2) => {
-        return { pid: id, cid: v2 }
+        return { pid: id, cid: Number(v2) }
       })
 
       const tagList = product.tag.split(',').map((v2, i2) => {
-        return { pid: id, tid: v2 }
+        return { pid: id, tid: Number(v2) }
       })
 
       productSize.push(...sizeList)
