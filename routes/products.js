@@ -29,6 +29,7 @@ router.get('/', async (req, res) => {
   //   order='asc' // string, 排序順序 用於 ORDER BY 'asc' | 'desc', 預設為'asc'
   //   price_gte = 1500 // number, 對應 price 欄位, `price >= 1500`
   //   price_lte = 100000 // number, 對應 price 欄位, `price <= 10000`
+  //   raw=true, //boolean, 代表只回傳products陣列
   // } = req.query
 
   // !!注意: 以下都要檢查各query參數值的正確性，或給定預設值，要不然可能會產生資料庫查詢錯誤
@@ -112,6 +113,10 @@ router.get('/', async (req, res) => {
       limit,
       order,
     })
+
+    if (req.query.raw === 'true') {
+      return res.json(rows)
+    }
 
     return res.json({
       status: 'success',
