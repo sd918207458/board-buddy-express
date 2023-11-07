@@ -22,6 +22,23 @@ const sequelize = new Sequelize(
     },
   }
 )
+// for postgresql test
+// const sequelize = new Sequelize(
+//   process.env.PG_DB_DATABASE,
+//   process.env.PG_DB_USERNAME,
+//   process.env.PG_DB_PASSWORD,
+//   {
+//     host: process.env.PG_DB_HOST,
+//     port: process.env.PG_DB_PORT,
+//     dialect: 'postgres',
+//     logging: false,
+//     define: {
+//       freezeTableName: true,
+//       charset: 'utf8',
+//       collate: 'utf8_general_ci',
+//     },
+//   }
+// )
 
 // 啟動時測試連線
 sequelize
