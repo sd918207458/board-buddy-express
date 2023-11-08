@@ -11,7 +11,7 @@ import { QueryTypes, Op } from 'sequelize'
 
 /* 
 測試連結:
-products?page=1&name_like=e&brand_ids=1,2&cat_ids=4,5,6,7,8&size_ids=1,2&tag_ids=3,4&color_ids=1,2&sort=id&order=asc&perpage=10&price_gte=1500&price_lte=10000
+/products?page=3&perpage=10&brand_ids=1,2,4&cat_ids=4,5,6,10,11,12&color_ids=1,2&size_ids=2,3&tag_ids=1,2,4&name_like=e&price_gte=1500&price_lte=10000&sort=price&order=asc
 */
 // GET 獲得所有資料，加入分頁與搜尋字串功能，單一資料表處理
 router.get('/', async (req, res) => {
@@ -86,7 +86,9 @@ router.get('/', async (req, res) => {
   // where各條件(以AND相連)
   const conditions = []
   for (const [key, value] of Object.entries(req.query)) {
-    conditions.push(genClause(key, value))
+    if (value) {
+      conditions.push(genClause(key, value))
+    }
   }
 
   // console.log(conditions)
@@ -108,7 +110,7 @@ router.get('/', async (req, res) => {
     const { count, rows } = await Product.findAndCountAll({
       where: { [Op.and]: conditions },
       raw: true, // 只需要資料表中資料,
-      // logging: (msg) => console.log(msg.bgWhite),
+      logging: (msg) => console.log(msg.bgWhite),
       offset,
       limit,
       order,
