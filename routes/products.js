@@ -67,12 +67,18 @@ router.get('/', async (req, res) => {
       case 'tag_ids':
         return genConcatRegexp(value, 'tag')
       case 'price_gte':
+        // 會有'0'字串的情況，注意要跳過此條件
+        if (!Number(value)) return ''
+
         return {
           price: {
             [Op.gte]: Number(value),
           },
         }
       case 'price_lte':
+        // 會有'0'字串的情況，注意要跳過此條件
+        if (!Number(value)) return ''
+
         return {
           price: {
             [Op.lte]: Number(value),
