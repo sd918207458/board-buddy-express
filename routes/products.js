@@ -118,12 +118,16 @@ router.get('/', async (req, res) => {
       return res.json(rows)
     }
 
+    // 計算總頁數
+    const pageCount = Math.ceil(count / Number(perpage)) || 0
+
     return res.json({
       status: 'success',
       data: {
         total: count,
-        page: Number(page),
-        perpage: Number(perpage),
+        pageCount,
+        page,
+        perpage,
         products: rows,
       },
     })
