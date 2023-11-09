@@ -26,66 +26,9 @@ router.get('/', authenticate, async (req, res) => {
   res.json({ status: 'success', data: { favorites } })
 })
 
-// router.get('/all-products-no-login', async (req, res, next) => {
-//   const sql = `SELECT p.*
-//     FROM products AS p
-//     ORDER BY p.id ASC`
-
-//   const { rows } = await executeQuery(sql)
-
-//   res.json({ products: rows })
-// })
-
-// router.get('/all-products', authenticate, async (req, res, next) => {
-//   const user = req.user
-//   const uid = user.id
-
-//   const sql = `SELECT p.*, IF(f.id, 'true', 'false') AS is_favorite
-//     FROM products AS p
-//     LEFT JOIN favorites AS f ON f.pid = p.id
-//     AND f.uid = ${uid}
-//     ORDER BY p.id ASC`
-
-//   const { rows } = await executeQuery(sql)
-
-//   console.log(rows)
-
-//   // cast boolean
-//   const products = rows.map((v) => ({
-//     ...v,
-//     is_favorite: v.is_favorite === 'true',
-//   }))
-
-//   console.log(products)
-
-//   res.json({ products })
-// })
-
-// router.get('/fav-products', authenticate, async (req, res, next) => {
-//   const user = req.user
-//   const uid = user.id
-
-//   const sql = `SELECT p.*
-// FROM products AS p
-//     INNER JOIN favorites AS f ON f.pid = p.id
-//     AND f.uid = ${uid}
-// ORDER BY p.id ASC`
-
-//   const { rows } = await executeQuery(sql)
-
-//   console.log(rows)
-
-//   res.json({ products: rows })
-// })
-
 router.put('/:id', authenticate, async (req, res, next) => {
   const pid = getIdParam(req)
-
   const uid = req.user.id
-
-  // const sql = `INSERT INTO favorites (uid, pid) VALUES (${uid}, ${pid})`
-
-  // const { rows } = await executeQuery(sql)
 
   const existFav = await Favorite.findOne({ where: { pid, uid } })
   if (existFav) {
