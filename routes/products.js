@@ -116,7 +116,7 @@ router.get('/', async (req, res) => {
     const { count, rows } = await Product.findAndCountAll({
       where: { [Op.and]: conditions },
       raw: true, // 只需要資料表中資料,
-      logging: (msg) => console.log(msg.bgWhite),
+      // logging: (msg) => console.log(msg.bgWhite),
       offset,
       limit,
       order,
