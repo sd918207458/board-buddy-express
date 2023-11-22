@@ -1,5 +1,9 @@
 # express-base-es6-esm
 
+## 版本
+
+v1.1
+
 ## !!使用前注意
 
 - git clone後，將`.env.template`改為`.env`檔案，之後進行其中相關設定
