@@ -1,8 +1,6 @@
 import express from 'express'
 const router = express.Router()
 
-// import { findOne, insertOne, count } from '#db-helpers/base.js'
-
 import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
