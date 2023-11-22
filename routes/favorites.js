@@ -1,7 +1,6 @@
 import express from 'express'
 const router = express.Router()
 
-// import { executeQuery } from '#db-helpers/base.js'
 // 檢查空物件, 轉換req.params為數字
 import { getIdParam } from '#db-helpers/db-tool.js'
 

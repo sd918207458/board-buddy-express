@@ -2,7 +2,7 @@
 
 ## !!使用前注意
 
-- `.env`檔已移除，記得git clone後，將`.env.template`改為`.env`檔案，之後進行相關設定
+- git clone後，將`.env.template`改為`.env`檔案，之後進行其中相關設定
 - `.env`中`DB_XXX`相關設定，需改為你的資料庫、帳號、密碼才能開始使用
 
 ## 指令
@@ -44,43 +44,71 @@ npm run debug-win
 
 ### 資料庫 DB
 
-### Table Names
+### 資料表名稱 Table Names
 
-Lower Case Table Name
-Table name in Singular
-Prefixed Table name
+- 全英文小寫(以下底線`_`分隔字詞) Lower Case Table Name
+- 英文單數詞 Table name in Singular
+- 前綴字名稱 Prefixed Table name
 
-### Field Names
+### 欄位名稱 Field Names
 
-Use all above cases which include lowercase, no space, no numbers, and avoid prefix.
-
-Choose short names no-longer than two words.
-
-Field names should be easy and understandable.
-
-Primary key can be id or table name_id or it can be a self-explanatory name.
-
-Avoid using reserve words as field name. i.e. — Pre-defined words or Keywords. You can add prefix to these names to make it understandable like user_name, signup_date.
-
-Avoid using column with same name as table name. This can cause confusion while writing query.
-
-Avoid abbreviated, concatenated, or acronym-based names.
-
-Do define a foreign key on database schema.
-
-Foreign key column must have a table name with their primary key.
-
-e.g. blog_id represents foreign key id from table blog.
+- 全英文小寫，無空白與數字
+- 選擇短名稱，不超過兩個單詞
+- 主鍵(Primary key)使用`id`或`資料表名稱_id`
+- 避免使用保留字詞，加上前綴字例如user_name或signup_date
+- 避免使用相同於資料表名稱
+- 避免使用縮寫或簡稱
+- 外鍵(Foreign key)欄位需要有資料表名稱加上它們的主鍵，例如blog_id代表從資料表blog來的外鍵
 
 ### API路由 REST API
 
-#### standards
+#### 標準
 
 - [JSend](https://github.com/omniti-labs/jsend)
 - [Microsoft Azure REST API Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md)
 - [Google JSON guide](https://google.github.io/styleguide/jsoncstyleguide.xml)
 
-#### status code
+#### 範例
+
+成功:
+
+```json
+{
+    "status" : "success",
+    "data" : {
+        "post" : { "id" : 1, "title" : "A blog", "body" : "Some content" }
+     }
+}
+```
+
+或 不需要回應資料時(DELETE...)
+
+```json
+{
+    "status" : "success",
+    "data" : null
+}
+```
+
+失敗:
+
+```json
+{
+    "status" : "fail",
+    "data" : { "title" : "A title is required" }
+}
+```
+
+錯誤:
+
+```json
+{
+    "status" : "error",
+    "message" : "Unable to communicate with database"
+}
+```
+
+#### 狀態碼(status code)
 
 ```text
 GET: 200 OK
