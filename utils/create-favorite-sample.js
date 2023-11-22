@@ -4,7 +4,7 @@ import {
   insertMany,
   insertOne,
   cleanTable,
-} from '../models/base.js'
+} from '../db-utils/base.js'
 // eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
 

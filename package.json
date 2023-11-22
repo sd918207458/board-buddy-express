@@ -1,11 +1,17 @@
 {
-  "name": "node-express-es6",
-  "version": "0.0.0",
+  "name": "express-base-esm",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "seed": "node ./cli/db-init.js",
+    "backup": "node ./cli/db-backup.js",
+    "debug": "DEBUG=express:* node ./bin/www",
+    "debug-win": "set DEBUG=express:* & node ./bin/www"
   },
   "dependencies": {
+    "app-root-path": "^3.1.0",
+    "bcrypt": "^5.1.1",
     "bluebird": "^3.7.2",
     "colors": "^1.4.0",
     "cookie-parser": "~1.4.4",
@@ -13,32 +19,37 @@
     "debug": "~2.6.9",
     "dotenv": "^16.0.1",
     "express": "4.18.1",
-    "express-fileupload": "^1.4.0",
     "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.0",
     "line-pay-merchant": "^0.9.0",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^2.0.0",
+    "mysql2": "^2.3.3",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.3",
     "otpauth": "^9.1.3",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
     "pug": "^3.0.2",
     "request": "^2.88.2",
     "secure-compare": "^3.0.1",
+    "sequelize": "^6.33.0",
     "session-file-store": "^1.5.0",
     "sqlstring": "^2.3.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "^8.0.2",
+    "@faker-js/faker": "^8.2.0",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0-alpha.2",
-    "nodemon": "^1.19.4",
+    "nodemon": "^3.0.1",
     "prettier": "^3.0.0"
   },
   "type": "module",
@@ -49,7 +60,19 @@
   "nodemonConfig": {
     "ignore": [
       "sessions/*",
+      "data/*",
+      "seeds/*",
+      "public/*",
       "node_modules/*"
     ]
+  },
+  "imports": {
+    "##/*": "./*",
+    "#configs/*": "./configs/*",
+    "#data/*": "./data/*",
+    "#db-helpers/*": "./db-helpers/*",
+    "#middlewares/*": "./middlewares/*",
+    "#services/*": "./services/*",
+    "#utils/*": "./utils/*"
   }
 }

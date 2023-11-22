@@ -1,86 +1,109 @@
 import express from 'express'
 const router = express.Router()
 
-// 認証用middleware(中介軟體)
-import auth from '../middlewares/auth.js'
+import jsonwebtoken from 'jsonwebtoken'
+// 中介軟體，存取隱私會員資料用
+import authenticate from '#middlewares/authenticate.js'
 
-import { verifyUser, getUser, getUserById } from '../models/users.js'
+// 存取`.env`設定檔案使用
+import 'dotenv/config.js'
 
-router.post('/login', async function (req, res, next) {
-  // 獲得username, password資料
-  const user = req.body
+// 資料庫使用
+import { QueryTypes } from 'sequelize'
+import sequelize from '#configs/db.js'
+const { User } = sequelize.models
 
-  console.log(user)
+// 驗証加密密碼字串用
+import { compareHash } from '#db-helpers/password-hash.js'
 
-  // 這裡可以再檢查從react來的資料，哪些資料為必要(username, password...)
-  if (!user.username || !user.password) {
-    return res.json({ message: 'fail', code: '400' })
+// 定義安全的私鑰字串
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
+// 檢查登入狀態用
+router.get('/check', authenticate, async (req, res) => {
+  // 查詢資料庫目前的資料
+  const user = await User.findByPk(req.user.id, {
+    raw: true, // 只需要資料表中資料
+  })
+
+  // 不回傳密碼值
+  delete user.password
+  return res.json({ status: 'success', data: { user } })
+})
+
+router.post('/login', async (req, res) => {
+  // 從前端來的資料 req.body = { username:'xxxx', password :'xxxx'}
+  const loginUser = req.body
+
+  // 檢查從前端來的資料哪些為必要
+  if (!loginUser.username || !loginUser.password) {
+    return res.json({ status: 'fail', data: null })
   }
 
-  const { username, password } = user
+  // 查詢資料庫，是否有這帳號與密碼的使用者資料
+  // 方式一: 使用直接查詢
+  // const user = await sequelize.query(
+  //   'SELECT * FROM user WHERE username=? LIMIT 1',
+  //   {
+  //     replacements: [loginUser.username], //代入問號值
+  //     type: QueryTypes.SELECT, //執行為SELECT
+  //     plain: true, // 只回傳第一筆資料
+  //     raw: true, // 只需要資料表中資料
+  //     logging: console.log, // SQL執行呈現在console.log
+  //   }
+  // )
 
-  // 先查詢資料庫是否有同username/password的資料
-  const isMember = await verifyUser({
-    username,
-    password,
+  // 方式二: 使用模型查詢
+  const user = await User.findOne({
+    where: {
+      username: loginUser.username,
+    },
+    raw: true, // 只需要資料表中資料
   })
 
-  console.log(isMember)
+  // console.log(user)
 
-  if (!isMember) {
-    return res.json({ message: 'fail', code: '400' })
+  // user=null代表不存在
+  if (!user) {
+    return res.json({ status: 'error', message: '使用者不存在' })
   }
 
-  // 會員存在，將會員的資料取出
-  const member = await getUser({
-    username,
-    password,
-  })
+  // compareHash(登入時的密碼純字串, 資料庫中的密碼hash) 比較密碼正確性
+  // isValid=true 代表正確
+  const isValid = await compareHash(loginUser.password, user.password)
 
-  console.log(member)
-
-  // 如果沒必要，member的password資料不應該，也不需要回應給瀏覽器
-  delete member.password
-
-  // 啟用session
-  req.session.userId = member.id
-
-  return res.json({
-    message: 'success',
-    code: '200',
-    user: member,
-  })
-})
-
-router.post('/logout', auth, async function (req, res, next) {
-  res.clearCookie('SESSION_ID') //cookie name
-  req.session.destroy(() => {
-    console.log('session destroyed')
-  })
-
-  res.json({ message: 'success', code: '200' })
-})
-
-// Demo使用auth middleware
-router.get('/private', auth, (req, res) => {
-  const userId = req.session.userId
-  return res.json({ message: 'authorized', userId })
-})
-
-// Demo使用Session來決定是否有登入
-router.get('/check-login', async function (req, res, next) {
-  if (req.session.userId) {
-    const userId = req.session.userId
-    // 這裡可以直接查詢會員資料一並送出
-    const user = await getUserById(userId)
-    // 如果沒必要，user的password資料不應該，也不需要回應給瀏覽器
-    delete user.password
-
-    return res.json({ message: 'authorized', user })
-  } else {
-    return res.json({ message: 'Unauthorized' })
+  // isValid=false 代表密碼錯誤
+  if (!isValid) {
+    return res.json({ status: 'error', message: '密碼錯誤' })
   }
+
+  // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
+  const returnUser = {
+    id: user.id,
+    username: user.username,
+    google_uid: user.google_uid,
+    line_uid: user.line_uid,
+  }
+
+  // 產生存取令牌(access token)，其中包含會員資料
+  const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+    expiresIn: '3d',
+  })
+
+  // 使用httpOnly cookie來讓瀏覽器端儲存access token
+  res.cookie('accessToken', accessToken, { httpOnly: true })
+
+  // 傳送access token回應(例如react可以儲存在state中使用)
+  res.json({
+    status: 'success',
+    data: { accessToken },
+  })
 })
 
-// module.exports = router
+router.post('/logout', authenticate, (req, res) => {
+  // 清除cookie
+  res.clearCookie('accessToken', { httpOnly: true })
+  res.json({ status: 'success', data: null })
+})
+
 export default router
