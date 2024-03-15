@@ -2,7 +2,8 @@
 
 ## TODO
 
-- [ ] line pay feature
+- [ ] downsize Product sample data
+- [ ] line pay feature refactor
 - [ ] deprecated `models/base.js`
 - [ ] clear up `data` and other nouse files
 - [ ] add base db sample crud route X 2(one for sample origin node+mysql2, one for sequalize)
