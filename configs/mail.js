@@ -14,6 +14,10 @@ transport = {
     user: process.env.SMTP_TO_EMAIL,
     pass: process.env.SMTP_TO_PASSWORD,
   },
+  tls: {
+    servername: 'smtp.gmail.com',
+    rejectUnauthorized: false,
+  },
 }
 
 // 呼叫transport函式

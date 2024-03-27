@@ -4,10 +4,10 @@
 
 - [ ] downsize Product sample data
 - [ ] line pay feature refactor
-- [ ] deprecated `models/base.js`
+- [x] deprecated `models/base.js`
 - [ ] clear up `data` and other nouse files
 - [ ] add base db sample crud route X 2(one for sample origin node+mysql2, one for sequalize)
-- [ ] remove pg npm for test
+- [x] remove pg npm for test
 
 ## FIXME
 
@@ -48,6 +48,10 @@ PG_DB_PASSWORD=12345
 ```
 
 ## LOG
+
+### 240327
+
+- (f) fixed gmail smtp bugs ([issue](https://github.com/nodemailer/nodemailer/issues/1429))
 
 ### 231105
 
