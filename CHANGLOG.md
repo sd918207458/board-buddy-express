@@ -11,7 +11,8 @@
 
 ## FIXME
 
-- [ ] routes/users register(create) should use FindOrCreate function with OR condition
+- [ ] (u) mysql2 version to 3.x
+- [ ] (u) routes/users register(create) should use FindOrCreate function with OR condition
 (https://stackoverflow.com/questions/22147151/sequelize-findorcreate-function-with-or-condition)
 
 ## OTHERS
