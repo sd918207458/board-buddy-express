@@ -1,12 +1,16 @@
-import { readJsonFile, writeJsonFile } from './json-tool.js'
 // eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
 
 // 專用處理sql字串的工具，主要format與escape，防止sql injection
-import sqlString from 'sqlstring'
+//import sqlString from 'sqlstring'
 
 // 讓console.log可以呈現檔案與行號
-import { extendLog, toKebabCase } from './tool.js'
+import {
+  extendLog,
+  toKebabCase,
+  readJsonFile,
+  writeJsonFile,
+} from '#utils/tool.js'
 extendLog() // 執行全域套用
 // console.log呈現顏色用 全域套用
 import 'colors'
