@@ -1,3 +1,4 @@
+// !! 注意: 此檔案並不是express執行時用，指令為`node ./cli/fake-product.js 100`，最後的100數字代表100筆
 // eslint-disable-next-line
 import { fakerZH_TW as faker } from '@faker-js/faker'
 
