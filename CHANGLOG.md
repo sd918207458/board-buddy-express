@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] sequelize timezone to +8:00
+- [x] sequelize timezone to +8:00
 - [ ] change smtp error to warning
 - [ ] downsize Product sample data
 - [ ] line pay feature refactor
