@@ -15,6 +15,7 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: 'mysql',
     logging: false,
+    timezone: '+08:00',
     define: {
       freezeTableName: true,
       charset: 'utf8',
