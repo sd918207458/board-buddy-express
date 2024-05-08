@@ -2,6 +2,8 @@
 
 ## TODO
 
+- [ ] sequelize timezone to +8:00
+- [ ] change smtp error to warning
 - [ ] downsize Product sample data
 - [ ] line pay feature refactor
 - [x] deprecated `models/base.js`
