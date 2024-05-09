@@ -28,7 +28,8 @@ transporter.verify((error, success) => {
   if (error) {
     // 發生錯誤
     console.error(
-      'ERROR - 無法連線至SMTP伺服器 Unable to connect to the SMTP server.'.bgRed
+      'WARN - 無法連線至SMTP伺服器 Unable to connect to the SMTP server.'
+        .bgYellow
     )
   } else {
     // 代表成功
