@@ -2,6 +2,7 @@
 
 ## TODO
 
+- [ ] add prefix for sample db models and seeds
 - [ ] ecpay
 - [ ] ?add associations sync feature
 - [ ] change smtp error to warning
@@ -18,6 +19,7 @@
 
 ### 240513
 
+- (a) add raw mysql pool export file
 - (u) sequelize timezone to +8:00
 - (rm) remove pg npm for test
 - (rm) deprecated `models/base.js`
