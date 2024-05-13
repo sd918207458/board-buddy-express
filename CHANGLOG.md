@@ -2,52 +2,30 @@
 
 ## TODO
 
+- [ ] ecpay
+- [ ] ?add associations sync feature
+- [ ] change smtp error to warning
 - [ ] downsize Product sample data
 - [ ] line pay feature refactor
-- [ ] deprecated `models/base.js`
 - [ ] clear up `data` and other nouse files
 - [ ] add base db sample crud route X 2(one for sample origin node+mysql2, one for sequalize)
-- [ ] remove pg npm for test
 
 ## FIXME
 
+## ChangeLog
 
-## OTHERS
+> `u`: change/update `f`:fixed `a`: add `rm`: remove `!`: notice
 
-> db.js
+### 240513
 
-```js
-// for postgresql test
-const sequelize = new Sequelize(
-  process.env.PG_DB_DATABASE,
-  process.env.PG_DB_USERNAME,
-  process.env.PG_DB_PASSWORD,
-  {
-    host: process.env.PG_DB_HOST,
-    port: process.env.PG_DB_PORT,
-    dialect: 'postgres',
-    logging: false,
-    define: {
-      freezeTableName: true,
-      charset: 'utf8',
-      collate: 'utf8_general_ci',
-    },
-  }
-)
-```
+- (u) sequelize timezone to +8:00
+- (rm) remove pg npm for test
+- (rm) deprecated `models/base.js`
+- (f) routes/users register(create) should use FindOrCreate function with OR condition. [refs](https://stackoverflow.com/questions/22147151/sequelize-findorcreate-function-with-or-condition)
 
-> .env
+### 240327
 
-```text
-# TEST FOR pgsql
-PG_DB_HOST=127.0.0.1
-PG_DB_PORT=5432
-PG_DB_DATABASE=test
-PG_DB_USERNAME=test
-PG_DB_PASSWORD=12345
-```
-
-## LOG
+- (f) fixed gmail smtp bugs ([issue](https://github.com/nodemailer/nodemailer/issues/1429))
 
 ### 231105
 

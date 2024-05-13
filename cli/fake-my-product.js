@@ -66,38 +66,41 @@ const createCats = async (filename = 'Category.json') => {
 
 // 以下建立產品用 模型Product
 const genProduct = () => {
-  const photos = faker.helpers
-    .arrayElements(['t1.jpg', 't2.jpg', 't3.jpg', 't4.jpg', 't5.jpg'], 3)
-    .join(',')
+  // const photos = faker.helpers
+  //   .arrayElements(['t1.jpg', 't2.jpg', 't3.jpg', 't4.jpg', 't5.jpg'], 3)
+  //   .join(',')
 
-  const brand_id = faker.number.int({ min: 1, max: 4 })
+  const picture = faker.image.imageUrl()
+
+  //const brand_id = faker.number.int({ min: 1, max: 4 })
   const cat_id = faker.number.int({ min: 4, max: 12 })
-  const name = `${faker.commerce.productName()} - ${brands[brand_id - 1]} ${
-    allCats[cat_id - 1].name
-  }`
+  const brand = faker.helpers.arrayElement([
+    'Apple',
+    'Samsung',
+    '小米',
+    'Google',
+  ])
+  const name = `${faker.commerce.productName()} - ${brand}`
+
+  // const brand_id = faker.number.int({ min: 0, max: 3 })
 
   return {
-    sn: faker.string.uuid(),
+    //sn: faker.string.uuid(),
     name,
-    photos,
+    picture,
+    brand,
     stock: faker.number.int({ min: 1, max: 10 }) * 10,
     price: faker.number.int({ min: 15, max: 150 }) * 100,
-    info: faker.commerce.productDescription(),
-    brand_id,
-    cat_id,
-    color: faker.helpers
-      .arrayElements([1, 2, 3, 4], { min: 1, max: 4 })
-      .join(','),
-    tag: faker.helpers
-      .arrayElements([1, 2, 3, 4], {
+    //info: faker.commerce.productDescription(),
+    //brand_id,
+    // cat_id,
+    // color: faker.helpers
+    //   .arrayElements([1, 2, 3, 4], { min: 1, max: 4 })
+    //   .join(','),
+    tags: faker.helpers
+      .arrayElements(['大螢幕', '多顏色', '二年保固', '熱門', '特價中'], {
         min: 1,
         max: 3,
-      })
-      .join(','),
-    size: faker.helpers
-      .arrayElements([1, 2, 3, 4], {
-        min: 1,
-        max: 4,
       })
       .join(','),
   }
@@ -107,7 +110,7 @@ const productSize = []
 const productColor = []
 const productTag = []
 
-const createProducts = async (num = 1, filename = 'Product.json') => {
+const createProducts = async (num = 1, filename = 'My_Product.json') => {
   const products = Array(num)
     .fill(1)
     .map((v, i) => {
@@ -115,21 +118,21 @@ const createProducts = async (num = 1, filename = 'Product.json') => {
       const id = i + 1
       const product = genProduct()
 
-      const sizeList = product.size.split(',').map((v2, i2) => {
-        return { pid: id, sid: Number(v2) }
-      })
+      // const sizeList = product.size.split(',').map((v2, i2) => {
+      //   return { pid: id, sid: Number(v2) }
+      // })
 
-      const colorList = product.color.split(',').map((v2, i2) => {
-        return { pid: id, cid: Number(v2) }
-      })
+      // const colorList = product.color.split(',').map((v2, i2) => {
+      //   return { pid: id, cid: Number(v2) }
+      // })
 
-      const tagList = product.tag.split(',').map((v2, i2) => {
-        return { pid: id, tid: Number(v2) }
-      })
+      // const tagList = product.tag.split(',').map((v2, i2) => {
+      //   return { pid: id, tid: Number(v2) }
+      // })
 
-      productSize.push(...sizeList)
-      productColor.push(...colorList)
-      productTag.push(...tagList)
+      // productSize.push(...sizeList)
+      // productColor.push(...colorList)
+      // productTag.push(...tagList)
 
       return { id, ...product }
     })
@@ -151,10 +154,10 @@ const args = process.argv
 // 預設為10筆
 const num = Number(args[2]) || 100
 
-await createBrands()
+// await createBrands()
 // 需先產生分類，商品名稱上才會有分類名稱
 // 共產生Category.json與Product.json兩檔案
-await createCats()
+// await createCats()
 await createProducts(num)
 
 // 訊息

@@ -2,22 +2,25 @@
 
 ## 版本
 
-v1.1
+v1.2
 
 ## !!使用前注意
 
 - git clone後，將`.env.template`改為`.env`檔案，之後進行其中相關設定
 - `.env`中`DB_XXX`相關設定，需改為你的資料庫、帳號、密碼才能開始使用
 
+
 ## 指令
 
 express執行:
+
+> 模型對應資料表不存在會自動建立
 
 ```sh
 npm run dev
 ```
 
-資料庫種子(範例)資料載入:
+模型對應資料表建立+種子(範例)資料載入:
 
 ```sh
 npm run seed
@@ -150,3 +153,40 @@ GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ### JWT
 
 - add only unchangeable fields like username, role to JWT
+
+## OTHERS
+
+For postgresql test
+
+> db.js
+
+```js
+// for postgresql test
+const sequelize = new Sequelize(
+  process.env.PG_DB_DATABASE,
+  process.env.PG_DB_USERNAME,
+  process.env.PG_DB_PASSWORD,
+  {
+    host: process.env.PG_DB_HOST,
+    port: process.env.PG_DB_PORT,
+    dialect: 'postgres',
+    logging: false,
+    define: {
+      freezeTableName: true,
+      charset: 'utf8',
+      collate: 'utf8_general_ci',
+    },
+  }
+)
+```
+
+> .env
+
+```text
+# TEST FOR pgsql
+PG_DB_HOST=127.0.0.1
+PG_DB_PORT=5432
+PG_DB_DATABASE=test
+PG_DB_USERNAME=test
+PG_DB_PASSWORD=12345
+```
