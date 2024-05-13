@@ -8,6 +8,7 @@ import authenticate from '#middlewares/authenticate.js'
 import { getIdParam } from '#db-helpers/db-tool.js'
 
 // 資料庫使用
+import { Op } from 'sequelize'
 import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
@@ -87,13 +88,17 @@ router.post('/', async function (req, res) {
   }
 
   // 執行後user是建立的會員資料，created為布林值
-  // where指的是不可以有相同的資料，如username與email不能有相同的
-  // defaults用於建立新資料用
+  // where指的是不可以有相同的資料，如username或是email不能有相同的
+  // defaults用於建立新資料用需要的資料
   const [user, created] = await User.findOrCreate({
-    where: { username: newUser.username, email: newUser.email },
+    where: {
+      [Op.or]: [{ username: newUser.username }, { email: newUser.email }],
+    },
     defaults: {
       name: newUser.name,
       password: newUser.password,
+      username: newUser.username,
+      email: newUser.email,
     },
   })
 
