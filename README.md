@@ -153,3 +153,40 @@ GET /posts?limit=10&offset=20 - retrieves the third 10 posts, and so on
 ### JWT
 
 - add only unchangeable fields like username, role to JWT
+
+## OTHERS
+
+For postgresql test
+
+> db.js
+
+```js
+// for postgresql test
+const sequelize = new Sequelize(
+  process.env.PG_DB_DATABASE,
+  process.env.PG_DB_USERNAME,
+  process.env.PG_DB_PASSWORD,
+  {
+    host: process.env.PG_DB_HOST,
+    port: process.env.PG_DB_PORT,
+    dialect: 'postgres',
+    logging: false,
+    define: {
+      freezeTableName: true,
+      charset: 'utf8',
+      collate: 'utf8_general_ci',
+    },
+  }
+)
+```
+
+> .env
+
+```text
+# TEST FOR pgsql
+PG_DB_HOST=127.0.0.1
+PG_DB_PORT=5432
+PG_DB_DATABASE=test
+PG_DB_USERNAME=test
+PG_DB_PASSWORD=12345
+```
