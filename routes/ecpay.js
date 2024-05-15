@@ -180,6 +180,7 @@ router.post('/result', async (req, res, next) => {
   console.log('綠界回傳的資料如下：')
   console.log(req.body)
   // res.send('綠界回傳的資料如下：' + JSON.stringify(req.body))
+  // 寫入資料表 RtnCode === '1' 代表交易成功
   res.redirect(
     ReactClientBackURL + '?' + new URLSearchParams(req.body).toString()
   )
