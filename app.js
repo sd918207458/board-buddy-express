@@ -74,6 +74,8 @@ for (const filename of filenames) {
 }
 // 載入routes中的各路由檔案，並套用api路由 END
 
+app.use('/uploads', express.static('uploads'))
+
 // 捕抓404錯誤處理
 app.use(function (req, res, next) {
   next(createError(404))
