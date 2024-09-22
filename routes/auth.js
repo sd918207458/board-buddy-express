@@ -106,4 +106,44 @@ router.post('/logout', authenticate, (req, res) => {
   res.json({ status: 'success', data: null })
 })
 
+router.post('/register', async (req, res) => {
+  try {
+    const {
+      username,
+      email,
+      password,
+      confirmPassword,
+      first_name,
+      last_name,
+    } = req.body
+
+    // 檢查密碼是否匹配
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' })
+    }
+
+    // 創建新使用者
+    const newUser = await User.create({
+      username,
+      email,
+      password_hash: password, // Sequelize hook 會自動進行加密
+      first_name,
+      last_name,
+    })
+
+    return res
+      .status(201)
+      .json({ message: 'User registered successfully', newUser })
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      // 捕捉唯一性違反錯誤
+      return res.status(400).json({
+        message: `${error.errors[0].path} already exists`, // 返回用戶名或電郵已存在的錯誤訊息
+      })
+    }
+
+    return res.status(500).json({ message: 'Server error', error })
+  }
+})
+
 export default router

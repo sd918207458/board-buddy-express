@@ -4,7 +4,7 @@ import { generateHash } from '#db-helpers/password-hash.js'
 
 export default async function (sequelize) {
   return sequelize.define(
-    'MemberList',
+    'member',
     {
       member_id: {
         type: DataTypes.INTEGER,
