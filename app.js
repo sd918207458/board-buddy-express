@@ -76,8 +76,8 @@ for (const filename of filenames) {
 
 // 載入 /register 路由
 // 載入 /api 路由，將所有 authRoutes 掛載到 /api 下
-import authRoutes from './routes/auth.js'
-app.use('/api', authRoutes)
+// import authRoutes from './routes/auth.js'
+// app.use('/api', authRoutes)
 
 // 捕抓404錯誤處理
 app.use(function (req, res, next) {
