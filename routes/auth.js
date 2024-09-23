@@ -32,72 +32,55 @@ router.get('/check', authenticate, async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  // 從前端來的資料 req.body = { username:'xxxx', password :'xxxx'}
-  const loginUser = req.body
+  const { username, password } = req.body
 
-  // 檢查從前端來的資料哪些為必要
-  if (!loginUser.username || !loginUser.password) {
-    return res.json({ status: 'fail', data: null })
+  // 檢查從前端來的資料是否齊全
+  if (!username || !password) {
+    return res.status(400).json({ status: 'fail', message: '缺少必要資料' })
   }
 
-  // 查詢資料庫，是否有這帳號與密碼的使用者資料
-  // 方式一: 使用直接查詢
-  // const user = await sequelize.query(
-  //   'SELECT * FROM user WHERE username=? LIMIT 1',
-  //   {
-  //     replacements: [loginUser.username], //代入問號值
-  //     type: QueryTypes.SELECT, //執行為SELECT
-  //     plain: true, // 只回傳第一筆資料
-  //     raw: true, // 只需要資料表中資料
-  //     logging: console.log, // SQL執行呈現在console.log
-  //   }
-  // )
+  try {
+    // 查詢資料庫，檢查使用者是否存在
+    const user = await User.findOne({
+      where: { username },
+      raw: true, // 只需要資料表中的資料
+    })
 
-  // 方式二: 使用模型查詢
-  const user = await User.findOne({
-    where: {
-      username: loginUser.username,
-    },
-    raw: true, // 只需要資料表中資料
-  })
+    if (!user) {
+      // 如果使用者不存在，返回錯誤
+      return res.status(401).json({ status: 'error', message: '使用者不存在' })
+    }
 
-  // console.log(user)
+    // 驗證密碼
+    const isValid = await compareHash(password, user.password_hash)
 
-  // user=null代表不存在
-  if (!user) {
-    return res.json({ status: 'error', message: '使用者不存在' })
+    if (!isValid) {
+      // 如果密碼驗證失敗，返回錯誤
+      return res.status(401).json({ status: 'error', message: '密碼錯誤' })
+    }
+
+    // 存取令牌，只需要id和username即可
+    const returnUser = {
+      id: user.id,
+      username: user.username,
+    }
+
+    const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+      expiresIn: '3d',
+    })
+
+    // 將存取令牌存放於cookie中
+    res.cookie('accessToken', accessToken, { httpOnly: true })
+
+    // 傳送登入成功訊息
+    return res.json({
+      status: 'success',
+      data: { accessToken },
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
   }
-
-  // compareHash(登入時的密碼純字串, 資料庫中的密碼hash) 比較密碼正確性
-  // isValid=true 代表正確
-  const isValid = await compareHash(loginUser.password, user.password)
-
-  // isValid=false 代表密碼錯誤
-  if (!isValid) {
-    return res.json({ status: 'error', message: '密碼錯誤' })
-  }
-
-  // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
-  const returnUser = {
-    id: user.id,
-    username: user.username,
-    google_uid: user.google_uid,
-    line_uid: user.line_uid,
-  }
-
-  // 產生存取令牌(access token)，其中包含會員資料
-  const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
-    expiresIn: '3d',
-  })
-
-  // 使用httpOnly cookie來讓瀏覽器端儲存access token
-  res.cookie('accessToken', accessToken, { httpOnly: true })
-
-  // 傳送access token回應(例如react可以儲存在state中使用)
-  res.json({
-    status: 'success',
-    data: { accessToken },
-  })
 })
 
 router.post('/logout', authenticate, (req, res) => {
