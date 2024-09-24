@@ -21,14 +21,28 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 
 // 檢查登入狀態用
 router.get('/check', authenticate, async (req, res) => {
-  // 查詢資料庫目前的資料
-  const user = await User.findByPk(req.user.id, {
-    raw: true, // 只需要資料表中資料
-  })
+  try {
+    console.log('Looking for user with ID:', req.user.id) // 打印 id 來調試
 
-  // 不回傳密碼值
-  delete user.password
-  return res.json({ status: 'success', data: { user } })
+    // 查詢資料庫目前的資料
+    const user = await User.findByPk(req.user.id, {
+      raw: true, // 只需要資料表中資料
+    })
+
+    if (!user) {
+      console.log('User not found')
+      // 如果找不到該用戶，返回 404 錯誤
+      return res.status(404).json({ status: 'error', message: '使用者不存在' })
+    }
+
+    // 不回傳密碼值
+    delete user.password_hash
+
+    return res.json({ status: 'success', data: { user } })
+  } catch (error) {
+    console.error('伺服器錯誤:', error)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+  }
 })
 
 router.post('/login', async (req, res) => {
@@ -61,7 +75,7 @@ router.post('/login', async (req, res) => {
 
     // 存取令牌，只需要id和username即可
     const returnUser = {
-      id: user.id,
+      id: user.member_id, // 確保傳遞的是 member_id
       username: user.username,
     }
 

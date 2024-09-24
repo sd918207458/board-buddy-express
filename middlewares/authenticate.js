@@ -28,6 +28,15 @@ export default function authenticate(req, res, next) {
         message: '不合法的存取令牌',
       })
     }
+    console.log('Decoded user:', user) // 確認解碼的 user 對象是否正確
+
+    // 確認是否包含 member_id
+    if (!user.id) {
+      return res.status(400).json({
+        status: 'error',
+        message: '存取令牌無效，缺少使用者 ID',
+      })
+    }
 
     // 將user資料加到req中
     req.user = user
