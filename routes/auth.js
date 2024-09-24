@@ -46,17 +46,17 @@ router.get('/check', authenticate, async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body
+  const { email, password } = req.body // 使用 email 而不是 username
 
   // 檢查從前端來的資料是否齊全
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(400).json({ status: 'fail', message: '缺少必要資料' })
   }
 
   try {
-    // 查詢資料庫，檢查使用者是否存在
+    // 查詢資料庫，檢查使用者是否存在 (改為使用 email)
     const user = await User.findOne({
-      where: { username },
+      where: { email },
       raw: true, // 只需要資料表中的資料
     })
 
@@ -73,10 +73,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ status: 'error', message: '密碼錯誤' })
     }
 
-    // 存取令牌，只需要id和username即可
+    // 存取令牌，只需要id和email即可
     const returnUser = {
       id: user.member_id, // 確保傳遞的是 member_id
-      username: user.username,
+      email: user.email,
     }
 
     const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
