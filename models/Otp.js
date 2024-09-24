@@ -9,9 +9,13 @@ export default async function (sequelize) {
         primaryKey: true,
         autoIncrement: true,
       },
-      user_id: {
+      member_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: false, // 確保不允許為 null
+        references: {
+          model: 'User', // 引用 User 模型
+          key: 'member_id', // 使用 'member_id' 作為外鍵
+        },
       },
       email: {
         type: DataTypes.STRING,
@@ -27,12 +31,12 @@ export default async function (sequelize) {
       },
     },
     {
-      tableName: 'otp', //直接提供資料表名稱
-      timestamps: true, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用snake_case命名
-      createdAt: 'created_at', // 建立的時間戳
-      updatedAt: 'updated_at', // 更新的時間戳
+      tableName: 'otp',
+      timestamps: true,
+      paranoid: false,
+      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     }
   )
 }

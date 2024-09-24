@@ -117,28 +117,22 @@ router.post('/', async function (req, res) {
   })
 })
 
-// POST - 可同時上傳與更新會員檔案用，使用multer(設定值在此檔案最上面)
+// 正確的文件上傳路由，不應使用 getIdParam
 router.post(
   '/upload-avatar',
   authenticate,
-  upload.single('avatar'), // 上傳來的檔案(這是單個檔案，表單欄位名稱為avatar)
+  upload.single('avatar'),
   async function (req, res) {
-    // req.file 即上傳來的檔案(avatar這個檔案)
-    // req.body 其它的文字欄位資料…
-    // console.log(req.file, req.body)
-
     if (req.file) {
-      const id = req.user.id
-      const data = { avatar: req.file.filename }
+      const id = req.user.id // 從授權中獲取 user.id，不是來自 URL 的動態參數
+      const newAvatar = req.file.filename
 
-      // 對資料庫執行update
-      const [affectedRows] = await User.update(data, {
-        where: {
-          id,
-        },
-      })
+      // 更新用戶的 avatar
+      const [affectedRows] = await User.update(
+        { avatar: newAvatar },
+        { where: { id } }
+      )
 
-      // 沒有更新到任何資料 -> 失敗或沒有資料被更新
       if (!affectedRows) {
         return res.json({
           status: 'error',
@@ -148,13 +142,28 @@ router.post(
 
       return res.json({
         status: 'success',
-        data: { avatar: req.file.filename },
+        data: { avatar: newAvatar },
       })
     } else {
       return res.json({ status: 'fail', data: null })
     }
   }
 )
+
+// 需要 :id 參數的路由使用 getIdParam
+router.get('/:id', authenticate, async function (req, res) {
+  const id = getIdParam(req) // 這裡使用 getIdParam
+  const user = await User.findByPk(id)
+
+  if (!user) {
+    return res.status(404).json({
+      status: 'error',
+      message: '用戶不存在',
+    })
+  }
+
+  res.json({ status: 'success', data: { user } })
+})
 
 // PUT - 更新會員資料(密碼更新用)
 router.put('/:id/password', authenticate, async function (req, res) {
