@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize'
+// models/Game_rooms.js
+import { DataTypes } from 'sequelize';
 
-export default async function (sequelize) {
+export default function (sequelize) {
   return sequelize.define(
-    'Game_Rooms',
+    'Game_rooms',
     {
       room_id: {
         type: DataTypes.INTEGER,
@@ -10,7 +11,7 @@ export default async function (sequelize) {
         autoIncrement: true,
       },
       room_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: false,
       },
       member_id: {
@@ -18,7 +19,7 @@ export default async function (sequelize) {
         allowNull: true,
       },
       room_intro: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
       minperson: {
@@ -38,43 +39,24 @@ export default async function (sequelize) {
         allowNull: true,
       },
       location: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
       img: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
       room_type: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
-      game1: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
-      game2: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      game3: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-        charset: 'utf8mb4', // 设置字符集
-        collate: 'utf8mb4_0900_ai_ci', // 设置排序规则
-      },
-      roomrule: {
-        type: DataTypes.STRING(1000),
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
     },
     {
-      tableName: 'game_rooms', // 直接提供資料表名稱
-      timestamps: true, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用snake_case命名
-      createdAt: 'created_at', // 建立的時間戳
-      updatedAt: 'updated_at', // 更新的時間戳
+      tableName: 'game_rooms',
+      timestamps: true,
+      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     }
-  )
+  );
 }
