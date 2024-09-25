@@ -191,44 +191,41 @@ router.put('/:id/password', authenticate, async function (req, res) {
 })
 
 // PUT - 更新會員資料(排除更新密碼)
-router.put('/:id/profile', authenticate, async function (req, res) {
-  // 手動映射 req.user.id 為 req.user.member_id
-  if (req.user && req.user.id) {
-    req.user.member_id = req.user.id
-  }
+// 更新會員資料的 API
+router.put('/update', authenticate, async function (req, res) {
+  const member_id = req.user.member_id
 
-  const member_id = getIdParam(req)
-
-  if (req.user.member_id !== member_id) {
-    return res.json({ status: 'error', message: '存取會員資料失敗' })
+  if (!member_id) {
+    return res.json({ status: 'error', message: '無效的用戶ID' })
   }
 
   const user = req.body
 
-  if (!member_id || !user.name) {
+  if (!user.username || !user.emailAddress || !user.phone) {
     return res.json({ status: 'error', message: '缺少必要資料' })
   }
 
-  const dbUser = await User.findByPk(member_id, { raw: true })
-
-  if (!dbUser) {
-    return res.json({ status: 'error', message: '使用者不存在' })
-  }
-
-  if (!user.birth_date) {
-    delete user.birth_date
-  }
-
-  const [affectedRows] = await User.update(user, { where: { member_id } })
+  const [affectedRows] = await User.update(
+    {
+      username: user.username,
+      email: user.emailAddress,
+      phone_number: user.phone,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      date_of_birth: user.birthday,
+      gender: user.gender,
+      favorite_games: user.gameType,
+      preferred_play_times: user.playTime,
+      avatar: user.avatar,
+    },
+    { where: { member_id } }
+  )
 
   if (!affectedRows) {
     return res.json({ status: 'error', message: '更新失敗或沒有資料被更新' })
   }
 
-  const updatedUser = await User.findByPk(member_id, { raw: true })
-  delete updatedUser.password
-
-  return res.json({ status: 'success', data: { user: updatedUser } })
+  return res.json({ status: 'success', message: '資料已成功更新' })
 })
 
 // DELETE - 刪除會員資料
