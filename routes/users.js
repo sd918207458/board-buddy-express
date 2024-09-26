@@ -191,7 +191,6 @@ router.put('/:id/password', authenticate, async function (req, res) {
 })
 
 // PUT - 更新會員資料(排除更新密碼)
-// 更新會員資料的 API
 router.put('/update', authenticate, async function (req, res) {
   const member_id = req.user.member_id
 
@@ -216,7 +215,7 @@ router.put('/update', authenticate, async function (req, res) {
       gender: user.gender,
       favorite_games: user.gameType,
       preferred_play_times: user.playTime,
-      avatar: user.avatar,
+      avatar: user.avatar, // 更新頭像
     },
     { where: { member_id } }
   )
