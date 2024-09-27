@@ -82,7 +82,7 @@ router.post('/login', async (req, res) => {
     const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
       expiresIn: '3d',
     })
-
+    console.log('Generated Token:', accessToken)
     // 將存取令牌存放於cookie中
     res.cookie('accessToken', accessToken, { httpOnly: true })
 

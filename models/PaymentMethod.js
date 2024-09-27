@@ -13,18 +13,17 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'member', // 引用的資料表
-          key: 'member_id', // 引用的欄位
+          model: 'User', // 注意這裡應該是User模型, 而非member
+          key: 'member_id',
         },
-        onDelete: 'CASCADE', // 刪除會員時，刪除其付款方式
-        unique: 'uniqueCardForMember', // 確保會員不會有兩個相同卡號
+        onDelete: 'CASCADE',
+        unique: 'uniqueCardForMember',
       },
       card_number: {
         type: DataTypes.STRING(20),
         allowNull: false,
-        unique: 'uniqueCardForMember', // 與 `member_id` 組合成唯一約束
+        unique: 'uniqueCardForMember',
       },
-
       card_type: {
         type: DataTypes.ENUM('Visa', 'MasterCard', 'Amex'),
         allowNull: false,
@@ -60,7 +59,7 @@ export default function (sequelize) {
   PaymentMethod.associate = function (models) {
     PaymentMethod.belongsTo(models.User, {
       foreignKey: 'member_id',
-      as: 'user', // 允許通過 `PaymentMethod.user` 存取相關的會員資料
+      as: 'user',
     })
   }
 

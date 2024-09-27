@@ -99,34 +99,49 @@ router.put('/:id', authenticate, async (req, res) => {
 
 // 設置預設付款方式的 API
 router.put('/set-default/:id', authenticate, async (req, res) => {
+  const { id } = req.params
+  const member_id = req.user.member_id
+
   try {
-    const member_id = req.user.member_id // 從 `req.user` 獲取 `member_id`
-    const { id } = req.params
+    // 重設其他付款方式的 `is_default` 為 false
+    await PaymentMethod.update({ is_default: false }, { where: { member_id } })
 
-    // 將該會員的所有付款方式的 `isDefault` 設為 `false`
-    await PaymentMethod.update({ isDefault: false }, { where: { member_id } })
-
-    // 將指定的付款方式設為預設
-    const [updated] = await PaymentMethod.update(
-      { isDefault: true },
-      { where: { payment_id: id } }
+    // 設置當前付款方式為預設
+    const [affectedRows] = await PaymentMethod.update(
+      { is_default: true },
+      { where: { payment_id: id, member_id } }
     )
 
-    if (!updated) {
-      return res.status(404).json({ message: '找不到付款方式' })
+    if (!affectedRows) {
+      return res.status(400).json({ status: 'error', message: '更新失敗' })
     }
 
+    return res.json({ status: 'success', message: '設置為預設付款方式' })
+  } catch (error) {
+    console.error('設置預設付款方式失敗:', error)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+  }
+})
+
+// 獲取預設付款方式的 API
+router.get('/default', authenticate, async (req, res) => {
+  try {
+    const member_id = req.user.member_id
+
     const defaultPaymentMethod = await PaymentMethod.findOne({
-      where: { payment_id: id },
+      where: { member_id, is_default: true },
     })
 
-    return res.status(200).json({
-      status: 'success',
-      data: defaultPaymentMethod,
-    })
+    if (!defaultPaymentMethod) {
+      return res
+        .status(404)
+        .json({ status: 'error', message: '未找到預設付款方式' })
+    }
+
+    return res.json({ status: 'success', data: defaultPaymentMethod })
   } catch (error) {
-    console.error('設置預設付款方式失敗', error)
-    return res.status(500).json({ message: '伺服器錯誤，請重試' })
+    console.error('獲取預設付款方式失敗:', error)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
   }
 })
 

@@ -26,9 +26,9 @@ const storage = multer.diskStorage({
     callback(null, 'public/avatar/')
   },
   filename: function (req, file, callback) {
-    // 經授權後，req.user帶有會員的member_id
-    const newFilename = req.user.member_id // 使用 member_id 作為檔名
-    callback(null, newFilename + path.extname(file.originalname))
+    // 使用原始檔案名稱
+    const newFilename = file.originalname
+    callback(null, newFilename) // 保留原始名稱
   },
 })
 const upload = multer({ storage: storage })
@@ -115,13 +115,13 @@ router.post(
     }
 
     if (req.file) {
-      const member_id = req.user.member_id
-      const newAvatar = `${member_id}${path.extname(req.file.originalname)}` // 使用 member_id 作為檔名
+      // 使用原始檔案名稱
+      const newAvatar = req.file.originalname
 
       // 更新資料庫中的 avatar 欄位
       const [affectedRows] = await User.update(
         { avatar: newAvatar },
-        { where: { member_id } }
+        { where: { member_id: req.user.member_id } }
       )
 
       if (!affectedRows) {
