@@ -45,48 +45,43 @@ router.get('/check', authenticate, async (req, res) => {
   }
 })
 
+// 登入 API，產生並存入 accessToken
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body // 使用 email 而不是 username
+  const { email, password } = req.body
 
-  // 檢查從前端來的資料是否齊全
   if (!email || !password) {
     return res.status(400).json({ status: 'fail', message: '缺少必要資料' })
   }
 
   try {
-    // 查詢資料庫，檢查使用者是否存在 (改為使用 email)
     const user = await User.findOne({
       where: { email },
-      raw: true, // 只需要資料表中的資料
+      raw: true,
     })
 
     if (!user) {
-      // 如果使用者不存在，返回錯誤
       return res.status(401).json({ status: 'error', message: '使用者不存在' })
     }
 
-    // 驗證密碼
     const isValid = await compareHash(password, user.password_hash)
 
     if (!isValid) {
-      // 如果密碼驗證失敗，返回錯誤
       return res.status(401).json({ status: 'error', message: '密碼錯誤' })
     }
 
-    // 存取令牌，只需要id和email即可
-    const returnUser = {
-      id: user.member_id, // 確保傳遞的是 member_id
-      email: user.email,
-    }
+    const returnUser = { id: user.member_id, email: user.email }
 
     const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
       expiresIn: '3d',
     })
-    console.log('Generated Token:', accessToken)
-    // 將存取令牌存放於cookie中
-    res.cookie('accessToken', accessToken, { httpOnly: true })
 
-    // 傳送登入成功訊息
+    // 將 accessToken 存入 cookie，並設置 httpOnly 保護
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true, // 保證 cookie 只能通過 HTTP 請求訪問，防止 XSS 攻擊
+      secure: process.env.NODE_ENV === 'production', // 在生產環境中使用 secure 標誌
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 3天
+    })
+
     return res.json({
       status: 'success',
       data: { accessToken },
@@ -97,12 +92,13 @@ router.post('/login', async (req, res) => {
   }
 })
 
+// 登出 API，清除 accessToken cookie
 router.post('/logout', authenticate, (req, res) => {
-  // 清除cookie
   res.clearCookie('accessToken', { httpOnly: true })
   res.json({ status: 'success', data: null })
 })
 
+// 註冊 API
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password, confirmPassword } = req.body
