@@ -42,11 +42,6 @@ router.get('/', async function (req, res) {
 
 // GET - 得到單筆資料
 router.get('/:id', authenticate, async function (req, res) {
-  // 手動映射 req.user.id 為 req.user.member_id
-  if (req.user && req.user.id) {
-    req.user.member_id = req.user.id
-  }
-
   const member_id = getIdParam(req)
 
   // 檢查是否為授權會員，只有授權會員可以存取自己的資料
@@ -106,22 +101,18 @@ router.post(
   authenticate,
   upload.single('avatar'),
   async function (req, res) {
-    if (req.user && req.user.id) {
-      req.user.member_id = req.user.id
-    }
+    const member_id = req.user.member_id || req.user.id // 檢查 member_id 和 id
 
-    if (!req.user.member_id) {
+    if (!member_id) {
       return res.status(400).json({ message: '無效的使用者 ID' })
     }
 
     if (req.file) {
-      // 使用原始檔案名稱
       const newAvatar = req.file.originalname
 
-      // 更新資料庫中的 avatar 欄位
       const [affectedRows] = await User.update(
         { avatar: newAvatar },
-        { where: { member_id: req.user.member_id } }
+        { where: { member_id } }
       )
 
       if (!affectedRows) {
@@ -131,7 +122,6 @@ router.post(
         })
       }
 
-      // 返回圖片的完整URL
       const avatarUrl = `http://localhost:3005/avatar/${newAvatar}`
 
       return res.json({
@@ -146,11 +136,6 @@ router.post(
 
 // PUT - 更新會員資料(密碼更新用)
 router.put('/:id/password', authenticate, async function (req, res) {
-  // 手動映射 req.user.id 為 req.user.member_id
-  if (req.user && req.user.id) {
-    req.user.member_id = req.user.id
-  }
-
   const member_id = getIdParam(req)
 
   if (req.user.member_id !== member_id) {
@@ -228,12 +213,7 @@ router.put('/update', authenticate, async function (req, res) {
 })
 
 // DELETE - 刪除會員資料
-router.delete('/:id', async function (req, res) {
-  // 手動映射 req.user.id 為 req.user.member_id
-  if (req.user && req.user.id) {
-    req.user.member_id = req.user.id
-  }
-
+router.delete('/:id', authenticate, async function (req, res) {
   const member_id = getIdParam(req)
 
   const affectedRows = await User.destroy({ where: { member_id } })
