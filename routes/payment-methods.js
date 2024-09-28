@@ -18,6 +18,8 @@ router.post('/', authenticate, async (req, res) => {
   const member_id = req.user.id
 
   try {
+    let newPaymentMethod
+
     // 信用卡付款邏輯
     if (type === 'creditCard') {
       if (!card_number || !card_type || !expiration_date || !cardholder_name) {
@@ -26,7 +28,7 @@ router.post('/', authenticate, async (req, res) => {
 
       const maskedCardNumber = card_number.slice(-4)
 
-      const newPaymentMethod = await PaymentMethod.create({
+      newPaymentMethod = await PaymentMethod.create({
         member_id,
         card_number: maskedCardNumber,
         card_type,
@@ -34,8 +36,6 @@ router.post('/', authenticate, async (req, res) => {
         cardholder_name,
         payment_type: 'creditCard',
       })
-
-      return res.status(201).json({ status: 'success', data: newPaymentMethod })
     }
     // 線上付款邏輯
     else if (type === 'onlinePayment') {
@@ -43,27 +43,25 @@ router.post('/', authenticate, async (req, res) => {
         return res.status(400).json({ message: '缺少線上付款服務提供商' })
       }
 
-      const newPaymentMethod = await PaymentMethod.create({
+      newPaymentMethod = await PaymentMethod.create({
         member_id,
         payment_type: 'onlinePayment',
         online_payment_service: onlinePaymentService,
       })
-
-      return res.status(201).json({ status: 'success', data: newPaymentMethod })
     }
     // 現金付款邏輯
     else if (type === 'cash') {
-      const newPaymentMethod = await PaymentMethod.create({
+      newPaymentMethod = await PaymentMethod.create({
         member_id,
         payment_type: 'cash',
       })
-
-      return res.status(201).json({ status: 'success', data: newPaymentMethod })
     }
     // 其他未知付款方式
     else {
       return res.status(400).json({ message: '未知的付款方式' })
     }
+
+    return res.status(201).json({ status: 'success', data: newPaymentMethod })
   } catch (error) {
     console.error('新增付款方式失敗', error)
     return res.status(500).json({ message: '伺服器錯誤，請重試' })
@@ -96,16 +94,21 @@ router.put('/set-default/:id', authenticate, async (req, res) => {
   const member_id = req.user.id
 
   try {
-    // 重設其他付款方式的 `is_default` 為 false
-    await PaymentMethod.update({ is_default: false }, { where: { member_id } })
+    const currentDefault = await PaymentMethod.findOne({
+      where: { member_id, is_default: true },
+    })
 
-    // 設置當前付款方式為預設
-    const [affectedRows] = await PaymentMethod.update(
+    // 如果當前預設付款方式和設置的付款方式不同，更新
+    if (currentDefault && currentDefault.payment_id !== parseInt(id, 10)) {
+      await currentDefault.update({ is_default: false })
+    }
+
+    const updatedPaymentMethod = await PaymentMethod.update(
       { is_default: true },
       { where: { payment_id: id, member_id } }
     )
 
-    if (!affectedRows) {
+    if (!updatedPaymentMethod) {
       return res.status(400).json({ status: 'error', message: '更新失敗' })
     }
 
@@ -121,15 +124,17 @@ router.get('/', authenticate, async (req, res) => {
   const member_id = req.user.id
   try {
     const paymentMethods = await PaymentMethod.findAll({ where: { member_id } })
+
     if (paymentMethods.length === 0) {
       return res
         .status(404)
         .json({ status: 'error', message: '沒有找到付款方式' })
     }
-    res.json({ status: 'success', data: paymentMethods })
+
+    return res.json({ status: 'success', data: paymentMethods })
   } catch (error) {
     console.error('獲取付款方式失敗:', error)
-    res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
   }
 })
 
@@ -140,15 +145,17 @@ router.get('/default', authenticate, async (req, res) => {
     const defaultPaymentMethod = await PaymentMethod.findOne({
       where: { member_id, is_default: true },
     })
+
     if (!defaultPaymentMethod) {
       return res
         .status(404)
         .json({ status: 'error', message: '未找到預設付款方式' })
     }
-    res.json({ status: 'success', data: defaultPaymentMethod })
+
+    return res.json({ status: 'success', data: defaultPaymentMethod })
   } catch (error) {
     console.error('獲取預設付款方式失敗:', error)
-    res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
   }
 })
 

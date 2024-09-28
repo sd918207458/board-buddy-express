@@ -19,6 +19,28 @@ import { compareHash } from '#db-helpers/password-hash.js'
 import path from 'path'
 import multer from 'multer'
 
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
+// GET - 取得當前用戶的資料
+router.get('/check', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id // 從 req.user 取得解碼後的 user ID
+    const user = await User.findByPk(userId, { raw: true })
+
+    if (!user) {
+      return res.status(404).json({ status: 'error', message: '使用者不存在' })
+    }
+
+    // 不回傳密碼
+    delete user.password_hash
+
+    return res.json({ status: 'success', data: { user } })
+  } catch (error) {
+    console.error('伺服器錯誤:', error.message)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+  }
+})
+
 // multer的設定值 - START
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -42,21 +64,32 @@ router.get('/', async function (req, res) {
 
 // GET - 得到單筆資料
 router.get('/:id', authenticate, async function (req, res) {
-  const member_id = getIdParam(req)
+  const member_id = getIdParam(req) // 從 URL 參數中獲取 member_id
 
   // 檢查是否為授權會員，只有授權會員可以存取自己的資料
   if (req.user.member_id !== member_id) {
-    return res.json({ status: 'error', message: '存取會員資料失敗' })
+    return res
+      .status(403)
+      .json({ status: 'error', message: '存取會員資料失敗' })
   }
 
-  const user = await User.findByPk(member_id, {
-    raw: true, // 只需要資料表中資料
-  })
+  try {
+    const user = await User.findByPk(member_id, {
+      raw: true, // 只需要資料表中的資料
+    })
 
-  // 不回傳密碼
-  delete user.password
+    if (!user) {
+      return res.status(404).json({ status: 'error', message: '會員不存在' })
+    }
 
-  return res.json({ status: 'success', data: { user } })
+    // 不回傳密碼
+    delete user.password_hash
+
+    return res.status(200).json({ status: 'success', data: { user } })
+  } catch (error) {
+    console.error('獲取用戶資料失敗:', error.message)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+  }
 })
 
 // POST - 新增會員資料
@@ -175,41 +208,55 @@ router.put('/:id/password', authenticate, async function (req, res) {
   return res.json({ status: 'success', data: null })
 })
 
-// PUT - 更新會員資料(排除更新密碼)
-router.put('/update', authenticate, async function (req, res) {
-  const member_id = req.user.member_id
+// PUT - 更新會員資料
+router.put('/update', authenticate, async (req, res) => {
+  const userId = req.user.id
 
-  if (!member_id) {
-    return res.json({ status: 'error', message: '無效的用戶ID' })
+  const {
+    username,
+    emailAddress,
+    phone,
+    first_name,
+    last_name,
+    birthday,
+    gender,
+    avatar,
+  } = req.body
+
+  if (!username || !emailAddress || !phone) {
+    return res.status(400).json({
+      status: 'error',
+      message: '缺少必要資料',
+    })
   }
 
-  const user = req.body
+  try {
+    const [updated] = await User.update(
+      {
+        username,
+        email: emailAddress,
+        phone_number: phone,
+        first_name,
+        last_name,
+        date_of_birth: birthday,
+        gender,
+        avatar, // 更新頭像
+      },
+      { where: { member_id: userId } }
+    )
 
-  if (!user.username || !user.emailAddress || !user.phone) {
-    return res.json({ status: 'error', message: '缺少必要資料' })
+    if (updated) {
+      return res.json({ status: 'success', message: '資料已成功更新' })
+    }
+
+    return res.status(400).json({
+      status: 'error',
+      message: '更新失敗，資料未更改',
+    })
+  } catch (error) {
+    console.error('伺服器錯誤:', error.message)
+    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
   }
-
-  const [affectedRows] = await User.update(
-    {
-      username: user.username,
-      email: user.emailAddress,
-      phone_number: user.phone,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      date_of_birth: user.birthday,
-      gender: user.gender,
-      favorite_games: user.gameType,
-      preferred_play_times: user.playTime,
-      avatar: user.avatar, // 更新頭像
-    },
-    { where: { member_id } }
-  )
-
-  if (!affectedRows) {
-    return res.json({ status: 'error', message: '更新失敗或沒有資料被更新' })
-  }
-
-  return res.json({ status: 'success', message: '資料已成功更新' })
 })
 
 // DELETE - 刪除會員資料

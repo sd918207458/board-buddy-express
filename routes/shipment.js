@@ -1,27 +1,9 @@
 import express from 'express'
-const router = express.Router()
-
 import authenticate from '#middlewares/authenticate.js'
 import sequelize from '#configs/db.js' // 從 sequelize 中獲取資料庫
 const { Address } = sequelize.models // 確保 Address 模型正確設置
 
-// 存取`.env`設定檔案使用
-import 'dotenv/config.js'
-
-const callback_url = process.env.SHIP_711_STORE_CALLBACK_URL
-
-// 註: 本路由與資料庫無關，單純轉向使用
-
-// POST
-router.post('/711', function (req, res, next) {
-  //console.log(req.body)
-  res.redirect(callback_url + '?' + new URLSearchParams(req.body).toString())
-})
-
-// 測試路由用
-// router.get('/', function (req, res, next) {
-//   res.render('index', { title: 'shipment route is OK' })
-// })
+const router = express.Router()
 
 // 新增送貨地址
 router.post('/addresses', authenticate, async (req, res) => {
@@ -39,10 +21,12 @@ router.post('/addresses', authenticate, async (req, res) => {
       storeName,
     } = req.body
 
+    // 驗證必要字段
     if (!username || !phone || !city || !street) {
       return res.status(400).json({ message: '缺少必要欄位' })
     }
 
+    // 創建新的地址
     const newAddress = await Address.create({
       member_id: req.user.id,
       username,
@@ -92,17 +76,18 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
       return res.status(404).json({ message: '地址不存在或無法存取' })
     }
 
+    // 只更新提供的字段
     await addressToUpdate.update({
-      username,
-      phone,
-      city,
-      area,
-      street,
-      detailedAddress,
-      isDefault,
-      deliveryMethod,
-      storeType,
-      storeName,
+      ...(username && { username }),
+      ...(phone && { phone }),
+      ...(city && { city }),
+      ...(area && { area }),
+      ...(street && { street }),
+      ...(detailedAddress && { detailedAddress }),
+      ...(isDefault !== undefined && { isDefault }),
+      ...(deliveryMethod && { deliveryMethod }),
+      ...(storeType && { storeType }),
+      ...(storeName && { storeName }),
     })
 
     return res.status(200).json({
@@ -141,11 +126,15 @@ router.put('/addresses/:id/default', authenticate, async (req, res) => {
   try {
     const addressId = req.params.id
 
-    // 將所有地址的 `isDefault` 設為 `false`
-    await Address.update(
-      { isDefault: false },
-      { where: { member_id: req.user.id } }
-    )
+    // 獲取當前的預設地址
+    const currentDefaultAddress = await Address.findOne({
+      where: { member_id: req.user.id, isDefault: true },
+    })
+
+    // 如果當前預設地址與要更新的地址不同，則進行更新
+    if (currentDefaultAddress && currentDefaultAddress.id !== addressId) {
+      await currentDefaultAddress.update({ isDefault: false })
+    }
 
     const defaultAddress = await Address.findOne({
       where: { id: addressId, member_id: req.user.id },
