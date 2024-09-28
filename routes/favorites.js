@@ -25,18 +25,22 @@ router.get('/', authenticate, async (req, res) => {
   res.json({ status: 'success', data: { favorites } })
 })
 
-router.put('/:id', authenticate, async (req, res, next) => {
+router.put('/:id/:type', authenticate, async (req, res, next) => {
   const pid = getIdParam(req)
+  const type = req.params.type // 'product' 或 'store'
   const uid = req.user.id
 
-  const existFav = await Favorite.findOne({ where: { pid, uid } })
+  // 確保 'type' 參數有效
+  if (type !== 'product' && type !== 'store') {
+    return res.status(400).json({ status: 'error', message: '無效的類型' })
+  }
+
+  const existFav = await Favorite.findOne({ where: { pid, uid, type } })
   if (existFav) {
     return res.json({ status: 'error', message: '資料已經存在，新增失敗' })
   }
 
-  const newFav = await Favorite.create({ pid, uid })
-
-  // console.log(newFav.id)
+  const newFav = await Favorite.create({ pid, uid, type })
 
   // 沒有新增到資料
   if (!newFav.id) {
@@ -49,18 +53,49 @@ router.put('/:id', authenticate, async (req, res, next) => {
   return res.json({ status: 'success', data: null })
 })
 
-router.delete('/:id', authenticate, async (req, res, next) => {
+// 獲取所有收藏的商品
+router.get('/products', authenticate, async (req, res) => {
+  const pids = await Favorite.findAll({
+    attributes: ['pid'],
+    where: {
+      uid: req.user.id,
+      type: 'product', // 只查找收藏的商品
+    },
+    raw: true,
+  })
+
+  const favorites = pids.map((v) => v.pid)
+  res.json({ status: 'success', data: { favorites } })
+})
+
+// 獲取所有收藏的店家
+router.get('/stores', authenticate, async (req, res) => {
+  const sids = await Favorite.findAll({
+    attributes: ['pid'],
+    where: {
+      uid: req.user.id,
+      type: 'store', // 只查找收藏的店家
+    },
+    raw: true,
+  })
+
+  const favorites = sids.map((v) => v.pid)
+  res.json({ status: 'success', data: { favorites } })
+})
+
+router.delete('/:id/:type', authenticate, async (req, res, next) => {
   const pid = getIdParam(req)
+  const type = req.params.type // 'product' 或 'store'
   const uid = req.user.id
 
   const affectedRows = await Favorite.destroy({
     where: {
       pid,
       uid,
+      type,
     },
   })
 
-  // 沒有刪除到任何資料 -> 失敗或沒有資料被刪除
   if (!affectedRows) {
     return res.json({
       status: 'error',
@@ -68,7 +103,6 @@ router.delete('/:id', authenticate, async (req, res, next) => {
     })
   }
 
-  // 成功
   return res.json({ status: 'success', data: null })
 })
 

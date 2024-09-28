@@ -26,36 +26,66 @@ router.post('/711', function (req, res, next) {
 // 新增送貨地址
 router.post('/addresses', authenticate, async (req, res) => {
   try {
-    const { address, city, country, zip_code, address_type } = req.body
+    const {
+      username,
+      phone,
+      city,
+      area,
+      street,
+      detailedAddress,
+      isDefault,
+      deliveryMethod,
+      storeType,
+      storeName,
+    } = req.body
 
-    if (!address || !city || !country || !zip_code) {
-      return res.status(400).json({ message: '缺少必要的欄位' })
+    if (!username || !phone || !city || !street) {
+      return res.status(400).json({ message: '缺少必要欄位' })
     }
 
     const newAddress = await Address.create({
-      member_id: req.user.id, // 從 authenticate 中獲得 req.user.id
-      address,
+      member_id: req.user.id,
+      username,
+      phone,
       city,
-      country,
-      zip_code,
-      address_type,
+      area,
+      street,
+      detailedAddress,
+      isDefault,
+      deliveryMethod,
+      storeType,
+      storeName,
     })
 
-    return res.status(201).json({ message: '地址新增成功', data: newAddress })
+    return res.status(201).json({
+      message: '地址新增成功',
+      data: newAddress,
+    })
   } catch (error) {
     console.error('新增地址失敗:', error)
-    return res.status(500).json({ message: '伺服器錯誤' })
+    return res.status(500).json({ message: '伺服器錯誤，無法新增地址' })
   }
 })
 
 // 更新送貨地址
 router.put('/addresses/:id', authenticate, async (req, res) => {
   try {
-    const { address, city, country, zip_code, address_type } = req.body
+    const {
+      username,
+      phone,
+      city,
+      area,
+      street,
+      detailedAddress,
+      isDefault,
+      deliveryMethod,
+      storeType,
+      storeName,
+    } = req.body
     const addressId = req.params.id
 
     const addressToUpdate = await Address.findOne({
-      where: { address_id: addressId, member_id: req.user.id },
+      where: { id: addressId, member_id: req.user.id },
     })
 
     if (!addressToUpdate) {
@@ -63,18 +93,25 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
     }
 
     await addressToUpdate.update({
-      address,
+      username,
+      phone,
       city,
-      country,
-      zip_code,
-      address_type,
+      area,
+      street,
+      detailedAddress,
+      isDefault,
+      deliveryMethod,
+      storeType,
+      storeName,
     })
-    return res
-      .status(200)
-      .json({ message: '地址更新成功', data: addressToUpdate })
+
+    return res.status(200).json({
+      message: '地址更新成功',
+      data: addressToUpdate,
+    })
   } catch (error) {
     console.error('更新地址失敗:', error)
-    return res.status(500).json({ message: '伺服器錯誤' })
+    return res.status(500).json({ message: '伺服器錯誤，無法更新地址' })
   }
 })
 
@@ -84,7 +121,7 @@ router.delete('/addresses/:id', authenticate, async (req, res) => {
     const addressId = req.params.id
 
     const addressToDelete = await Address.findOne({
-      where: { address_id: addressId, member_id: req.user.id },
+      where: { id: addressId, member_id: req.user.id },
     })
 
     if (!addressToDelete) {
@@ -95,7 +132,7 @@ router.delete('/addresses/:id', authenticate, async (req, res) => {
     return res.status(200).json({ message: '地址刪除成功' })
   } catch (error) {
     console.error('刪除地址失敗:', error)
-    return res.status(500).json({ message: '伺服器錯誤' })
+    return res.status(500).json({ message: '伺服器錯誤，無法刪除地址' })
   }
 })
 
@@ -104,15 +141,14 @@ router.put('/addresses/:id/default', authenticate, async (req, res) => {
   try {
     const addressId = req.params.id
 
-    // 先將所有地址的isDefault設為false
+    // 將所有地址的 `isDefault` 設為 `false`
     await Address.update(
       { isDefault: false },
       { where: { member_id: req.user.id } }
     )
 
-    // 將選中的地址設為預設地址
     const defaultAddress = await Address.findOne({
-      where: { address_id: addressId, member_id: req.user.id },
+      where: { id: addressId, member_id: req.user.id },
     })
 
     if (!defaultAddress) {
@@ -120,12 +156,13 @@ router.put('/addresses/:id/default', authenticate, async (req, res) => {
     }
 
     await defaultAddress.update({ isDefault: true })
-    return res
-      .status(200)
-      .json({ message: '預設地址設定成功', data: defaultAddress })
+    return res.status(200).json({
+      message: '預設地址設定成功',
+      data: defaultAddress,
+    })
   } catch (error) {
     console.error('設定預設地址失敗:', error)
-    return res.status(500).json({ message: '伺服器錯誤' })
+    return res.status(500).json({ message: '伺服器錯誤，無法設置預設地址' })
   }
 })
 
@@ -135,10 +172,11 @@ router.get('/addresses', authenticate, async (req, res) => {
     const addresses = await Address.findAll({
       where: { member_id: req.user.id },
     })
+
     return res.status(200).json({ data: addresses })
   } catch (error) {
     console.error('獲取地址失敗:', error)
-    return res.status(500).json({ message: '伺服器錯誤' })
+    return res.status(500).json({ message: '伺服器錯誤，無法獲取地址' })
   }
 })
 

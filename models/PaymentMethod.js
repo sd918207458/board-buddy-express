@@ -13,7 +13,7 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'User', // 注意這裡應該是User模型, 而非member
+          model: 'User', // 關聯到 User 模型
           key: 'member_id',
         },
         onDelete: 'CASCADE',
@@ -21,24 +21,33 @@ export default function (sequelize) {
       },
       card_number: {
         type: DataTypes.STRING(20),
-        allowNull: false,
+        allowNull: true, // 支持非信用卡支付方式
         unique: 'uniqueCardForMember',
       },
       card_type: {
         type: DataTypes.ENUM('Visa', 'MasterCard', 'Amex'),
-        allowNull: false,
+        allowNull: true, // 支持非信用卡支付方式
       },
       expiration_date: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true, // 支持非信用卡支付方式
       },
       cardholder_name: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true, // 支持非信用卡支付方式
       },
       payment_type: {
         type: DataTypes.STRING(255),
         defaultValue: null,
+        allowNull: true, // 用來區分支付類型（例如 'creditCard', 'cash', 'onlinePayment'）
+      },
+      online_payment_service: {
+        type: DataTypes.STRING(50),
+        allowNull: true, // 儲存線上支付服務名稱
+      },
+      is_default: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false, // 標記是否是預設付款方式
       },
       created_at: {
         type: DataTypes.DATE,
