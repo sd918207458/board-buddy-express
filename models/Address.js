@@ -13,30 +13,38 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'User', // 對應的表名（User 模型對應 member 表）
-          key: 'member_id', // 外鍵對應 member 表中的 member_id
+          model: 'User',
+          key: 'member_id',
         },
-        onDelete: 'CASCADE', // 可選：如果會員被刪除，地址也會跟著刪除
+        onDelete: 'CASCADE',
       },
-      address_type: {
-        type: DataTypes.ENUM('home', 'work', 'other'),
-        defaultValue: 'home', // 設定預設值
+      username: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
       },
-      address: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
+      phone: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
       },
       city: {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
-      country: {
+      area: {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
-      zip_code: {
-        type: DataTypes.STRING(20),
+      street: {
+        type: DataTypes.STRING(255),
         allowNull: true,
+      },
+      detailed_address: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      isDefault: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -50,9 +58,9 @@ export default function (sequelize) {
       },
     },
     {
-      tableName: 'addresses', // 對應資料庫中的資料表名稱
-      timestamps: true, // 自動維護 createdAt 和 updatedAt 欄位
-      underscored: true, // 允許下劃線風格的欄位命名
+      tableName: 'addresses',
+      timestamps: true,
+      underscored: true,
     }
   )
 }

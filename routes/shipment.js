@@ -7,38 +7,33 @@ const router = express.Router()
 
 // 新增送貨地址
 router.post('/addresses', authenticate, async (req, res) => {
+  const memberId = req.user.member_id || req.user.id // 確保從驗證後的 req.user 取到用戶 ID
+
+  const { username, phone, city, area, street, detailed_address, isDefault } =
+    req.body
+
+  if (!username || !phone || !city || !street) {
+    return res.status(400).json({ message: '缺少必要欄位' })
+  }
+
+  // 如果設置為預設地址，將其他地址的預設設置為 false
+  if (isDefault) {
+    await Address.update(
+      { isDefault: false },
+      { where: { member_id: memberId } }
+    )
+  }
+
   try {
-    const {
-      username,
-      phone,
-      city,
-      area,
-      street,
-      detailedAddress,
-      isDefault,
-      deliveryMethod,
-      storeType,
-      storeName,
-    } = req.body
-
-    // 驗證必要字段
-    if (!username || !phone || !city || !street) {
-      return res.status(400).json({ message: '缺少必要欄位' })
-    }
-
-    // 創建新的地址
     const newAddress = await Address.create({
-      member_id: req.user.id,
+      member_id: memberId,
       username,
       phone,
       city,
       area,
       street,
-      detailedAddress,
+      detailed_address,
       isDefault,
-      deliveryMethod,
-      storeType,
-      storeName,
     })
 
     return res.status(201).json({
@@ -53,37 +48,47 @@ router.post('/addresses', authenticate, async (req, res) => {
 
 // 更新送貨地址
 router.put('/addresses/:id', authenticate, async (req, res) => {
-  try {
-    const {
-      username,
-      phone,
-      city,
-      area,
-      street,
-      detailedAddress,
-      isDefault,
-      deliveryMethod,
-      storeType,
-      storeName,
-    } = req.body
-    const addressId = req.params.id
+  const memberId = req.user.member_id || req.user.id // 確保從驗證後的 req.user 取到用戶 ID
+  const addressId = req.params.id
 
+  const {
+    username,
+    phone,
+    city,
+    area,
+    street,
+    detailedAddress,
+    isDefault,
+    deliveryMethod,
+    storeType,
+    storeName,
+  } = req.body
+
+  try {
     const addressToUpdate = await Address.findOne({
-      where: { id: addressId, member_id: req.user.id },
+      where: { address_id: addressId, member_id: memberId },
     })
 
     if (!addressToUpdate) {
       return res.status(404).json({ message: '地址不存在或無法存取' })
     }
 
-    // 只更新提供的字段
+    // 如果設置為預設地址，將其他地址的預設設置為 false
+    if (isDefault) {
+      await Address.update(
+        { isDefault: false },
+        { where: { member_id: memberId } }
+      )
+    }
+
+    // 更新地址
     await addressToUpdate.update({
       ...(username && { username }),
       ...(phone && { phone }),
       ...(city && { city }),
       ...(area && { area }),
       ...(street && { street }),
-      ...(detailedAddress && { detailedAddress }),
+      ...(detailedAddress && { detailed_address }),
       ...(isDefault !== undefined && { isDefault }),
       ...(deliveryMethod && { deliveryMethod }),
       ...(storeType && { storeType }),
@@ -102,11 +107,12 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
 
 // 刪除送貨地址
 router.delete('/addresses/:id', authenticate, async (req, res) => {
-  try {
-    const addressId = req.params.id
+  const memberId = req.user.member_id || req.user.id
+  const addressId = req.params.id // 確認這裡使用 address_id 而不是 id
 
+  try {
     const addressToDelete = await Address.findOne({
-      where: { id: addressId, member_id: req.user.id },
+      where: { address_id: addressId, member_id: memberId },
     })
 
     if (!addressToDelete) {
@@ -123,21 +129,18 @@ router.delete('/addresses/:id', authenticate, async (req, res) => {
 
 // 設定預設送貨地址
 router.put('/addresses/:id/default', authenticate, async (req, res) => {
+  const memberId = req.user.member_id || req.user.id // 確保從驗證後的 req.user 取到用戶 ID
+  const addressId = req.params.id
+
   try {
-    const addressId = req.params.id
-
-    // 獲取當前的預設地址
-    const currentDefaultAddress = await Address.findOne({
-      where: { member_id: req.user.id, isDefault: true },
-    })
-
-    // 如果當前預設地址與要更新的地址不同，則進行更新
-    if (currentDefaultAddress && currentDefaultAddress.id !== addressId) {
-      await currentDefaultAddress.update({ isDefault: false })
-    }
+    // 將所有地址的 isDefault 設為 false
+    await Address.update(
+      { isDefault: false },
+      { where: { member_id: memberId } }
+    )
 
     const defaultAddress = await Address.findOne({
-      where: { id: addressId, member_id: req.user.id },
+      where: { address_id: addressId, member_id: memberId },
     })
 
     if (!defaultAddress) {
@@ -157,9 +160,10 @@ router.put('/addresses/:id/default', authenticate, async (req, res) => {
 
 // 獲取所有地址
 router.get('/addresses', authenticate, async (req, res) => {
+  const memberId = req.user.member_id || req.user.id // 確保從驗證後的 req.user 取到用戶 ID
   try {
     const addresses = await Address.findAll({
-      where: { member_id: req.user.id },
+      where: { member_id: memberId },
     })
 
     return res.status(200).json({ data: addresses })
