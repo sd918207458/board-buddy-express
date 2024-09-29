@@ -11,10 +11,10 @@ export default async function (sequelize) {
       },
       member_id: {
         type: DataTypes.INTEGER,
-        allowNull: false, // 確保不允許為 null
+        allowNull: false,
         references: {
-          model: 'User', // 引用 User 模型
-          key: 'member_id', // 使用 'member_id' 作為外鍵
+          model: 'User',
+          key: 'member_id',
         },
       },
       email: {

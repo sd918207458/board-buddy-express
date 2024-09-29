@@ -12,17 +12,26 @@ export default function (sequelize) {
       },
       username: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true, // 可以允許空值，因為Google登入可能沒有username
         unique: true,
       },
       password_hash: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true, // Google登入不需要密碼
       },
       email: {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
+      },
+      google_uid: {
+        type: DataTypes.STRING(255), // Google帳號的UID
+        allowNull: true,
+        unique: true,
+      },
+      photo_url: {
+        type: DataTypes.STRING(255), // Google的頭像網址
+        allowNull: true,
       },
       first_name: {
         type: DataTypes.STRING(50),
