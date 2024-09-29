@@ -10,7 +10,7 @@ import { getIdParam } from '#db-helpers/db-tool.js'
 // 資料庫使用
 import { Op } from 'sequelize'
 import sequelize from '#configs/db.js'
-const { User } = sequelize.models
+const { User, Coupon } = sequelize.models
 
 // 驗証加密密碼字串用
 import { compareHash } from '#db-helpers/password-hash.js'
@@ -167,6 +167,39 @@ router.post(
   }
 )
 
+// 註冊新會員並發送100元優惠券
+router.post('/register', async (req, res) => {
+  const { username, email, password } = req.body
+
+  try {
+    // 建立新會員
+    const newUser = await User.create({ username, email, password })
+
+    // 設置優惠券的有效期限為一個月
+    const expiryDate = new Date()
+    expiryDate.setMonth(expiryDate.getMonth() + 1)
+
+    // 分配100元優惠券給新會員
+    const newCoupon = await Coupon.create({
+      member_id: newUser.id,
+      coupon_code: 'WELCOME100',
+      discount_type: 'amount',
+      discount_value: 100, // 固定折抵金額 NT$100
+      expiry_date: expiryDate, // 有效期一個月
+    })
+
+    res.status(201).json({
+      status: 'success',
+      message: '註冊成功並發送優惠券',
+      user: newUser,
+      coupon: newCoupon,
+    })
+  } catch (error) {
+    console.error('註冊會員時發生錯誤:', error)
+    res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+  }
+})
+
 // PUT - 更新會員資料(密碼更新用)
 router.put('/:id/password', authenticate, async function (req, res) {
   const member_id = getIdParam(req)
@@ -221,6 +254,8 @@ router.put('/update', authenticate, async (req, res) => {
     birthday,
     gender,
     avatar,
+    favorite_games, // 新增欄位
+    preferred_play_times, // 新增欄位
   } = req.body
 
   if (!username || !emailAddress || !phone) {
@@ -241,6 +276,8 @@ router.put('/update', authenticate, async (req, res) => {
         date_of_birth: birthday,
         gender,
         avatar, // 更新頭像
+        favorite_games, // 新增欄位
+        preferred_play_times, // 新增欄位
       },
       { where: { member_id: userId } }
     )

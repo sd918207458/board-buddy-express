@@ -1,11 +1,24 @@
 import express from 'express'
-import sequelize from '#configs/db.js'
 import authenticate from '#middlewares/authenticate.js'
+import sequelize from '#configs/db.js'
+const { PaymentMethod, Coupon } = sequelize.models
 
 const router = express.Router()
-const { PaymentMethod } = sequelize.models
 
-// 新增付款方式的 API
+// Helper function for error handling
+const handleError = (res, error, message = '伺服器錯誤') => {
+  console.error(message, error)
+  return res.status(500).json({ message })
+}
+
+// 通用的資源未找到回應
+const handleNotFound = (res, resource = '資源') => {
+  return res.status(404).json({ message: `${resource} 找不到` })
+}
+
+// --- Payment Method Routes ---
+
+// Add new payment method
 router.post('/', authenticate, async (req, res) => {
   const {
     type,
@@ -15,12 +28,11 @@ router.post('/', authenticate, async (req, res) => {
     cardholder_name,
     onlinePaymentService,
   } = req.body
-  const member_id = req.user.id
+  const member_id = req.user.member_id || req.user.id
 
   try {
     let newPaymentMethod
 
-    // 信用卡付款邏輯
     if (type === 'creditCard') {
       if (!card_number || !card_type || !expiration_date || !cardholder_name) {
         return res.status(400).json({ message: '缺少信用卡信息' })
@@ -36,9 +48,7 @@ router.post('/', authenticate, async (req, res) => {
         cardholder_name,
         payment_type: 'creditCard',
       })
-    }
-    // 線上付款邏輯
-    else if (type === 'onlinePayment') {
+    } else if (type === 'onlinePayment') {
       if (!onlinePaymentService) {
         return res.status(400).json({ message: '缺少線上付款服務提供商' })
       }
@@ -48,114 +58,178 @@ router.post('/', authenticate, async (req, res) => {
         payment_type: 'onlinePayment',
         online_payment_service: onlinePaymentService,
       })
-    }
-    // 現金付款邏輯
-    else if (type === 'cash') {
+    } else if (type === 'cash') {
       newPaymentMethod = await PaymentMethod.create({
         member_id,
         payment_type: 'cash',
       })
-    }
-    // 其他未知付款方式
-    else {
+    } else {
       return res.status(400).json({ message: '未知的付款方式' })
     }
 
     return res.status(201).json({ status: 'success', data: newPaymentMethod })
   } catch (error) {
-    console.error('新增付款方式失敗', error)
-    return res.status(500).json({ message: '伺服器錯誤，請重試' })
+    return handleError(res, error, '新增付款方式失敗')
   }
 })
 
-// 刪除付款方式的 API
+// Delete payment method
 router.delete('/:id', authenticate, async (req, res) => {
+  const { id } = req.params
+
   try {
-    const { id } = req.params
     const deleted = await PaymentMethod.destroy({ where: { payment_id: id } })
 
     if (!deleted) {
-      return res.status(404).json({ message: '找不到付款方式' })
+      return handleNotFound(res, '付款方式')
     }
 
-    return res.status(200).json({
-      status: 'success',
-      message: '付款方式已成功刪除',
-    })
+    return res
+      .status(200)
+      .json({ status: 'success', message: '付款方式已成功刪除' })
   } catch (error) {
-    console.error('刪除付款方式失敗', error)
-    return res.status(500).json({ message: '伺服器錯誤，請重試' })
+    return handleError(res, error, '刪除付款方式失敗')
   }
 })
 
-// 設置預設付款方式的 API
+// Update payment method
+router.put('/:id', authenticate, async (req, res) => {
+  const { id } = req.params
+  const {
+    type,
+    card_number,
+    card_type,
+    expiration_date,
+    cardholder_name,
+    onlinePaymentService,
+    is_default,
+  } = req.body
+  const member_id = req.user.member_id || req.user.id
+
+  try {
+    const paymentMethod = await PaymentMethod.findOne({
+      where: { payment_id: id, member_id },
+    })
+
+    if (!paymentMethod) {
+      return handleNotFound(res, '付款方式')
+    }
+
+    // 檢查付款方式類型並更新相應字段
+    if (type === 'creditCard') {
+      if (!card_number || !card_type || !expiration_date || !cardholder_name) {
+        return res.status(400).json({ message: '缺少信用卡信息' })
+      }
+
+      const maskedCardNumber = card_number.slice(-4)
+      await paymentMethod.update({
+        card_number: maskedCardNumber,
+        card_type,
+        expiration_date,
+        cardholder_name,
+        payment_type: 'creditCard',
+        is_default,
+      })
+    } else if (type === 'onlinePayment') {
+      if (!onlinePaymentService) {
+        return res.status(400).json({ message: '缺少線上付款服務提供商' })
+      }
+
+      await paymentMethod.update({
+        payment_type: 'onlinePayment',
+        online_payment_service: onlinePaymentService,
+        is_default,
+      })
+    } else if (type === 'cash') {
+      await paymentMethod.update({
+        payment_type: 'cash',
+        is_default,
+      })
+    } else {
+      return res.status(400).json({ message: '未知的付款方式' })
+    }
+
+    return res.json({ status: 'success', data: paymentMethod })
+  } catch (error) {
+    return handleError(res, error, '更新付款方式失敗')
+  }
+})
+
+// Set default payment method
 router.put('/set-default/:id', authenticate, async (req, res) => {
   const { id } = req.params
-  const member_id = req.user.id
+  const member_id = req.user.member_id || req.user.id
 
   try {
     const currentDefault = await PaymentMethod.findOne({
       where: { member_id, is_default: true },
     })
 
-    // 如果當前預設付款方式和設置的付款方式不同，更新
     if (currentDefault && currentDefault.payment_id !== parseInt(id, 10)) {
       await currentDefault.update({ is_default: false })
     }
 
-    const updatedPaymentMethod = await PaymentMethod.update(
+    const updated = await PaymentMethod.update(
       { is_default: true },
       { where: { payment_id: id, member_id } }
     )
 
-    if (!updatedPaymentMethod) {
+    if (!updated) {
       return res.status(400).json({ status: 'error', message: '更新失敗' })
     }
 
     return res.json({ status: 'success', message: '設置為預設付款方式' })
   } catch (error) {
-    console.error('設置預設付款方式失敗:', error)
-    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+    return handleError(res, error, '設置預設付款方式失敗')
   }
 })
 
-// 獲取所有付款方式
+// Get all payment methods
 router.get('/', authenticate, async (req, res) => {
-  const member_id = req.user.id
+  const member_id = req.user.member_id || req.user.id
+  console.log('Fetching payment methods for member ID:', member_id) // 日誌追蹤
   try {
     const paymentMethods = await PaymentMethod.findAll({ where: { member_id } })
-
+    console.log('Found payment methods:', paymentMethods) // 日誌追蹤
     if (paymentMethods.length === 0) {
-      return res
-        .status(404)
-        .json({ status: 'error', message: '沒有找到付款方式' })
+      return handleNotFound(res, '付款方式')
     }
-
     return res.json({ status: 'success', data: paymentMethods })
   } catch (error) {
-    console.error('獲取付款方式失敗:', error)
-    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+    console.error('Error fetching payment methods:', error) // 錯誤日誌
+    return handleError(res, error, '獲取付款方式失敗')
   }
 })
 
-// 獲取預設付款方式
+// Get default payment method
 router.get('/default', authenticate, async (req, res) => {
-  const member_id = req.user.id
+  const member_id = req.user.member_id || req.user.id
+  console.log('Fetching default payment method for member ID:', member_id) // 日誌追蹤
+
   try {
     const defaultPaymentMethod = await PaymentMethod.findOne({
       where: { member_id, is_default: true },
     })
+    console.log('Found default payment method:', defaultPaymentMethod) // 日誌追蹤
 
     if (!defaultPaymentMethod) {
-      return res
-        .status(404)
-        .json({ status: 'error', message: '未找到預設付款方式' })
+      return handleNotFound(res, '預設付款方式')
     }
 
     return res.json({ status: 'success', data: defaultPaymentMethod })
   } catch (error) {
-    console.error('獲取預設付款方式失敗:', error)
-    return res.status(500).json({ status: 'error', message: '伺服器錯誤' })
+    console.error('Error fetching default payment method:', error) // 加入錯誤日誌
+    return handleError(res, error, '獲取預設付款方式失敗')
+  }
+})
+
+router.get('/coupons', authenticate, async (req, res) => {
+  const member_id = req.user.member_id
+  try {
+    const coupons = await Coupon.findAll({ where: { member_id } })
+    return res.status(200).json({ status: 'success', data: coupons })
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching coupons' })
   }
 })
 
