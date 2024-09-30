@@ -1,6 +1,9 @@
 import express from 'express'
 import authenticate from '#middlewares/authenticate.js'
 import sequelize from '#configs/db.js'
+import 'dotenv/config.js'
+
+const callback_url = process.env.SHIP_711_STORE_CALLBACK_URL
 const { Address } = sequelize.models
 
 const router = express.Router()
@@ -10,7 +13,12 @@ const handleError = (res, error, message = '伺服器錯誤') => {
   console.error(message, error)
   return res.status(500).json({ message })
 }
-
+// POST
+router.post('/711', function (req, res, next) {
+  //console.log(req.body)
+  let searchParams = new URLSearchParams(req.body)
+  res.redirect(callback_url + '?' + searchParams.toString())
+})
 // Add new shipping address
 router.post('/addresses', authenticate, async (req, res) => {
   const memberId = req.user.member_id || req.user.id
