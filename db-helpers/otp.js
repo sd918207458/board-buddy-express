@@ -100,7 +100,7 @@ const updatePassword = async (email, token, password) => {
   // 移除otp記錄
   await Otp.destroy({
     where: {
-      id: foundOtp.id,
+      member_id: foundOtp.member_id, // 確認使用 member_id 而不是 id
     },
   })
 
