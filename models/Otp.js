@@ -9,6 +9,15 @@ export default async function (sequelize) {
         primaryKey: true,
         autoIncrement: true,
       },
+      google_uid: {
+        type: DataTypes.STRING(255), // Google帳號的UID
+        allowNull: true,
+        unique: true,
+      },
+      photo_url: {
+        type: DataTypes.STRING(255), // Google的頭像網址
+        allowNull: true,
+      },
       member_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

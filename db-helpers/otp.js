@@ -91,7 +91,7 @@ const updatePassword = async (email, token, password) => {
     { password },
     {
       where: {
-        id: foundOtp.user_id,
+        member_id: foundOtp.member_id, // 確認使用 member_id 而不是 id
       },
       individualHooks: true, // 密碼進資料表前要加密 trigger the beforeUpdate hook
     }

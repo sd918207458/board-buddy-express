@@ -63,7 +63,7 @@ router.post('/', async function (req, res, next) {
   } else {
     // 2-2. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有google來的資料 -> 執行登入工作
     const user = {
-      name: displayName,
+      username: displayName,
       email: email,
       google_uid,
       photo_url: photoURL,

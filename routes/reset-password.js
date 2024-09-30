@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 
 import { createOtp, updatePassword } from '#db-helpers/otp.js'
+
 import transporter from '#configs/mail.js'
 import 'dotenv/config.js'
 
@@ -10,25 +11,21 @@ const mailText = (otpToken) => `親愛的網站會員 您好，
 通知重設密碼所需要的驗証碼，
 請輸入以下的6位數字，重設密碼頁面的"電子郵件驗証碼"欄位中。
 請注意驗証碼將於寄送後30分鐘後到期，如有任何問題請洽網站客服人員:
-
+    
 ${otpToken}
-
+    
 敬上
 
 台灣 NextJS Inc. 網站`
 
-// 創建OTP
+// 發送OTP驗證碼
 router.post('/otp', async (req, res, next) => {
-  const { email } = req.body
-
-  if (!email) return res.json({ status: 'error', message: '缺少必要資料' })
-
   try {
-    // 建立OTP資料表記錄，成功回傳OTP記錄物件，失敗為空物件{}
-    const otp = await createOtp(email)
+    const { email } = req.body
+    if (!email) throw new Error('缺少必要資料')
 
-    if (!otp.token)
-      return res.json({ status: 'error', message: 'Email錯誤或期間內重覆要求' })
+    const otp = await createOtp(email)
+    if (!otp.token) throw new Error('Email錯誤或期間內重覆要求')
 
     // 寄送email
     const mailOptions = {
@@ -38,43 +35,58 @@ router.post('/otp', async (req, res, next) => {
       text: mailText(otp.token),
     }
 
-    // 寄送email
     transporter.sendMail(mailOptions, (err, response) => {
       if (err) {
-        // 失敗處理
-        return res.json({ status: 'error', message: '發送電子郵件失敗' })
+        console.error('郵件發送失敗:', err)
+        return res.status(500).json({
+          status: 'error',
+          message: '發送電子郵件失敗',
+          error: err.message, // 包含錯誤訊息
+          stack: err.stack, // 堆疊信息
+        })
       } else {
-        // 成功回覆的json
         return res.json({ status: 'success', data: null })
       }
     })
   } catch (error) {
-    console.error(error)
-    return res.json({ status: 'error', message: '系統錯誤' })
+    console.error('OTP錯誤:', error)
+    return res.status(500).json({
+      status: 'error',
+      message: error.message,
+      stack: error.stack,
+    })
   }
 })
 
-// 重設密碼
+// 重設密碼用
 router.post('/reset', async (req, res) => {
   const { email, token, password } = req.body
 
   if (!token || !email || !password) {
-    return res.json({ status: 'error', message: '缺少必要資料' })
+    return res.status(400).json({
+      status: 'error',
+      message: '缺少必要資料: token, email 或 password 缺失',
+    })
   }
 
   try {
-    // updatePassword中驗証OTP的存在與合法性(是否有到期)
+    // 使用外部的 updatePassword 函數進行密碼重設
     const result = await updatePassword(email, token, password)
 
     if (!result) {
-      return res.json({ status: 'error', message: '修改密碼失敗' })
+      throw new Error('修改密碼失敗，可能原因是OTP已到期或無效')
     }
 
     // 成功
     return res.json({ status: 'success', data: null })
   } catch (error) {
-    console.error(error)
-    return res.json({ status: 'error', message: '系統錯誤' })
+    console.error('重設密碼失敗:', error)
+    return res.status(500).json({
+      status: 'error',
+      message: '伺服器錯誤，無法重設密碼',
+      error: error.message, // 提供詳細錯誤訊息
+      stack: error.stack, // 包含錯誤的堆疊訊息
+    })
   }
 })
 
