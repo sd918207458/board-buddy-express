@@ -56,6 +56,18 @@ export default function (sequelize) {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      storeType: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      storeName: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      storeAddress: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
     },
     {
       tableName: 'addresses',

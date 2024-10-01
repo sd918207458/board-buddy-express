@@ -22,8 +22,18 @@ router.post('/711', function (req, res, next) {
 // Add new shipping address
 router.post('/addresses', authenticate, async (req, res) => {
   const memberId = req.user.member_id || req.user.id
-  const { username, phone, city, area, street, detailed_address, isDefault } =
-    req.body
+  const {
+    username,
+    phone,
+    city,
+    area,
+    street,
+    detailed_address,
+    isDefault,
+    storeType,
+    storeName, // Store Name selected by user
+    storeAddress, // Store Address selected by user
+  } = req.body
 
   if (!username || !phone || !city || !street) {
     return res.status(400).json({ message: '缺少必要欄位' })
@@ -46,6 +56,9 @@ router.post('/addresses', authenticate, async (req, res) => {
       street,
       detailed_address,
       isDefault,
+      storeType, // 7-11
+      storeName, // Store Name selected by user
+      storeAddress, // Store Address selected by user
     })
 
     return res.status(201).json({ message: '地址新增成功', data: newAddress })
@@ -66,9 +79,9 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
     street,
     detailed_address,
     isDefault,
-    deliveryMethod,
     storeType,
     storeName,
+    storeAddress,
   } = req.body
 
   try {
@@ -95,9 +108,9 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
       street,
       detailed_address,
       isDefault,
-      deliveryMethod,
       storeType,
       storeName,
+      storeAddress,
     })
 
     return res

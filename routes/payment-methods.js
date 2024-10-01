@@ -25,7 +25,7 @@ router.post('/', authenticate, async (req, res) => {
     card_number,
     card_type,
     expiration_date,
-    cardholder_name,
+    cardholder_name = '', // 設置默認為空字符串
     onlinePaymentService,
   } = req.body
   const member_id = req.user.member_id || req.user.id
@@ -34,12 +34,11 @@ router.post('/', authenticate, async (req, res) => {
     let newPaymentMethod
 
     if (type === 'creditCard') {
-      if (!card_number || !card_type || !expiration_date || !cardholder_name) {
+      if (!card_number || !card_type || !expiration_date) {
         return res.status(400).json({ message: '缺少信用卡信息' })
       }
 
       const maskedCardNumber = card_number.slice(-4)
-
       newPaymentMethod = await PaymentMethod.create({
         member_id,
         card_number: maskedCardNumber,
@@ -106,6 +105,17 @@ router.put('/:id', authenticate, async (req, res) => {
   } = req.body
   const member_id = req.user.member_id || req.user.id
 
+  console.log('Received PUT request data:', {
+    type,
+    card_number,
+    card_type,
+    expiration_date,
+    cardholder_name,
+    onlinePaymentService,
+    is_default,
+    member_id,
+  })
+
   try {
     const paymentMethod = await PaymentMethod.findOne({
       where: { payment_id: id, member_id },
@@ -115,42 +125,47 @@ router.put('/:id', authenticate, async (req, res) => {
       return handleNotFound(res, '付款方式')
     }
 
-    // 檢查付款方式類型並更新相應字段
+    const updateData = { is_default }
     if (type === 'creditCard') {
-      if (!card_number || !card_type || !expiration_date || !cardholder_name) {
+      if (!card_number || !card_type || !expiration_date) {
         return res.status(400).json({ message: '缺少信用卡信息' })
       }
 
+      if (!/^\d{16}$/.test(card_number)) {
+        return res
+          .status(400)
+          .json({ message: '信用卡號碼格式錯誤，請輸入16位數字' })
+      }
+
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiration_date)) {
+        return res
+          .status(400)
+          .json({ message: '到期日格式錯誤，請按照MM/YY格式' })
+      }
+
       const maskedCardNumber = card_number.slice(-4)
-      await paymentMethod.update({
-        card_number: maskedCardNumber,
-        card_type,
-        expiration_date,
-        cardholder_name,
-        payment_type: 'creditCard',
-        is_default,
-      })
+      updateData.card_number = maskedCardNumber
+      updateData.card_type = card_type
+      updateData.expiration_date = expiration_date
+      updateData.cardholder_name = cardholder_name
+      updateData.payment_type = 'creditCard'
     } else if (type === 'onlinePayment') {
       if (!onlinePaymentService) {
         return res.status(400).json({ message: '缺少線上付款服務提供商' })
       }
 
-      await paymentMethod.update({
-        payment_type: 'onlinePayment',
-        online_payment_service: onlinePaymentService,
-        is_default,
-      })
+      updateData.payment_type = 'onlinePayment'
+      updateData.online_payment_service = onlinePaymentService
     } else if (type === 'cash') {
-      await paymentMethod.update({
-        payment_type: 'cash',
-        is_default,
-      })
+      updateData.payment_type = 'cash'
     } else {
       return res.status(400).json({ message: '未知的付款方式' })
     }
 
+    await paymentMethod.update(updateData)
     return res.json({ status: 'success', data: paymentMethod })
   } catch (error) {
+    console.error('Error updating payment method:', error)
     return handleError(res, error, '更新付款方式失敗')
   }
 })
@@ -187,16 +202,17 @@ router.put('/set-default/:id', authenticate, async (req, res) => {
 // Get all payment methods
 router.get('/', authenticate, async (req, res) => {
   const member_id = req.user.member_id || req.user.id
-  console.log('Fetching payment methods for member ID:', member_id) // 日誌追蹤
+
+  console.log('Fetching payment methods for member ID:', member_id)
+
   try {
     const paymentMethods = await PaymentMethod.findAll({ where: { member_id } })
-    console.log('Found payment methods:', paymentMethods) // 日誌追蹤
     if (paymentMethods.length === 0) {
       return handleNotFound(res, '付款方式')
     }
     return res.json({ status: 'success', data: paymentMethods })
   } catch (error) {
-    console.error('Error fetching payment methods:', error) // 錯誤日誌
+    console.error('Error fetching payment methods:', error)
     return handleError(res, error, '獲取付款方式失敗')
   }
 })
@@ -204,13 +220,13 @@ router.get('/', authenticate, async (req, res) => {
 // Get default payment method
 router.get('/default', authenticate, async (req, res) => {
   const member_id = req.user.member_id || req.user.id
-  console.log('Fetching default payment method for member ID:', member_id) // 日誌追蹤
+
+  console.log('Fetching default payment method for member ID:', member_id)
 
   try {
     const defaultPaymentMethod = await PaymentMethod.findOne({
       where: { member_id, is_default: true },
     })
-    console.log('Found default payment method:', defaultPaymentMethod) // 日誌追蹤
 
     if (!defaultPaymentMethod) {
       return handleNotFound(res, '預設付款方式')
@@ -218,13 +234,15 @@ router.get('/default', authenticate, async (req, res) => {
 
     return res.json({ status: 'success', data: defaultPaymentMethod })
   } catch (error) {
-    console.error('Error fetching default payment method:', error) // 加入錯誤日誌
+    console.error('Error fetching default payment method:', error)
     return handleError(res, error, '獲取預設付款方式失敗')
   }
 })
 
+// Get all coupons for the user
 router.get('/coupons', authenticate, async (req, res) => {
   const member_id = req.user.member_id
+
   try {
     const coupons = await Coupon.findAll({ where: { member_id } })
     return res.status(200).json({ status: 'success', data: coupons })
