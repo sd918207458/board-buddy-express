@@ -6,6 +6,7 @@ import express from 'express'
 import logger from 'morgan'
 import path from 'path'
 import session from 'express-session'
+import sequelize from './configs/db.js' // 假設你的 Sequelize 配置檔案在這裡
 
 // 使用檔案的session store，存在sessions資料夾
 import sessionFileStore from 'session-file-store'
@@ -62,6 +63,16 @@ app.use(
   })
 )
 
+// 同步模型與資料表
+sequelize
+  .sync({ alter: true })
+  .then(() => {
+    console.log('資料庫同步成功')
+  })
+  .catch((error) => {
+    console.error('資料庫同步失敗:', error)
+  })
+
 // 載入routes中的各路由檔案，並套用api路由 START
 const apiPath = '/api' // 預設路由
 const routePath = path.join(__dirname, 'routes')
@@ -73,6 +84,11 @@ for (const filename of filenames) {
   app.use(`${apiPath}/${slug === 'index' ? '' : slug}`, item.default)
 }
 // 載入routes中的各路由檔案，並套用api路由 END
+
+// 載入 /register 路由
+// 載入 /api 路由，將所有 authRoutes 掛載到 /api 下
+// import authRoutes from './routes/auth.js'
+// app.use('/api', authRoutes)
 
 // 捕抓404錯誤處理
 app.use(function (req, res, next) {

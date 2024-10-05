@@ -10,6 +10,7 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 export default function authenticate(req, res, next) {
   // const token = req.headers['authorization']
   const token = req.cookies.accessToken
+
   // console.log(token)
 
   // if no token
@@ -26,6 +27,15 @@ export default function authenticate(req, res, next) {
       return res.json({
         status: 'error',
         message: '不合法的存取令牌',
+      })
+    }
+    console.log('Decoded user:', user) // 確認解碼的 user 對象是否正確
+
+    // 確認是否包含 member_id
+    if (!user.id) {
+      return res.status(400).json({
+        status: 'error',
+        message: '存取令牌無效，缺少使用者 ID',
       })
     }
 

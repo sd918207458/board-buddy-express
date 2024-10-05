@@ -19,77 +19,47 @@ const shouldReset = (expTimestamp, exp, limit = 60) => {
 
 // exp = 是 30 分到期,  limit = 60 是 60秒內不產生新的token
 const createOtp = async (email, exp = 30, limit = 60) => {
-  // 方式二: 使用模型查詢
-  // 檢查使用者email是否存在
+  // 查找使用者
   const user = await User.findOne({
-    where: {
-      email,
-    },
-    raw: true, // 只需要資料表中資料
+    where: { email },
+    raw: true, // 只需資料表數據
   })
 
   if (!user) {
-    console.log('ERROR - 使用者帳號不存在'.bgRed)
+    console.log('ERROR - 使用者帳號不存在')
     return {}
   }
-  // 檢查otp是否已經存在
+
+  // 查找是否已有 OTP 記錄
   const foundOtp = await Otp.findOne({
-    where: {
-      email,
-    },
-    raw: true, // 只需要資料表中資料
+    where: { email },
+    raw: true, // 只需資料表數據
   })
 
-  // 找到記錄，因為在60s(秒)內限制，所以"不能"產生新的otp token
+  // 60 秒內不能產生新的 OTP
   if (foundOtp && !shouldReset(foundOtp.exp_timestamp, exp, limit)) {
-    console.log('ERROR - 60s(秒)內要求重新產生otp'.bgRed)
+    console.log('ERROR - 60 秒內要求重新產生 OTP')
     return {}
   }
 
-  // 找到記錄，超過60s(秒)內限制，所以可以產生新的otp token
-  if (foundOtp && shouldReset(foundOtp.exp_timestamp, exp, limit)) {
-    // 以使用者輸入的Email作為secret產生otp token
-    const token = generateToken(email)
-
-    // 到期時間 預設 exp = 30 分鐘到期
-    const exp_timestamp = Date.now() + exp * 60 * 1000
-
-    // 修改Otp
-    await Otp.update(
-      { token, exp_timestamp },
-      {
-        where: {
-          email,
-        },
-      }
-    )
-
-    return {
-      ...foundOtp,
-      exp_timestamp,
-      token,
-    }
-  }
-
-  // 以下為"沒找到otp記錄"
-  // 以使用者輸入的Email作為secret產生otp token
   const token = generateToken(email)
-
-  // 到期時間 預設 exp = 30 分鐘到期
   const exp_timestamp = Date.now() + exp * 60 * 1000
 
-  // 建立otp物件
+  if (foundOtp && shouldReset(foundOtp.exp_timestamp, exp, limit)) {
+    // 更新 OTP
+    await Otp.update({ token, exp_timestamp }, { where: { email } })
+    return { ...foundOtp, exp_timestamp, token }
+  }
+
+  // 創建新的 OTP 記錄，使用 member_id 而不是 id
   const newOtp = {
-    user_id: user.id,
+    member_id: user.member_id, // 使用 user.member_id
     email,
     token,
     exp_timestamp,
   }
 
-  // 建立新記錄
   const otp = await Otp.create(newOtp)
-  // console.log(otp.dataValues)
-
   return otp.dataValues
 }
 
@@ -121,7 +91,7 @@ const updatePassword = async (email, token, password) => {
     { password },
     {
       where: {
-        id: foundOtp.user_id,
+        member_id: foundOtp.member_id, // 確認使用 member_id 而不是 id
       },
       individualHooks: true, // 密碼進資料表前要加密 trigger the beforeUpdate hook
     }
@@ -130,7 +100,7 @@ const updatePassword = async (email, token, password) => {
   // 移除otp記錄
   await Otp.destroy({
     where: {
-      id: foundOtp.id,
+      member_id: foundOtp.member_id, // 確認使用 member_id 而不是 id
     },
   })
 
