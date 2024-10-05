@@ -44,7 +44,8 @@ export default (sequelize) => {
       subtotal: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
-        defaultValue: sequelize.literal('number * price'), // 生成的小計
+        // 計算 subtotal 應該在應用層進行，而不是在資料庫層
+        // subtotal: number * price
       },
       orderdetail_status: {
         type: DataTypes.ENUM('cart', 'processing', 'completed', 'cancelled'),

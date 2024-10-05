@@ -13,11 +13,10 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'User', // 關聯到 User 模型
+          model: 'member', // 改為引用 'member' 表
           key: 'member_id',
         },
         onDelete: 'CASCADE',
-        unique: 'uniqueCardForMember',
       },
       card_number: {
         type: DataTypes.STRING(20),
@@ -29,9 +28,10 @@ export default function (sequelize) {
         allowNull: true, // 支持非信用卡支付方式
       },
       expiration_date: {
-        type: DataTypes.DATE,
-        allowNull: true, // 支持非信用卡支付方式
+        type: DataTypes.STRING(5), // 儲存 MM/YY 格式的字串
+        allowNull: true,
       },
+
       cardholder_name: {
         type: DataTypes.STRING(100),
         allowNull: true, // 支持非信用卡支付方式

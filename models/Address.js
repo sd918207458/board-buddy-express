@@ -13,7 +13,7 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'User',
+          model: 'member', // 引用 'member' 表，而不是 'User'
           key: 'member_id',
         },
         onDelete: 'CASCADE',

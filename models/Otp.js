@@ -22,7 +22,7 @@ export default async function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'User',
+          model: 'member',
           key: 'member_id',
         },
       },
