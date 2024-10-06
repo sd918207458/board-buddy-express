@@ -12,7 +12,7 @@ export default function (sequelize) {
       },
       username: {
         type: DataTypes.STRING(50),
-        allowNull: true, // 可以允許空值，因為Google登入可能沒有username
+        allowNull: true, // Google登入可能沒有 username
         unique: true,
       },
       password_hash: {
