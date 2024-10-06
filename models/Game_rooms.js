@@ -1,5 +1,5 @@
 // models/Game_rooms.js
-import { DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize'
 
 export default function (sequelize) {
   return sequelize.define(
@@ -50,6 +50,34 @@ export default function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      type1: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      type2: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      type3: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      game1: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      game2: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      game3: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
+      roomrule: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
+      },
     },
     {
       tableName: 'game_rooms',
@@ -58,5 +86,5 @@ export default function (sequelize) {
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     }
-  );
+  )
 }

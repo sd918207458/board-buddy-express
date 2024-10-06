@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 
 // 创建新的游戏房间
 router.post('/', async (req, res) => {
-    const { room_name, room_intro, minperson, maxperson, event_date, location, img, room_type, member_id } = req.body;
+    const { room_name, room_intro, minperson, maxperson, event_date, location, img, room_type, member_id, type1, type2, type3, roomrule, game1, game2, game3} = req.body;
 
     // 验证必需字段
     if (!room_name || !minperson || !maxperson || !event_date) {
@@ -53,6 +53,13 @@ router.post('/', async (req, res) => {
             img,
             room_type,
             member_id: member_id || null,
+            type1,
+            type2,
+            type3,
+            game1,
+            game2,
+            game3,
+            roomrule
         });
 
         res.status(201).json({ status: 'success', data: newRoom });
