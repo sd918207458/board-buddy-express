@@ -61,6 +61,10 @@ export default async function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      stock: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       tableName: 'product_game', //直接提供資料表名稱
