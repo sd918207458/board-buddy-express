@@ -18,40 +18,44 @@ ${otpToken}
 
 台灣 NextJS Inc. 網站`
 
-// create otp
+// 發送OTP驗證碼
 router.post('/otp', async (req, res, next) => {
-  const { email } = req.body
+  try {
+    const { email } = req.body
+    if (!email) throw new Error('缺少必要資料')
 
-  if (!email) return res.json({ status: 'error', message: '缺少必要資料' })
+    const otp = await createOtp(email)
+    if (!otp.token) throw new Error('Email錯誤或期間內重覆要求')
 
-  // 建立otp資料表記錄，成功回傳otp記錄物件，失敗為空物件{}
-  const otp = await createOtp(email)
-
-  // console.log(otp)
-
-  if (!otp.token)
-    return res.json({ status: 'error', message: 'Email錯誤或期間內重覆要求' })
-
-  // 寄送email
-  const mailOptions = {
-    // 這裡要改寄送人名稱，email在.env檔中代入
-    from: `"support"<${process.env.SMTP_TO_EMAIL}>`,
-    to: email,
-    subject: '重設密碼要求的電子郵件驗証碼',
-    text: mailText(otp.token),
-  }
-
-  // 寄送email
-  transporter.sendMail(mailOptions, (err, response) => {
-    if (err) {
-      // 失敗處理
-      // console.log(err)
-      return res.json({ status: 'error', message: '發送電子郵件失敗' })
-    } else {
-      // 成功回覆的json
-      return res.json({ status: 'success', data: null })
+    // 寄送email
+    const mailOptions = {
+      from: `"support"<${process.env.SMTP_TO_EMAIL}>`,
+      to: email,
+      subject: '重設密碼要求的電子郵件驗証碼',
+      text: mailText(otp.token),
     }
-  })
+
+    transporter.sendMail(mailOptions, (err, response) => {
+      if (err) {
+        console.error('郵件發送失敗:', err)
+        return res.status(500).json({
+          status: 'error',
+          message: '發送電子郵件失敗',
+          error: err.message, // 包含錯誤訊息
+          stack: err.stack, // 堆疊信息
+        })
+      } else {
+        return res.json({ status: 'success', data: null })
+      }
+    })
+  } catch (error) {
+    console.error('OTP錯誤:', error)
+    return res.status(500).json({
+      status: 'error',
+      message: error.message,
+      stack: error.stack,
+    })
+  }
 })
 
 // 重設密碼用
@@ -59,18 +63,31 @@ router.post('/reset', async (req, res) => {
   const { email, token, password } = req.body
 
   if (!token || !email || !password) {
-    return res.json({ status: 'error', message: '缺少必要資料' })
+    return res.status(400).json({
+      status: 'error',
+      message: '缺少必要資料: token, email 或 password 缺失',
+    })
   }
 
-  // updatePassword中驗証otp的存在與合法性(是否有到期)
-  const result = await updatePassword(email, token, password)
+  try {
+    // 使用外部的 updatePassword 函數進行密碼重設
+    const result = await updatePassword(email, token, password)
 
-  if (!result) {
-    return res.json({ status: 'error', message: '修改密碼失敗' })
+    if (!result) {
+      throw new Error('修改密碼失敗，可能原因是OTP已到期或無效')
+    }
+
+    // 成功
+    return res.json({ status: 'success', data: null })
+  } catch (error) {
+    console.error('重設密碼失敗:', error)
+    return res.status(500).json({
+      status: 'error',
+      message: '伺服器錯誤，無法重設密碼',
+      error: error.message, // 提供詳細錯誤訊息
+      stack: error.stack, // 包含錯誤的堆疊訊息
+    })
   }
-
-  // 成功
-  return res.json({ status: 'success', data: null })
 })
 
 export default router

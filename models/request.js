@@ -2,47 +2,49 @@ import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
   return sequelize.define(
-    'Otp',
+    'Request',
     {
-      id: {
+      request_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      google_uid: {
-        type: DataTypes.STRING(255), // Google帳號的UID
-        allowNull: true,
-        unique: true,
-      },
-      photo_url: {
-        type: DataTypes.STRING(255), // Google的頭像網址
-        allowNull: true,
+      order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
       member_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'member',
-          key: 'member_id',
-        },
       },
-      email: {
+      order_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      product_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      token: {
+      product_model: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      exp_timestamp: {
-        type: DataTypes.BIGINT,
+      product_quantity: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      reason: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM('requested', 'approved', 'rejected'),
+        defaultValue: 'requested',
       },
     },
     {
-      tableName: 'otp',
+      tableName: 'requests',
       timestamps: true,
-      paranoid: false,
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',

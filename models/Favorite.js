@@ -17,6 +17,10 @@ export default async function (sequelize) {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.STRING(10), // 'product' 或 'store'
+        allowNull: false,
+      },
     },
     {
       tableName: 'favorite', //直接提供資料表名稱
