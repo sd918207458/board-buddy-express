@@ -20,6 +20,7 @@ export default async function (sequelize) {
       type: {
         type: DataTypes.STRING(10), // 'product' 或 'store'
         allowNull: false,
+        defaultValue: 'product',
       },
     },
     {
