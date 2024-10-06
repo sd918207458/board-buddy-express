@@ -53,7 +53,7 @@ export default async function (sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      pushlisher: {
+      publisher: {
         type: DataTypes.STRING,
         allowNull: true,
       },

@@ -130,6 +130,7 @@ router.get('/:id', async (req, res) => {
   }
 
   try {
+    const id = getIdParam(req) // 使用 getIdParam 來獲取並驗證 ID
     const productGame = await Product_Game.findByPk(id)
     if (!productGame) {
       return res.status(404).json({
