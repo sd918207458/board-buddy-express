@@ -64,7 +64,7 @@ const createOtp = async (email, exp = 30, limit = 60) => {
 }
 
 // 更新密碼
-const updatePassword = async (email, token, password) => {
+const updatePassword = async (email, token, hashedPassword) => {
   // 檢查otp是否已經存在
   const foundOtp = await Otp.findOne({
     where: {
@@ -88,7 +88,7 @@ const updatePassword = async (email, token, password) => {
 
   // 修改密碼
   await User.update(
-    { password },
+    { password_hash: hashedPassword }, // 存入加密後的密碼
     {
       where: {
         member_id: foundOtp.member_id, // 確認使用 member_id 而不是 id

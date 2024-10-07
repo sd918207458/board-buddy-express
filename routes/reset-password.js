@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 
 import { createOtp, updatePassword } from '#db-helpers/otp.js'
+import { generateHash } from '#db-helpers/password-hash.js' // 引入加密函數
 
 import transporter from '#configs/mail.js'
 import 'dotenv/config.js'
@@ -70,22 +71,22 @@ router.post('/reset', async (req, res) => {
   }
 
   try {
-    // 使用外部的 updatePassword 函數進行密碼重設
-    const result = await updatePassword(email, token, password)
+    // 將密碼進行加密
+    const hashedPassword = await generateHash(password)
+
+    // 使用統一的 updatePassword 函數進行密碼重設
+    const result = await updatePassword(email, token, hashedPassword)
 
     if (!result) {
       throw new Error('修改密碼失敗，可能原因是OTP已到期或無效')
     }
 
-    // 成功
     return res.json({ status: 'success', data: null })
   } catch (error) {
     console.error('重設密碼失敗:', error)
     return res.status(500).json({
       status: 'error',
       message: '伺服器錯誤，無法重設密碼',
-      error: error.message, // 提供詳細錯誤訊息
-      stack: error.stack, // 包含錯誤的堆疊訊息
     })
   }
 })
