@@ -176,9 +176,13 @@ router.get('/addresses', authenticate, async (req, res) => {
 
   try {
     const addresses = await Address.findAll({ where: { member_id: memberId } })
+    console.log('Fetched addresses:', addresses) // 打印資料
     return res.status(200).json({ data: addresses })
   } catch (error) {
-    return handleError(res, error, '無法獲取地址')
+    console.error('Error fetching addresses: ', error) // 具體的錯誤訊息
+    return res
+      .status(500)
+      .json({ message: '無法獲取地址', error: error.message })
   }
 })
 
