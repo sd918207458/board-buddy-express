@@ -20,13 +20,7 @@ const handleNotFound = (res, resource = '資源') => {
 
 // Add new payment method
 router.post('/', authenticate, async (req, res) => {
-  const {
-    type,
-    card_number,
-    card_type,
-    expiration_date,
-    onlinePaymentService,
-  } = req.body
+  const { type, card_number, card_type, expiration_date } = req.body
   const member_id = req.user.member_id || req.user.id
 
   try {
@@ -42,15 +36,6 @@ router.post('/', authenticate, async (req, res) => {
         card_type,
         expiration_date,
         payment_type: 'creditCard',
-      })
-    } else if (type === 'onlinePayment') {
-      if (!onlinePaymentService) {
-        return res.status(400).json({ message: '缺少線上付款服務提供商' })
-      }
-      newPaymentMethod = await PaymentMethod.create({
-        member_id,
-        payment_type: 'onlinePayment',
-        online_payment_service: onlinePaymentService,
       })
     } else if (type === 'cash') {
       newPaymentMethod = await PaymentMethod.create({
@@ -94,7 +79,7 @@ router.put('/:id', authenticate, async (req, res) => {
     card_number,
     card_type,
     expiration_date,
-    onlinePaymentService,
+
     is_default,
   } = req.body
   const member_id = req.user.member_id || req.user.id
@@ -132,12 +117,6 @@ router.put('/:id', authenticate, async (req, res) => {
       updateData.card_type = card_type
       updateData.expiration_date = expiration_date
       updateData.payment_type = 'creditCard'
-    } else if (type === 'onlinePayment') {
-      if (!onlinePaymentService) {
-        return res.status(400).json({ message: '缺少線上付款服務提供商' })
-      }
-      updateData.payment_type = 'onlinePayment'
-      updateData.online_payment_service = onlinePaymentService
     } else if (type === 'cash') {
       updateData.payment_type = 'cash'
     } else {
