@@ -99,6 +99,8 @@ export default function (sequelize) {
           }
         },
       },
+      onDelete: 'CASCADE',
+      index: false, // 禁用索引
       tableName: 'member',
       timestamps: true,
       underscored: true,
