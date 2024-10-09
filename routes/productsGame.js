@@ -63,19 +63,14 @@ router.get('/types', async (req, res) => {
             [Op.eq]: product_type, // 過濾條件，匹配 product_type
           },
         },
-        attributes: ['product_type', 'product_name'], // 只獲取所需欄位
+        attributes: ['product_id', 'product_name', 'product_type'], // 獲取所需的所有欄位
       })
 
-      // 構建返回數據格式
-      const result = Array.isArray(products)
-        ? products.map((product) => product.product_name)
-        : []
-
-      // 返回遊戲名稱
+      // 返回完整的遊戲資料，而不僅僅是名稱
       res.status(200).json({
         status: 'success',
         data: {
-          [product_type]: result,
+          [product_type]: products, // 返回遊戲數據，包括 id 和其他必要信息
         },
       })
     } else {

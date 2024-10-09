@@ -1,4 +1,3 @@
-// !! 注意: 此檔案並不是express執行時用，只用於初始化資料庫資料，指令為`npm run seed`
 import sequelize from '#configs/db.js'
 import applySeeds from '#db-helpers/sequelize/seeds-setup.js'
 // import applyAssociations from './associations-setup.js'
@@ -8,25 +7,81 @@ import { extendLog } from '#utils/tool.js'
 import 'colors'
 extendLog()
 
-// 注意，這只會更改資料庫中的表，而不會更改JS端的模型
-// sync 的值有以下三種
-// { alter: true } 檢查資料庫中資料表的當前狀態(它有哪些列,它們的資料類型等),然後在表中進行必要的更改，使其與模型匹配.
-// { force: true } 將建立資料表,如果表已經存在,則將其首先刪除
-// {} 如果表不存在,則建立該表(如果已經存在,則不執行任何操作)
-// 同步化模型與資料庫結構
-await sequelize.sync({ force: true })
+// 獲取資料庫中的所有表名
+async function getAllTables() {
+  const [tables] = await sequelize.query(`
+    SELECT TABLE_NAME 
+    FROM information_schema.TABLES 
+    WHERE TABLE_SCHEMA = DATABASE()
+  `)
+  return tables.map((row) => row.TABLE_NAME)
+}
 
-// 同步化資料庫範例資料(seeds)
-await applySeeds(sequelize)
+// 獲取表中的所有外鍵
+async function getForeignKeys(tableName) {
+  const [results] = await sequelize.query(`
+    SELECT CONSTRAINT_NAME 
+    FROM information_schema.KEY_COLUMN_USAGE 
+    WHERE TABLE_NAME = '${tableName}' AND CONSTRAINT_SCHEMA = DATABASE() 
+    AND REFERENCED_TABLE_NAME IS NOT NULL
+  `)
+  return results.map((row) => row.CONSTRAINT_NAME)
+}
 
-console.log(
-  'INFO - 所有模型與種子資料已完成同步化(建立資料表,如果表已經存在首先刪除) All seeds were synchronized successfully.'
-    .bgGreen
-)
+// 移除資料庫中所有表的外鍵
+async function dropAllForeignKeys() {
+  console.log('INFO - 移除所有表的外鍵約束...'.yellow)
 
-// 同步化資料庫關聯
-// applyAssociations(sequelize)
+  const tables = await getAllTables()
 
-// Ends the process
-// eslint-disable-next-line
-process.exit()
+  for (const table of tables) {
+    const foreignKeys = await getForeignKeys(table)
+
+    if (foreignKeys.length > 0) {
+      for (const foreignKey of foreignKeys) {
+        try {
+          await sequelize.query(
+            `ALTER TABLE ${table} DROP FOREIGN KEY ${foreignKey};`
+          )
+          console.log(`INFO - 表 ${table} 的外鍵 ${foreignKey} 移除成功.`.green)
+        } catch (error) {
+          console.error(
+            `ERROR - 無法移除表 ${table} 的外鍵 ${foreignKey}:`.red,
+            error
+          )
+          throw new Error(
+            `Failed to drop foreign key ${foreignKey} on table ${table}: ${error.message}`
+          )
+        }
+      }
+    } else {
+      console.log(`INFO - 表 ${table} 沒有外鍵，無需移除.`.yellow)
+    }
+  }
+}
+
+// 同步資料庫
+async function syncDatabase() {
+  try {
+    // 先移除所有表的外鍵約束，避免刪除表時出現錯誤
+    await dropAllForeignKeys()
+
+    // 強制同步資料庫，將刪除並重新建立資料表
+    console.log('INFO - 開始同步資料庫模型...'.yellow)
+    await sequelize.sync({ force: true }) // 可以改為 { alter: true } 根據需要選擇
+    console.log('INFO - 資料庫模型同步完成.'.green)
+
+    // 同步範例資料
+    console.log('INFO - 開始同步範例資料 (seeds)...'.yellow)
+    await applySeeds(sequelize)
+    console.log('INFO - 所有範例資料同步成功.'.green)
+  } catch (error) {
+    console.error('ERROR - 同步資料庫時發生錯誤:'.red, error)
+    throw new Error(`Database synchronization failed: ${error.message}`)
+  }
+}
+
+// 開始執行同步資料庫
+syncDatabase().catch((error) => {
+  console.error('Uncaught Error:', error.message) // 捕捉未處理的錯誤並顯示
+})
