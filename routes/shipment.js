@@ -17,7 +17,12 @@ const handleError = (res, error, message = '伺服器錯誤') => {
 router.post('/711', function (req, res, next) {
   //console.log(req.body)
   let searchParams = new URLSearchParams(req.body)
-  res.redirect(callback_url + '?' + searchParams.toString())
+  // 重定向到你想要的網址
+  // res.redirect(
+  //   `/checkout?store_name=${selectedStore.name}&store_address=${selectedStore.address}`
+  // )
+  // res.redirect(callback_url + '?' + searchParams.toString())
+  res.redirect('http://localhost:3000/checkout')
 })
 // Add new shipping address
 router.post('/addresses', authenticate, async (req, res) => {
