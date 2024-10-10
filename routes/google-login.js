@@ -5,97 +5,144 @@ import sequelize from '#configs/db.js'
 const { User } = sequelize.models
 
 import jsonwebtoken from 'jsonwebtoken'
-// 存取`.env`設定檔案使用
 import 'dotenv/config.js'
 
-// 定義安全的私鑰字串
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
 
 router.post('/', async function (req, res, next) {
-  // providerData =  req.body
-  console.log(JSON.stringify(req.body))
+  try {
+    // Log received body data for debugging
+    console.log('Received request body:', JSON.stringify(req.body))
 
-  // 檢查從react來的資料
-  if (!req.body.providerId || !req.body.uid) {
-    return res.json({ status: 'error', message: '缺少google登入資料' })
-  }
+    // 檢查從 React 發來的資料
+    if (!req.body.providerId || !req.body.uid) {
+      return res.status(400).json({
+        status: 'error',
+        message: '缺少 Google 登入資料，請檢查 providerId 和 uid 是否正確',
+      })
+    }
 
-  const { displayName, email, uid, photoURL } = req.body
-  const google_uid = uid
+    const { displayName, email, uid, photoURL } = req.body
+    const google_uid = uid
 
-  // 以下流程:
-  // 1. 先查詢資料庫是否有同google_uid的資料
-  // 2-1. 有存在 -> 執行登入工作
-  // 2-2. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有google來的資料 -> 執行登入工作
+    // Log the extracted fields
+    console.log(
+      `Extracted data - displayName: ${displayName}, email: ${email}, uid: ${uid}, photoURL: ${photoURL}`
+    )
 
-  // 1. 先查詢資料庫是否有同google_uid的資料
-  const total = await User.count({
-    where: {
-      google_uid,
-    },
-  })
-
-  // 要加到access token中回傳給前端的資料
-  // 存取令牌(access token)只需要id和username就足夠，其它資料可以再向資料庫查詢
-  let returnUser = {
-    id: 0,
-    username: '',
-    google_uid: '',
-    line_uid: '',
-  }
-
-  if (total) {
-    // 2-1. 有存在 -> 從資料庫查詢會員資料
-    const dbUser = await User.findOne({
+    // 1. 查詢資料庫是否有同 google_uid 的資料
+    const total = await User.count({
       where: {
         google_uid,
       },
-      raw: true, // 只需要資料表中資料
     })
 
-    // 回傳給前端的資料
-    returnUser = {
-      id: dbUser.id,
-      username: dbUser.username,
-      google_uid: dbUser.google_uid,
-      line_uid: dbUser.line_uid,
-    }
-  } else {
-    // 2-2. 不存在 -> 建立一個新會員資料(無帳號與密碼)，只有google來的資料 -> 執行登入工作
-    const user = {
-      username: displayName,
-      email: email,
-      google_uid,
-      photo_url: photoURL,
-    }
+    // 確認資料庫查詢的結果
+    console.log(
+      `Database check result - existing users with google_uid: ${total}`
+    )
 
-    // 新增會員資料
-    const newUser = await User.create(user)
-
-    // 回傳給前端的資料
-    returnUser = {
-      id: newUser.id,
+    // 要加到 access token 中回傳給前端的資料
+    let returnUser = {
+      id: 0,
       username: '',
-      google_uid: newUser.google_uid,
-      line_uid: newUser.line_uid,
+      google_uid: '',
+      line_uid: '',
     }
+
+    if (total > 0) {
+      // 2-1. 有存在 -> 從資料庫查詢會員資料
+      const dbUser = await User.findOne({
+        where: {
+          google_uid,
+        },
+        raw: true, // 只需要資料表中資料
+      })
+
+      // 確認資料庫查詢的會員資料
+      if (!dbUser) {
+        return res.status(500).json({
+          status: 'error',
+          message: '發生錯誤：無法找到已存在的會員資料，請檢查資料庫',
+        })
+      }
+
+      console.log(`Found user in database: ${JSON.stringify(dbUser)}`)
+
+      // 回傳給前端的資料
+      returnUser = {
+        id: dbUser.member_id,
+        username: dbUser.username,
+        google_uid: dbUser.google_uid,
+        line_uid: dbUser.line_uid || '', // 保持一致
+      }
+    } else {
+      // 2-2. 不存在 -> 建立一個新會員資料
+      const user = {
+        username: displayName || null, // Google 登錄可能沒有 displayName
+        email: email,
+        google_uid,
+        photo_url: photoURL || null,
+      }
+
+      console.log(`Creating new user with data: ${JSON.stringify(user)}`)
+
+      try {
+        // 新增會員資料
+        const newUser = await User.create(user)
+
+        // 確認新會員的創建結果
+        console.log(`New user created: ${JSON.stringify(newUser)}`)
+
+        returnUser = {
+          id: newUser.member_id,
+          username: newUser.username, // 修正：確保返回的 username
+          google_uid: newUser.google_uid,
+          line_uid: newUser.line_uid || '',
+        }
+      } catch (error) {
+        console.error('Error creating new user:', error)
+        return res.status(500).json({
+          status: 'error',
+          message: '創建新會員時發生錯誤，請檢查資料庫或資料格式',
+          error: error.message,
+        })
+      }
+    }
+
+    // 產生存取令牌(access token)，其中包含會員資料
+    try {
+      const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
+        expiresIn: '3d',
+      })
+
+      // 使用 httpOnly cookie 來儲存 access token
+      res.cookie('accessToken', accessToken, { httpOnly: true })
+
+      // 傳送 access token 回應
+      return res.json({
+        status: 'success',
+        data: {
+          accessToken,
+        },
+      })
+    } catch (tokenError) {
+      console.error('Error generating access token:', tokenError)
+      return res.status(500).json({
+        status: 'error',
+        message: '產生存取令牌時發生錯誤，請檢查加密邏輯',
+        error: tokenError.message,
+      })
+    }
+  } catch (err) {
+    // 捕獲所有未知錯誤
+    console.error('Unexpected error:', err)
+    return res.status(500).json({
+      status: 'error',
+      message: '伺服器發生未知錯誤，請聯繫管理員',
+      error: err.message,
+    })
   }
-
-  // 產生存取令牌(access token)，其中包含會員資料
-  const accessToken = jsonwebtoken.sign(returnUser, accessTokenSecret, {
-    expiresIn: '3d',
-  })
-
-  // 使用httpOnly cookie來讓瀏覽器端儲存access token
-  res.cookie('accessToken', accessToken, { httpOnly: true })
-
-  // 傳送access token回應(react可以儲存在state中使用)
-  return res.json({
-    status: 'success',
-    data: {
-      accessToken,
-    },
-  })
 })
 
 export default router
