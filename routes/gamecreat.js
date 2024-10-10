@@ -51,7 +51,7 @@ router.post('/upload-room', upload.single('img'), async (req, res) => {
 // 获取所有游戏房间
 router.get('/', async (req, res) => {
     try {
-        const rooms = await Game_rooms.findAll({ raw: true });
+        const rooms = await Game_rooms.findAll();
         res.json({ status: 'success', data: rooms });
     } catch (error) {
         console.error('Error fetching rooms:', error);
