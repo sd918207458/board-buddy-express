@@ -1,7 +1,7 @@
 import express from 'express';
 import sequelize from '#configs/db.js'; // 确保路径正确
 
-const { Room_heart } = sequelize.models; // 确保这是正确的模型名
+const { Room_history } = sequelize.models; // 确保这是正确的模型名
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
 
     try {
         // 将接收到的游戏数据保存到数据库
-        const newFavorite = await Room_heart.create({
+        const newFavorite = await Room_history.create({
             room_id,
             member_id,
             img,
@@ -26,10 +26,10 @@ router.post('/', async (req, res) => {
         });
 
         // 成功后返回新创建的记录
-        res.status(200).json({ message: '加入最爱成功', favorite: newFavorite });
+        res.status(200).json({ message: '加入房間成功', favorite: newFavorite });
     } catch (error) {
-        console.error('加入最爱时发生错误:', error);
-        res.status(500).json({ message: '加入最爱失败' });
+        console.error('加入房間时发生错误:', error);
+        res.status(500).json({ message: '加入房間失败' });
     }
 });
 
@@ -37,17 +37,17 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         // 从数据库中获取所有 Room_heart 数据
-        const favorites = await Room_heart.findAll();
+        const favorites = await Room_history.findAll();
 
         if (favorites.length === 0) {
-            return res.status(404).json({ message: '没有找到任何最爱房间' });
+            return res.status(404).json({ message: '没有找到任何房间' });
         }
 
         // 返回所有最爱房间信息
         res.status(200).json(favorites);
     } catch (error) {
-        console.error('获取最爱房间时发生错误:', error);
-        res.status(500).json({ message: '获取最爱房间失败' });
+        console.error('获取房间时发生错误:', error);
+        res.status(500).json({ message: '获取房间失败' });
     }
 });
 

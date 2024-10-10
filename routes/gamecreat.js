@@ -1,14 +1,57 @@
 import express from 'express';
 import { getIdParam } from '#db-helpers/db-tool.js';
 import sequelize from '#configs/db.js';
-const { Game_rooms } = sequelize.models; // 确保这是正确的
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// 获取当前目录
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { Game_rooms } = sequelize.models;
 const router = express.Router();
+
+// multer的設定值
+const storage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, 'public/room/');
+    },
+    filename: (req, file, callback) => {
+        callback(null, file.originalname);
+    },
+});
+const upload = multer({ storage });
+
+// POST - 上傳頭像
+router.post('/upload-room', upload.single('img'), async (req, res) => {
+    const { room_id } = req.body;
+    if (!room_id) {
+        return res.status(400).json({ status: 'error', message: '缺少 room_id' });
+    }
+
+    if (req.file) {
+        const newAvatar = req.file.originalname;
+        const [affectedRows] = await Game_rooms.update(
+            { img: newAvatar },
+            { where: { room_id } }
+        );
+
+        if (!affectedRows) {
+            return res.status(404).json({ status: 'error', message: '更新失败或没有数据被更新' });
+        }
+
+        const avatarUrl = `http://localhost:3005/room/${newAvatar}`;
+        return res.json({ status: 'success', data: { img: avatarUrl } });
+    } else {
+        return res.status(400).json({ status: 'fail', message: '文件上传失败' });
+    }
+});
 
 // 获取所有游戏房间
 router.get('/', async (req, res) => {
     try {
-        const rooms = await Game_rooms.findAll({ raw: true });
+        const rooms = await Game_rooms.findAll();
         res.json({ status: 'success', data: rooms });
     } catch (error) {
         console.error('Error fetching rooms:', error);
@@ -19,7 +62,6 @@ router.get('/', async (req, res) => {
 // 获取单个游戏房间
 router.get('/:id', async (req, res) => {
     const id = getIdParam(req);
-
     try {
         const room = await Game_rooms.findByPk(id, { raw: true });
         if (!room) {
@@ -33,13 +75,15 @@ router.get('/:id', async (req, res) => {
 });
 
 // 创建新的游戏房间
-router.post('/', async (req, res) => {
-    const { room_name, room_intro, minperson, maxperson, event_date, location, img, room_type, member_id, type1, type2, type3, roomrule, game1, game2, game3} = req.body;
+router.post('/', upload.single('img'), async (req, res) => {
+    const { room_name, room_intro, minperson, maxperson, event_date, location, room_type, member_id, type1, type2, type3, roomrule, game1, game2, game3 } = req.body;
 
     // 验证必需字段
-    if (!room_name || !minperson || !maxperson || !event_date) {
+    if (!room_name || !minperson || !maxperson || !event_date || !room_type) {
         return res.status(400).json({ status: 'error', message: '缺少必填字段' });
     }
+
+    const img = req.file ? req.file.filename : null;
 
     try {
         const newRoom = await Game_rooms.create({
@@ -65,14 +109,18 @@ router.post('/', async (req, res) => {
         res.status(201).json({ status: 'success', data: newRoom });
     } catch (error) {
         console.error('Error creating room:', error);
-        res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).json({ status: 'error', message: '创建房间时发生错误' });
     }
 });
 
 // 更新游戏房间
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('img'), async (req, res) => {
     const id = getIdParam(req);
     const updates = req.body;
+
+    if (req.file) {
+        updates.img = req.file.filename;
+    }
 
     try {
         const [updated] = await Game_rooms.update(updates, { where: { room_id: id } });
@@ -89,7 +137,6 @@ router.put('/:id', async (req, res) => {
 // 删除游戏房间
 router.delete('/:id', async (req, res) => {
     const id = getIdParam(req);
-
     try {
         const deleted = await Game_rooms.destroy({ where: { room_id: id } });
         if (!deleted) {

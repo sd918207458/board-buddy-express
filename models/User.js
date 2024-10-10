@@ -12,8 +12,8 @@ export default function (sequelize) {
       },
       username: {
         type: DataTypes.STRING(50),
-        allowNull: true, // Google 登入可能沒有 username
-        unique: true,
+        allowNull: true, // 可以允許空值，因為Google登入可能沒有username
+        unique: false,
       },
       password_hash: {
         type: DataTypes.STRING(255),

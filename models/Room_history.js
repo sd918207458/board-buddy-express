@@ -3,12 +3,11 @@ import { DataTypes } from 'sequelize'
 
 export default function (sequelize) {
   return sequelize.define(
-    'Game_rooms',
+    'Room_history',
     {
       room_id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+        allowNull: true,
       },
       room_name: {
         type: DataTypes.STRING(1000),
@@ -80,7 +79,7 @@ export default function (sequelize) {
       },
     },
     {
-      tableName: 'game_rooms',
+      tableName: 'room_history',
       timestamps: true,
       underscored: true,
       createdAt: 'created_at',
