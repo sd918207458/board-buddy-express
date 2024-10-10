@@ -7,12 +7,14 @@ const router = express.Router();
 
 // 处理加入最爱请求
 router.post('/', async (req, res) => {
-    const { room_id, room_name, room_intro, room_type, game1, game2, game3, location, event_date } = req.body;
+    const { room_id, member_id, img, room_name, room_intro, room_type, game1, game2, game3, location, event_date } = req.body;
 
     try {
         // 将接收到的游戏数据保存到数据库
         const newFavorite = await Room_heart.create({
             room_id,
+            member_id,
+            img,
             room_name,
             room_intro,
             room_type,

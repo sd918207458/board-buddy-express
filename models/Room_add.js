@@ -9,7 +9,7 @@ export default function (sequelize) {
         allowNull: true,
       },
       member_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
     },
