@@ -40,6 +40,7 @@ router.post('/711', function (req, res) {
 
 // Add new shipping address
 router.post('/addresses', authenticate, async (req, res) => {
+  console.log('接收到的資料:', req.body) // 確認 storeName 和 storeAddress 是否存在
   const memberId = req.user.member_id || req.user.id
   const {
     deliveryMethod,
@@ -51,16 +52,17 @@ router.post('/addresses', authenticate, async (req, res) => {
     detailed_address,
     isDefault,
     storeType,
+    storeName, // 新增的字段
+    storeAddress, // 新增的字段
   } = req.body
 
-  // Validate based on delivery method, but don't validate storeName or storeAddress
+  // Validate based on delivery method
   const validationError = validateAddress(deliveryMethod, req.body)
   if (validationError) {
     return res.status(400).json({ message: validationError })
   }
 
   try {
-    // If the address is set as default, update other addresses to non-default
     if (isDefault) {
       await Address.update(
         { isDefault: false },
@@ -79,10 +81,13 @@ router.post('/addresses', authenticate, async (req, res) => {
       detailed_address,
       isDefault,
       storeType,
+      storeName, // 儲存 storeName
+      storeAddress, // 儲存 storeAddress
     })
 
     return res.status(201).json({ message: '地址新增成功', data: newAddress })
   } catch (error) {
+    console.error('新增地址失敗:', error)
     return handleError(res, error, '新增地址失敗')
   }
 })
@@ -101,6 +106,8 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
     detailed_address,
     isDefault,
     storeType,
+    storeName, // 新增的字段
+    storeAddress, // 新增的字段
   } = req.body
 
   const validationError = validateAddress(deliveryMethod, req.body)
@@ -134,12 +141,15 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
       detailed_address,
       isDefault,
       storeType,
+      storeName, // 更新 storeName
+      storeAddress, // 更新 storeAddress
     })
 
     return res
       .status(200)
       .json({ message: '地址更新成功', data: addressToUpdate })
   } catch (error) {
+    console.error('更新地址失敗:', error)
     return handleError(res, error, '更新地址失敗')
   }
 })
