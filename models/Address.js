@@ -24,7 +24,7 @@ export default function (sequelize) {
       },
       phone: {
         type: DataTypes.STRING(20),
-        allowNull: false,
+        allowNull: true, // 允許 phone 為空
       },
       city: {
         type: DataTypes.STRING(50),

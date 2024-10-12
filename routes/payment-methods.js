@@ -167,10 +167,18 @@ router.get('/', authenticate, async (req, res) => {
   console.log('Fetching payment methods for member ID:', member_id)
 
   try {
-    const paymentMethods = await PaymentMethod.findAll({ where: { member_id } })
+    let paymentMethods = await PaymentMethod.findAll({ where: { member_id } })
+
+    // 如果用戶沒有任何付款方式，則創建一張現金付款卡片
     if (paymentMethods.length === 0) {
-      return handleNotFound(res, '付款方式')
+      const cashPaymentMethod = await PaymentMethod.create({
+        member_id,
+        payment_type: 'cash',
+        is_default: true, // 將現金設置為預設
+      })
+      paymentMethods = [cashPaymentMethod]
     }
+
     return res.json({ status: 'success', data: paymentMethods })
   } catch (error) {
     console.error('Error fetching payment methods:', error)

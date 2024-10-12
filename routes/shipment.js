@@ -13,21 +13,37 @@ const handleError = (res, error, message = '伺服器錯誤') => {
   console.error(message, error)
   return res.status(500).json({ message })
 }
-// POST
-router.post('/711', function (req, res, next) {
-  //console.log(req.body)
+
+// Helper function to validate address based on delivery method
+const validateAddress = (deliveryMethod, data) => {
+  if (deliveryMethod === 'homeDelivery') {
+    const { username, phone, city, street } = data
+    if (!username || !phone || !city || !street) {
+      return '缺少必要欄位：宅配地址的詳細資訊'
+    }
+  } else if (deliveryMethod === 'convenienceStore') {
+    const { storeType } = data
+    if (!storeType) {
+      return '缺少必要欄位：超商取貨的商店類型'
+    }
+  } else {
+    return '無效的配送方式'
+  }
+  return null
+}
+
+// POST /711 callback
+router.post('/711', function (req, res) {
   let searchParams = new URLSearchParams(req.body)
-  // 重定向到你想要的網址
-  // res.redirect(
-  //   `/checkout?store_name=${selectedStore.name}&store_address=${selectedStore.address}`
-  // )
-  // res.redirect(callback_url + '?' + searchParams.toString())
-  res.redirect('http://localhost:3000/checkout')
+  res.redirect(callback_url + '?' + searchParams.toString())
 })
+
 // Add new shipping address
 router.post('/addresses', authenticate, async (req, res) => {
+  console.log('接收到的資料:', req.body) // 確認 storeName 和 storeAddress 是否存在
   const memberId = req.user.member_id || req.user.id
   const {
+    deliveryMethod,
     username,
     phone,
     city,
@@ -36,12 +52,14 @@ router.post('/addresses', authenticate, async (req, res) => {
     detailed_address,
     isDefault,
     storeType,
-    storeName, // Store Name selected by user
-    storeAddress, // Store Address selected by user
+    storeName, // 新增的字段
+    storeAddress, // 新增的字段
   } = req.body
 
-  if (!username || !phone || !city || !street) {
-    return res.status(400).json({ message: '缺少必要欄位' })
+  // Validate based on delivery method
+  const validationError = validateAddress(deliveryMethod, req.body)
+  if (validationError) {
+    return res.status(400).json({ message: validationError })
   }
 
   try {
@@ -54,6 +72,7 @@ router.post('/addresses', authenticate, async (req, res) => {
 
     const newAddress = await Address.create({
       member_id: memberId,
+      deliveryMethod,
       username,
       phone,
       city,
@@ -61,13 +80,14 @@ router.post('/addresses', authenticate, async (req, res) => {
       street,
       detailed_address,
       isDefault,
-      storeType, // 7-11
-      storeName, // Store Name selected by user
-      storeAddress, // Store Address selected by user
+      storeType,
+      storeName, // 儲存 storeName
+      storeAddress, // 儲存 storeAddress
     })
 
     return res.status(201).json({ message: '地址新增成功', data: newAddress })
   } catch (error) {
+    console.error('新增地址失敗:', error)
     return handleError(res, error, '新增地址失敗')
   }
 })
@@ -77,6 +97,7 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
   const memberId = req.user.member_id || req.user.id
   const addressId = req.params.id
   const {
+    deliveryMethod,
     username,
     phone,
     city,
@@ -85,9 +106,14 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
     detailed_address,
     isDefault,
     storeType,
-    storeName,
-    storeAddress,
+    storeName, // 新增的字段
+    storeAddress, // 新增的字段
   } = req.body
+
+  const validationError = validateAddress(deliveryMethod, req.body)
+  if (validationError) {
+    return res.status(400).json({ message: validationError })
+  }
 
   try {
     const addressToUpdate = await Address.findOne({
@@ -106,6 +132,7 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
     }
 
     await addressToUpdate.update({
+      deliveryMethod,
       username,
       phone,
       city,
@@ -114,14 +141,15 @@ router.put('/addresses/:id', authenticate, async (req, res) => {
       detailed_address,
       isDefault,
       storeType,
-      storeName,
-      storeAddress,
+      storeName, // 更新 storeName
+      storeAddress, // 更新 storeAddress
     })
 
     return res
       .status(200)
       .json({ message: '地址更新成功', data: addressToUpdate })
   } catch (error) {
+    console.error('更新地址失敗:', error)
     return handleError(res, error, '更新地址失敗')
   }
 })
@@ -181,13 +209,9 @@ router.get('/addresses', authenticate, async (req, res) => {
 
   try {
     const addresses = await Address.findAll({ where: { member_id: memberId } })
-    console.log('Fetched addresses:', addresses) // 打印資料
     return res.status(200).json({ data: addresses })
   } catch (error) {
-    console.error('Error fetching addresses: ', error) // 具體的錯誤訊息
-    return res
-      .status(500)
-      .json({ message: '無法獲取地址', error: error.message })
+    return handleError(res, error, '無法獲取地址')
   }
 })
 
