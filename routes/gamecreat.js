@@ -114,15 +114,32 @@ router.post('/', upload.single('img'), async (req, res) => {
 });
 
 // 更新游戏房间
+// 更新游戏房间
 router.put('/:id', upload.single('img'), async (req, res) => {
     const id = getIdParam(req);
-    const updates = req.body;
+    const updates = {};
 
+    // 定义可更新的字段
+    const fieldsToUpdate = [
+        'room_name', 'room_intro', 'minperson', 'maxperson',
+        'event_date', 'location', 'room_type', 'roomrule',
+        'type1', 'type2', 'type3', 'game1', 'game2', 'game3'
+    ];
+
+    // 将请求体中的可更新字段添加到 updates 对象中
+    fieldsToUpdate.forEach(field => {
+        if (req.body[field]) {
+            updates[field] = req.body[field];
+        }
+    });
+
+    // 如果有上传文件，更新 img 字段
     if (req.file) {
         updates.img = req.file.filename;
     }
 
     try {
+        // 更新数据库记录
         const [updated] = await Game_rooms.update(updates, { where: { room_id: id } });
         if (!updated) {
             return res.status(404).json({ status: 'error', message: '房间未找到' });
@@ -134,9 +151,11 @@ router.put('/:id', upload.single('img'), async (req, res) => {
     }
 });
 
-// 删除游戏房间
+// 刪除遊戲房間
 router.delete('/:id', async (req, res) => {
+    console.log('Request params:', req.params); // 日誌請求參數
     const id = getIdParam(req);
+    console.log('Received id for deletion:', id); // 日誌 ID
     try {
         const deleted = await Game_rooms.destroy({ where: { room_id: id } });
         if (!deleted) {
@@ -148,5 +167,6 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ status: 'error', message: '内部服务器错误' });
     }
 });
+
 
 export default router;
